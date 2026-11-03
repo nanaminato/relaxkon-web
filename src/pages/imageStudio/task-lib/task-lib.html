@@ -1,14 +1,6 @@
 <div class="bg-theme text-theme w-100 h-100 d-flex flex-column">
-  <header>
-    <button nz-button class="m-2">
-      @if(menuVisible()){
-        <nz-icon nzType="menu-fold" nzTheme="outline" (click)="toggleMenu()"/>
-      }@else{
-        <nz-icon nzType="menu-unfold" nzTheme="outline" (click)="toggleMenu()" />
-      }
-    </button>
-  </header>
-  <div class="w-100 d-flex flex-row-reverse align-items-center">
+  <header class="studio-heading"><button nz-button type="button" (click)="toggleMenu()" [attr.aria-label]="'studioUi.menu' | translate" [attr.aria-expanded]="menuVisible()"><nz-icon nzType="menu-unfold" nzTheme="outline" /></button><div><h1>{{ 'universal.storeHouse' | translate }}</h1><p>{{ 'studioUi.libraryIntro' | translate }}</p></div></header>
+  <div class="studio-actions">
     <button nz-button class="m-3 rounded-3" (click)="loadGenerateTasks()" >
       {{'universal.reload'|translate}}
     </button>
@@ -28,6 +20,7 @@
     </div>
   </div>
   <nz-card class="rounded-3 tasks m-2 overflow-auto">
+    @if(generateTasks.length === 0){<div class="studio-empty">{{ 'studioUi.libraryEmpty' | translate }}</div>}
     @for(task of generateTasks; track task){
       <nz-card class="my-1">
         <app-task-item [task]="task" [useProxy]="useProxy" [index]="$index" (delete)="awareDeleteItem($event)"></app-task-item>

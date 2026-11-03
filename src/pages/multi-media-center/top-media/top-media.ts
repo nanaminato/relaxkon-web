@@ -1,4 +1,5 @@
-import {Component, inject,} from '@angular/core';
+import {LanguageSwitcher} from '../../../shared/language-switcher';
+import {Component, HostListener, inject,} from '@angular/core';
 import {RouterLink, RouterLinkActive, RouterOutlet} from "@angular/router";
 import {NzImageService} from "ng-zorro-antd/image";
 import {AccountLabel} from "../../accounts/account-label/account-label";
@@ -17,6 +18,7 @@ import {SizeReportService} from "../../../services/normal-services";
   standalone: true,
   imports: [
     RouterOutlet,
+    LanguageSwitcher,
     AccountLabel,
     NgTemplateOutlet,
     NzButtonComponent,
@@ -39,6 +41,7 @@ export class TopMedia {
   isCompact() {
     return this.sizeReportService.miniPhoneView();
   }
+  @HostListener('document:keydown.escape')
   hideMenu() {
     this.sizeReportService.hideMenu();
   }

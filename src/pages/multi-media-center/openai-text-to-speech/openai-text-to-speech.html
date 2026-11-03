@@ -7,16 +7,8 @@
     </app-tts-file-editor>
   </ng-container>
 </nz-modal>
-<header>
-  <button nz-button class="m-2">
-    @if(menuVisible()){
-      <nz-icon nzType="menu-fold" nzTheme="outline" (click)="toggleMenu()"/>
-    }@else{
-      <nz-icon nzType="menu-unfold" nzTheme="outline" (click)="toggleMenu()" />
-    }
-  </button>
-</header>
-<nz-card>
+<header class="studio-heading"><button nz-button type="button" (click)="toggleMenu()" [attr.aria-label]="'studioUi.menu' | translate" [attr.aria-expanded]="menuVisible()"><nz-icon nzType="menu-unfold" nzTheme="outline" /></button><div><h1>{{ 'studioUi.ttsTitle' | translate }}</h1><p>{{ 'studioUi.ttsIntro' | translate }}</p></div></header>
+<nz-card [nzTitle]="'studioUi.settings' | translate">
   <nz-row class="align-items-center my-1 bg-theme2 text-theme2">
     <nz-col class="m-2">
       <nz-col class="m-1">{{ 'mediaStudio.model' | translate }}</nz-col>
@@ -53,7 +45,7 @@
     </nz-col>
     <nz-col class="m-2">
       <nz-col class="mx-1">
-        {{ 'banner.soundType' | translate }}
+        {{ 'banner.fileFormat' | translate }}
       </nz-col>
       <nz-col>
         <nz-select class="select big" [(ngModel)]="response_format">
@@ -77,7 +69,7 @@
 </nz-card>
 <div class="m-1 border-black">
   <div class="file-drop rounded-2 border d-flex justify-content-center align-items-center" style="height: 150px;"
-       (click)="fileInput.click()"
+       role="button" tabindex="0" (keydown.enter)="fileInput.click()" (keydown.space)="$event.preventDefault(); fileInput.click()" (click)="fileInput.click()"
        (drop)="onFileDrop($event)" (dragover)="onDragOver($event)">
     <div class="drop-message">
       <span nz-icon nzType="cloud-upload" nzTheme="outline"></span>
@@ -143,15 +135,15 @@
     }
   </div>
 </div>
-<div class="border rounded-2">
+<div class="border rounded-2"><h2 class="studio-section-title">{{ 'studioUi.textContent' | translate }}</h2>
   <div class="d-flex">
     <button nz-button (click)="reparseAll()" class="m-2">{{ 'mediaStudio.parseAllFiles' | translate }}</button>
     <button nz-button (click)="putAllContent()" class="m-2">{{ 'mediaStudio.importParsedContent' | translate }}</button>
     <button nz-button (click)="inputText = ''" class="m-2">{{ 'mediaStudio.clearContent' | translate }}</button>
-    <button nz-button (click)="generate()" class="m-2">{{ 'mediaStudio.generateAudio' | translate }}</button>
+    <button nz-button nzType="primary" [disabled]="loading || !inputText.trim()" (click)="generate()" class="m-2">{{ 'mediaStudio.generateAudio' | translate }}</button>
   </div>
   <div class="d-flex justify-content-center align-items-center p-2">
-    <textarea [(ngModel)]="inputText"
+    <textarea [attr.aria-label]="'mediaStudio.ttsInputPlaceholder' | translate" [(ngModel)]="inputText"
       nz-input [placeholder]="'mediaStudio.ttsInputPlaceholder' | translate"
       cdkTextareaAutosize cdkAutosizeMinRows="3"
       cdkAutosizeMaxRows="10"
@@ -166,13 +158,13 @@
       {{getPendingText()}}
     </div>
   }@else{
-    <nz-card class="rounded-4">
+    @if(!audioSrc){<div class="studio-empty">{{ 'studioUi.audioEmpty' | translate }}</div>}@else{<nz-card class="rounded-4">
       <div class="d-flex flex-row align-items-center">
         <div class="music-player mx-2">
           <img #musicIcon class="mx-2 music-icon" [class.playing]="isAudioPlaying" src="assets/svgs/audio_play.svg" width="50" height="50" [alt]="'mediaStudio.audioPlaybackIcon' | translate"/>
         </div>
         <audio #player class="mx-1" controls [src]="audioSrc" (play)="onAudioPlay()" (pause)="onAudioPause()"></audio>
       </div>
-    </nz-card>
+    </nz-card>}
   }
 </div>

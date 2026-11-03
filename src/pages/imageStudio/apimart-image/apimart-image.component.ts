@@ -1,4 +1,4 @@
-import {Component, DoCheck, inject, OnInit, signal} from '@angular/core';
+import {Component, inject,  signal} from '@angular/core';
 import {Gallery} from "../gallery/gallery";
 import {TranslateModule} from "@ngx-translate/core";
 import {
@@ -56,7 +56,7 @@ import {ImageTaskService} from "../../../services/fetch_services";
     NzImageService,
   ]
 })
-export class APIMartImage implements OnInit,DoCheck{
+export class APIMartImage{
 
   constructor(private menuAbleService: MenuAbleService,
               private notification: NzNotificationService,
@@ -68,7 +68,7 @@ export class APIMartImage implements OnInit,DoCheck{
               private sendService: SendManagerService,
               private imageTaskService: ImageTaskService,) {
     this.menuAbleService.enableImage();
-    this.apiMartImageInit();
+
   }
   images: UrlImage[] | undefined = [];
   loading: boolean = false;
@@ -76,7 +76,6 @@ export class APIMartImage implements OnInit,DoCheck{
   image_num: number = 1;
   //for gpt-image-2 1
   //for gpt-image-2-official 1~4
-  image_num_old: number = 1;
   image_num_max: number = 1;
 
   model: string = "gpt-image-2";
@@ -132,7 +131,7 @@ export class APIMartImage implements OnInit,DoCheck{
   //official only
   output_format: string = "png";
   output_formats: string[] = [
-    "png","jpeg","webq"
+    "png","jpeg","webp"
   ]
 
   image_urls: string[] = [
@@ -242,27 +241,6 @@ export class APIMartImage implements OnInit,DoCheck{
       image_url_ttl: String(expiresAt),
       image_type: "image",
     }));
-  }
-  private apiMartImageInit() {
-    if(this.image_num_old!==this.image_num){
-      this.setSize(this.image_num);
-      this.image_num_old = this.image_num;
-    }
-  }
-  setSize(size: number){
-    this.images!.length = 0;
-    for(let i = 0;i<size;i++){
-      this.images?.push({image_url:"assets/placeholders/imgHolder.png"});
-    }
-  }
-  ngOnInit() {
-    this.setSize(this.image_num);
-  }
-  ngDoCheck(): void {
-    if(this.image_num_old!==this.image_num){
-      this.setSize(this.image_num);
-      this.image_num_old = this.image_num;
-    }
   }
   sizeReportService: SizeReportService = inject(SizeReportService);
   private localization = inject(LocalizationService);

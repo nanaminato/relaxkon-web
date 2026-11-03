@@ -1,4 +1,4 @@
-import {Component, DoCheck, inject, OnInit} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {Gallery} from "../gallery/gallery";
 import {TranslateModule} from "@ngx-translate/core";
 import {GptImageCreateRequest, GptImageResponse, TaskImage, UrlImage} from "../../../models/images";
@@ -39,7 +39,7 @@ import {GenerateTask} from "../../../models/media";
     CdkTextareaAutosize
   ]
 })
-export class GptImageCreate implements OnInit,DoCheck{
+export class GptImageCreate{
 
   constructor(private menuAbleService: MenuAbleService,
               private notification: NzNotificationService,
@@ -48,12 +48,11 @@ export class GptImageCreate implements OnInit,DoCheck{
               private authService: AuthService,
               private sendService: SendManagerService) {
     this.menuAbleService.enableImage();
-    this.dalleInit();
+
   }
   images: UrlImage[] | undefined = [];
   loading: boolean = false;
   image_num: number = 1;
-  image_num_old: number = 1;
   image_num_max: number = 1;
   model: string = "dall-e-3";
   prompt: string = "";
@@ -78,7 +77,7 @@ export class GptImageCreate implements OnInit,DoCheck{
     "auto"
   ]
   output_formats: string[] = [
-    "png","jpeg","webq"
+    "png","jpeg","webp"
   ]
   //dall3
   qualities: string[] = [
@@ -149,27 +148,6 @@ export class GptImageCreate implements OnInit,DoCheck{
     await this.universalService.addOrUpdateGenerateTask(task);
     await this.sendService.sendTask(task)
   }
-  private dalleInit() {
-    if(this.image_num_old!==this.image_num){
-      this.setSize(this.image_num);
-      this.image_num_old = this.image_num;
-    }
-  }
-  setSize(size: number){
-    this.images!.length = 0;
-    for(let i = 0;i<size;i++){
-      this.images?.push({image_url:"assets/placeholders/imgHolder.png"});
-    }
-  }
-  ngOnInit() {
-    this.setSize(this.image_num);
-  }
-  ngDoCheck(): void {
-    if(this.image_num_old!==this.image_num){
-      this.setSize(this.image_num);
-      this.image_num_old = this.image_num;
-    }
-  }
   sizeReportService: SizeReportService = inject(SizeReportService);
   private localization = inject(LocalizationService);
   menuVisible() {
@@ -191,7 +169,7 @@ export class GptImageCreate implements OnInit,DoCheck{
     }
     return '';
   }
-  //模型切换
+  //妯″瀷鍒囨崲
   protected modelChange(event: string) {
     if(this.model.startsWith("dall")){
       if(this.model==="dall-e-3"){

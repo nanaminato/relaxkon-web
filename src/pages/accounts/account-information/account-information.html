@@ -1,22 +1,16 @@
-<nz-card class="super-b overflow-y-scroll h-100 w-100">
-  <div class="d-flex flex-row-reverse">
-    <button class="btn btn-primary"
-      (click)="logout()">
-      {{ 'account.signOut' | translate }}
-    </button>
-  </div>
-  <div class="m-1 fs-u">
-    {{ 'account.username' | translate }}: {{user?.name}}
-  </div>
-  <div class="m-1 fs-u">
-    {{ 'account.nickname' | translate }}: {{user?.nickname===undefined ? ('universal.none' | translate) : user?.nickname}}
-  </div>
-  <div class="m-1 fs-u">
-    {{ 'account.roles' | translate }}:
-    @if(user!==undefined){
-      @for(role of roles!;track role.roleId){
-        {{role.name}}
-      }
-    }
-  </div>
-</nz-card>
+<section class="profile-card">
+  <div class="profile-heading"><span class="profile-avatar" aria-hidden="true">{{user?.name?.slice(0, 1)?.toUpperCase() || 'T'}}</span><div><h1>{{'account.self' | translate}}</h1><p>{{'studioUi.profileIntro' | translate}}</p></div></div>
+  @if(user){
+    <dl>
+      <div><dt>{{'account.username' | translate}}</dt><dd>{{user!.name}}</dd></div>
+      <div><dt>{{'account.nickname' | translate}}</dt><dd>{{user!.nickname || ('universal.none' | translate)}}</dd></div>
+      <div><dt>{{'account.roles' | translate}}</dt><dd aria-live="polite">
+        @if(rolesLoading){ {{'studioUi.profileLoading' | translate}} }
+        @else if(rolesError){<p>{{'studioUi.profileError' | translate}}</p><button class="btn btn-outline-primary btn-sm" (click)="fetchRolesOfThisUser()">{{'universal.reload' | translate}}</button>}
+        @else{ @for(role of roles;track role.roleId){<span class="role-tag">{{role.name}}</span>} @empty{ {{'universal.none' | translate}} } }
+      </dd></div>
+    </dl>
+    <aside><p>{{'studioUi.securityHint' | translate}}</p><a routerLink="/accounts/forgot-me-password">{{'account.forgotPassword' | translate}} →</a></aside>
+    <div class="profile-actions"><a class="btn btn-primary" routerLink="/chat">{{'accountUi.backToChat' | translate}}</a><button class="btn btn-outline-secondary" (click)="logout()">{{'account.signOut' | translate}}</button></div>
+  }@else{<p>{{'studioUi.profileGuest' | translate}}</p><a class="btn btn-primary" routerLink="/accounts/sign-in">{{'account.signIn' | translate}}</a>}
+</section>

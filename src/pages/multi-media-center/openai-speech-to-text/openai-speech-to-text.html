@@ -6,17 +6,9 @@
     <app-json-code-viewer [jsonCode]="result"></app-json-code-viewer>
   </ng-container>
 </nz-modal>
-<header>
-  <button nz-button class="m-2">
-    @if(menuVisible()){
-      <nz-icon nzType="menu-fold" nzTheme="outline" (click)="toggleMenu()"/>
-    }@else{
-      <nz-icon nzType="menu-unfold" nzTheme="outline" (click)="toggleMenu()" />
-    }
-  </button>
-</header>
+<header class="studio-heading"><button nz-button type="button" (click)="toggleMenu()" [attr.aria-label]="'studioUi.menu' | translate" [attr.aria-expanded]="menuVisible()"><nz-icon nzType="menu-unfold" nzTheme="outline" /></button><div><h1>{{ 'studioUi.sttTitle' | translate }}</h1><p>{{ 'studioUi.sttIntro' | translate }}</p></div></header>
 <div class="file-drop rounded-2 border d-flex justify-content-center align-items-center" style="height: 150px;"
-     (click)="fileInput.click()"
+     role="button" tabindex="0" (keydown.enter)="fileInput.click()" (keydown.space)="$event.preventDefault(); fileInput.click()" (click)="fileInput.click()"
      (drop)="onFileDrop($event)" (dragover)="onDragOver($event)">
   <div class="drop-message">
     <span nz-icon nzType="cloud-upload" nzTheme="outline"></span>
@@ -39,7 +31,7 @@
     }
   }
 </div>
-<nz-card>
+<nz-card [nzTitle]="'studioUi.settings' | translate">
   <nz-row class="align-items-center my-1 bg-theme2 text-theme2">
     <nz-col class="m-2">
       <nz-col class="m-1">{{ 'mediaStudio.model' | translate }}</nz-col>
@@ -98,8 +90,8 @@
   </div>
   <div class="d-flex justify-content-end">
     <div class="d-flex">
-      <button class="m-1" [disabled]="loading" (click)="transcription()" nz-button>{{ 'banner.transcription' | translate }}</button>
-      <button class="m-1" [disabled]="loading" (click)="translate()" nz-button>{{ 'banner.translation' | translate }}</button>
+      <button class="m-1" nzType="primary" [disabled]="loading || fileList.length === 0" (click)="transcription()" nz-button>{{ 'banner.transcription' | translate }}</button>
+      <button class="m-1" [disabled]="loading || fileList.length === 0" (click)="translate()" nz-button>{{ 'banner.translation' | translate }}</button>
     </div>
   </div>
   @if(loading){
@@ -108,7 +100,7 @@
     </div>
   }
   <div class="d-flex justify-content-center align-items-center p-2">
-    <textarea [(ngModel)]="outputText"
+    <textarea [attr.aria-label]="'mediaStudio.outputPlaceholder' | translate" [(ngModel)]="outputText"
               nz-input [placeholder]="'mediaStudio.outputPlaceholder' | translate"
               cdkTextareaAutosize
               cdkAutosizeMinRows="3"

@@ -34,7 +34,11 @@ test('literal translation references exist in all languages', () => {
     const references = [...source.matchAll(/['"]([\w.-]+)['"]\s*\|\s*translate\b/g),
       ...source.matchAll(/(?:\.text|\.instant)\(\s*['"]([\w.-]+)['"]/g)];
     for (const expression of source.matchAll(/(?:="([^"\n]*\|\s*translate[^"\n]*)"|{{([^}]*\|\s*translate[^}]*)}})/g)) {
-      for (const match of (expression[1] || expression[2]).matchAll(/['"]([\w.-]+)['"]/g)) references.push(match);
+      // Comparison operands and a dynamic key prefix are not complete translation keys.
+      const value = (expression[1] || expression[2]).replace(/(?:===|!==|==|!=)\s*['"][\w.-]+['"]/g, '');
+      for (const match of value.matchAll(/['"]([\w.-]+)['"]/g)) {
+        if (!value.slice(match.index + match[0].length).trimStart().startsWith('+')) references.push(match);
+      }
     }
     for (const [, key] of references) {
       for (const lang of Object.keys(dictionaries)) assert.ok(key in dictionaries[lang], `${file}: ${lang} missing ${key}`);
@@ -45,6 +49,30 @@ test('literal translation references exist in all languages', () => {
 test('English translations contain no untranslated Chinese or Japanese text', () => {
   for (const [key, text] of Object.entries(dictionaries.en)) {
     assert.ok(!/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(text), `en: ${key}`);
+  }
+});
+
+test('image parameter option values have translated labels in every language', () => {
+  const ts = require('typescript');
+  const options = new Set(['backgrounds', 'moderations', 'qualities', 'styles', 'image_response_formats']);
+  for (const relative of ['gpt-image/gpt-image-create.component.ts', 'apimart-image/apimart-image.component.ts']) {
+    const file = path.join(__dirname, '../src/pages/imageStudio', relative);
+    const source = ts.createSourceFile(file, fs.readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true);
+    function visit(node) {
+      const name = ts.isPropertyDeclaration(node) ? node.name.getText(source)
+        : ts.isBinaryExpression(node) && ts.isPropertyAccessExpression(node.left) ? node.left.name.text : '';
+      const value = ts.isPropertyDeclaration(node) ? node.initializer
+        : ts.isBinaryExpression(node) ? node.right : undefined;
+      if (options.has(name) && value && ts.isArrayLiteralExpression(value)) {
+        for (const option of value.elements) {
+          if (ts.isStringLiteral(option)) for (const lang of Object.keys(dictionaries)) {
+            assert.ok(`imageOptions.${option.text}` in dictionaries[lang], `${relative}: ${lang} missing label for ${option.text}`);
+          }
+        }
+      }
+      ts.forEachChild(node, visit);
+    }
+    visit(source);
   }
 });
 

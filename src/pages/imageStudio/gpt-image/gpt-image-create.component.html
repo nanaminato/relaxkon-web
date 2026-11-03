@@ -1,30 +1,22 @@
 <div class="bg-theme text-theme w-100 h-100 d-flex flex-row">
   <div class="studio-layout">
     <div class="params-panel">
-      <div class="px-3">
-        <button nz-button class="mx-2">
-          @if(menuVisible()){
-            <nz-icon nzType="menu-fold" nzTheme="outline" (click)="toggleMenu()"/>
-          }@else{
-            <nz-icon nzType="menu-unfold" nzTheme="outline" (click)="toggleMenu()" />
-          }
-        </button>
-      </div>
+      <header class="studio-heading"><button nz-button type="button" (click)="toggleMenu()" [attr.aria-label]="'studioUi.menu' | translate" [attr.aria-expanded]="menuVisible()"><nz-icon nzType="menu-unfold" nzTheme="outline" /></button><div><h1>{{ 'studioUi.imageTitle' | translate }}</h1><p>{{ 'studioUi.imageIntro' | translate }}</p></div></header>
       <div class="params-scroll">
-        <div>{{ 'imageStudio.model' | translate }}</div>
-        <nz-select class="w-100" [(ngModel)]="model" (ngModelChange)="modelChange($event)">
+        <label for="image-model">{{ 'imageStudio.model' | translate }}</label>
+        <nz-select nzId="image-model" class="w-100" [(ngModel)]="model" (ngModelChange)="modelChange($event)">
           <nz-option [nzValue]="'dall-e-3'" [nzLabel]="'dall-e-3'"></nz-option>
           <nz-option [nzValue]="'dall-e-2'" [nzLabel]="'dall-e-2'"></nz-option>
           <nz-option [nzValue]="'gpt-image-1.5'" [nzLabel]="'gpt-image-1.5'"></nz-option>
           <nz-option [nzValue]="'gpt-image-2'" [nzLabel]="'gpt-image-2'"></nz-option>
         </nz-select>
-        <div>{{ 'imageStudio.prompt' | translate }}</div>
-        <textarea
+        <label for="image-prompt">{{ 'imageStudio.prompt' | translate }}</label>
+        <textarea id="image-prompt"
           nz-input
           class="fs-6 w-100"
           [(ngModel)]="prompt"
           cdkTextareaAutosize
-          cdkAutosizeMinRows="2"
+          cdkAutosizeMinRows="4"
           cdkAutosizeMaxRows="10"
         ></textarea>
         <div>{{ 'imageStudio.quantity' | translate }}</div>
@@ -33,61 +25,61 @@
           <nz-input-number [nzMin]="1" [nzMax]="image_num_max" [nzStep]="1" [(ngModel)]="image_num"></nz-input-number>
         </div>
         @if(this.model.startsWith("gpt")){
-          <div>{{ 'imageStudio.background' | translate }}</div>
-          <nz-select class="w-100" [(ngModel)]="background">
+          <label for="image-background">{{ 'imageStudio.background' | translate }}</label>
+        <nz-select nzId="image-background" class="w-100" [(ngModel)]="background">
             @for(background of backgrounds; track background){
-              <nz-option [nzValue]="background" [nzLabel]="background"></nz-option>
+              <nz-option [nzValue]="background" [nzLabel]="('imageOptions.' + background) | translate"></nz-option>
             }
           </nz-select>
-          <div>{{ 'imageStudio.moderation' | translate }}</div>
-          <nz-select class="w-100" [(ngModel)]="moderation">
+          <label for="image-moderation">{{ 'imageStudio.moderation' | translate }}</label>
+        <nz-select nzId="image-moderation" class="w-100" [(ngModel)]="moderation">
             @for(moderation of moderations; track moderation){
-              <nz-option [nzValue]="moderation" [nzLabel]="moderation"></nz-option>
+              <nz-option [nzValue]="moderation" [nzLabel]="('imageOptions.' + moderation) | translate"></nz-option>
             }
           </nz-select>
         }
-        <div>{{ 'imageStudio.size' | translate }}</div>
-        <nz-select class="w-100" [(ngModel)]="size">
+        <label for="image-size">{{ 'imageStudio.size' | translate }}</label>
+        <nz-select nzId="image-size" class="w-100" [(ngModel)]="size">
           @for(size of sizes;track size){
-            <nz-option [nzValue]="size" [nzLabel]="size"></nz-option>
+            <nz-option [nzValue]="size" [nzLabel]="size === 'auto' ? ('imageOptions.auto' | translate) : size"></nz-option>
           }
         </nz-select>
-        <div>{{ 'imageStudio.quality' | translate }}</div>
-        <nz-select class="w-100" [(ngModel)]="quality">
+        <label for="image-quality">{{ 'imageStudio.quality' | translate }}</label>
+        <nz-select nzId="image-quality" class="w-100" [(ngModel)]="quality">
           @for(quality of qualities;track quality){
-            <nz-option [nzValue]="quality" [nzLabel]="quality"></nz-option>
+            <nz-option [nzValue]="quality" [nzLabel]="('imageOptions.' + quality) | translate"></nz-option>
           }
         </nz-select>
 
         @if(this.model.startsWith("dall-e-3")){
-          <div>{{ 'imageStudio.style' | translate }}</div>
-          <nz-select class="w-100" [(ngModel)]="style">
+          <label for="image-style">{{ 'imageStudio.style' | translate }}</label>
+        <nz-select nzId="image-style" class="w-100" [(ngModel)]="style">
             @for(style of styles;track style){
-              <nz-option [nzValue]="style" [nzLabel]="style"></nz-option>
+              <nz-option [nzValue]="style" [nzLabel]="('imageOptions.' + style) | translate"></nz-option>
             }
           </nz-select>
         }
-        <div>{{ 'imageStudio.imageFormat' | translate }}</div>
-        <nz-select class="w-100" [(ngModel)]="output_format">
+        <label for="image-imageFormat">{{ 'imageStudio.imageFormat' | translate }}</label>
+        <nz-select nzId="image-imageFormat" class="w-100" [(ngModel)]="output_format">
           @for(output_format of output_formats;track output_format){
             <nz-option [nzValue]="output_format" [nzLabel]="output_format"></nz-option>
           }
         </nz-select>
         @if(this.model.startsWith("dall")){
-          <div>{{ 'imageStudio.responseFormat' | translate }}</div>
-          <nz-select class="w-100" [(ngModel)]="response_format">
+          <label for="image-responseFormat">{{ 'imageStudio.responseFormat' | translate }}</label>
+        <nz-select nzId="image-responseFormat" class="w-100" [(ngModel)]="response_format">
             @for(response_format of image_response_formats;track response_format){
-              <nz-option [nzValue]="response_format" [nzLabel]="response_format"></nz-option>
+              <nz-option [nzValue]="response_format" [nzLabel]="('imageOptions.' + response_format) | translate"></nz-option>
             }
           </nz-select>
         }
 
         <div class="generate-bar">
-          <button nz-button class="w-100" (click)="generateImages()">{{ 'universal.generate'|translate }}</button>
+          <button nz-button class="w-100" nzType="primary" [disabled]="loading || !prompt.trim()" (click)="generateImages()">{{ 'universal.generate'|translate }}</button>
         </div>
       </div>
     </div>
-    <div class="gallery-panel">
+    <div class="gallery-panel"><h2>{{ 'studioUi.results' | translate }}</h2>
       <app-gallery class="w-100" #gallery [loading]="loading" [images]="images"></app-gallery>
     </div>
   </div>

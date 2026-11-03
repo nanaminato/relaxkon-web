@@ -9,11 +9,11 @@
   <div></div>
 }
 <ng-template #logo>
-  <section class="empty-state">
+  <section class="welcome">
     <span class="empty-mark" aria-hidden="true">T</span>
     <h1>{{'workspace.chatWelcome' | translate}}</h1>
     <p>{{'workspace.chatDescription' | translate}}</p>
-    <div class="starter-grid">
+    <div class="starters">
       <button type="button" (click)="useStarter('workspace.planPrompt')"><span nz-icon nzType="bulb" aria-hidden="true"></span><strong>{{'workspace.plan' | translate}}</strong><small>{{'workspace.planHint' | translate}}</small></button>
       <button type="button" (click)="useStarter('workspace.writePrompt')"><span nz-icon nzType="edit" aria-hidden="true"></span><strong>{{'workspace.write' | translate}}</strong><small>{{'workspace.writeHint' | translate}}</small></button>
       <button type="button" (click)="useStarter('workspace.codePrompt')"><span nz-icon nzType="code" aria-hidden="true"></span><strong>{{'workspace.code' | translate}}</strong><small>{{'workspace.codeHint' | translate}}</small></button>
@@ -22,8 +22,8 @@
 </ng-template>
 <div class="chat-main w-100 h-100 bg-theme2 text-theme">
   <!-- 顶部菜单切换按钮（独立、低 z-index，不放在 sticky-top 容器中） -->
-  <div class="chat-topbar px-2 py-2">
-    <button nz-button class="bg-theme2 text-theme2 border-0" type="button" (click)="toggleMenu()"
+  <div class="topbar px-2 py-2">
+    <button nz-button class="bg-theme2 text-theme2 border-0 rounded-2" type="button" (click)="toggleMenu()"
             [attr.aria-label]="(menuVisible() ? 'workspace.closeNavigation' : 'workspace.openNavigation') | translate">
       @if(menuVisible()){
         <nz-icon nzType="menu-fold" nzTheme="outline" />
@@ -31,10 +31,10 @@
         <nz-icon nzType="menu-unfold" nzTheme="outline" />
       }
     </button>
-    <div class="chat-heading"><strong>{{'universal.aiChat' | translate}}</strong><span>{{'workspace.chatSubtitle' | translate}}</span></div>
+    <div class="chat-title"><strong>{{'universal.aiChat' | translate}}</strong><span>{{'workspace.chatSubtitle' | translate}}</span></div>
     <app-language-switcher></app-language-switcher>
   </div>
-  <div class="chat-messages" #chatPanel>
+  <div class="messages" #chatPanel>
     @if (showLogo()) {
       <ng-container *ngTemplateOutlet="logo"></ng-container>
     } @else {
@@ -50,8 +50,8 @@
   </div>
   <!--  对话页面下部分的组件， 包含输入框等-->
   <div class="composer-shell">
-    <div class="center-input rounded-2">
-      <div class="composer-toolbar align-items-start">
+    <div class="composer rounded-2">
+      <div class="toolbar align-items-start">
         <!-- 模型选择：移到选择文件的左边 -->
         <div class="model-row align-self-start">
           @defer (on immediate) {
@@ -71,7 +71,7 @@
             </button>
           </nz-upload>
         </div>
-        <div class="composer-tools align-items-start">
+        <div class="tools align-items-start">
           <button type="button" class="text-theme2 border-1 border-theme2 bg-theme2 rounded-2"
                   (click)="clearContext()"
                   nz-tooltip [nzTooltipTitle]="'chat-main.clearContext' | translate" [attr.aria-label]="'chat-main.clearContext' | translate">
@@ -120,7 +120,7 @@
       </div>
     </div>
   </div>
-  <div class="notice-row">
+  <div class="notice">
     <div class="center fs-mini overflow-hidden">
       {{'chat-main.potentialErrorNotice' | translate}}
     </div>

@@ -1,4 +1,43 @@
 {
+  "imageOptions": {
+    "auto": "自動",
+    "transparent": "透明",
+    "opaque": "不透明",
+    "low": "低",
+    "medium": "中",
+    "high": "高",
+    "hd": "高精細",
+    "standard": "標準",
+    "vivid": "鮮やか",
+    "natural": "自然",
+    "url": "画像 URL",
+    "b64_json": "Base64 画像"
+},
+  "studioUi": {
+    "settings": "生成・処理設定",
+    "textContent": "テキスト内容",
+    "extractEmpty": "ファイルはまだありません。アップロード後、内容を抽出・確認・編集できます。",
+    "menu": "スタジオナビゲーションを切り替え",
+    "imageTitle": "アイデアを画像に",
+    "imageIntro": "アイデアを入力し、設定を調整して作品をプレビューできます。",
+    "results": "生成結果",
+    "imageEmpty": "次の作品はここから",
+    "imageEmptyHint": "プロンプトを入力して生成すると、ここに画像が表示されます。",
+    "ttsTitle": "テキストに声を",
+    "ttsIntro": "テキストを入力するか文書を読み込み、声と速度を選んで音声を生成します。",
+    "sttTitle": "音声をテキストに",
+    "sttIntro": "音声をアップロードして文字起こしや翻訳を行い、結果を確認できます。",
+    "extractTitle": "文書からコンテンツを抽出",
+    "extractIntro": "ファイルをアップロードし、抽出されたテキストを確認・編集できます。",
+    "audioEmpty": "生成された音声がここに表示されます",
+    "libraryIntro": "生成タスク、進捗、作品をまとめて確認できます。",
+    "libraryEmpty": "作品はまだありません。画像を生成してみましょう。",
+    "profileIntro": "アカウント情報とアクセス権を確認できます。",
+    "profileLoading": "ロールを読み込み中…",
+    "profileError": "ロールを読み込めません。もう一度お試しください。",
+    "profileGuest": "アカウント情報を表示するにはログインしてください。",
+    "securityHint": "パスワードの更新は、アカウントに登録されたメールアドレスから行えます。"
+},
   "themes": {
     "light": "ライト",
     "dark": "ダーク",
@@ -320,7 +359,7 @@
     "resolution": "解像度", "quality": "品質", "background": "背景", "moderation": "モデレーション強度",
     "style": "スタイル", "imageFormat": "画像形式", "responseFormat": "データ形式", "maskImage": "マスク画像 (mask_url)",
     "maskUrlPlaceholder": "マスク画像の URL を入力", "referenceUrlPlaceholder": "参照画像の URL を入力", "selectLocalImage": "ローカル画像を選択",
-    "uploadLocalImage": "ローカル画像をアップロード", "addUrl": "URL を追加", "referenceImages": "参照画像 (image_urls): {{count}}/16",
+    "uploadLocalImage": "ローカル画像をアップロード", "addUrl": "URL を追加", "referenceImages": "参照画像: {{count}}/16",
     "officialFallback": "公式サービスへのフォールバック"
   },
   "mediaStudio": {

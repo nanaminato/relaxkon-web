@@ -1,14 +1,14 @@
 <div class="d-flex flex-row w-100 h-100" style="position: relative;">
   <ng-template #studios>
     <div class="w-100 d-flex flex-column">
-      <button nz-button class="rounded-2 bg-light text-dark mx-2 my-1 d-flex flex-row" (click)="closeMenuIfCompact()" routerLink="/chat"><img height="25" width="25" src="assets/icon/aichat_11zon.jpg">{{'universal.aiChat' | translate}}</button>
-      <button nz-button class="rounded-2 bg-light text-dark mx-2 my-1 d-flex flex-row" (click)="closeMenuIfCompact()" routerLink="/image-studio"><img height="25" width="25" src="assets/icon/aipainting_11zon.jpg">{{'universal.aiPainting' | translate}}</button>
+      <button nz-button class="rounded-2 bg-light text-dark mx-2 my-1 d-flex flex-row" (click)="closeMenuIfCompact()" routerLink="/chat"><span class="studio-nav-symbol" aria-hidden="true">↗</span>{{'universal.aiChat' | translate}}</button>
+      <button nz-button class="rounded-2 bg-light text-dark mx-2 my-1 d-flex flex-row" (click)="closeMenuIfCompact()" routerLink="/image-studio"><span class="studio-nav-symbol" aria-hidden="true">✧</span>{{'universal.aiPainting' | translate}}</button>
       <button nz-button class="rounded-2 bg-light text-dark mx-2 my-1 d-flex flex-row" (click)="closeMenuIfCompact()" routerLink="/media-studio"><span nz-icon nzType="node-index" nzTheme="outline"></span>{{ 'universal.mediaStudio' | translate }}</button>
     </div>
   </ng-template>
   @if(visible()){
     @if(isCompact()){
-      <div class="menu-backdrop" (click)="hideMenu()"></div>
+      <button class="menu-backdrop" type="button" [attr.aria-label]="'studioUi.menu' | translate" (click)="hideMenu()"></button>
     }
     <div class="d-flex flex-column h-100 menu" [class.w-100]="!isCompact()" [class.menu-overlay]="isCompact()"
     >
@@ -24,7 +24,7 @@
           <button class="m-2 rounded-2" (click)="closeMenuIfCompact()" nz-button routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/media-studio/media-extractor']">{{ 'mediaStudio.fileExtractor' | translate }}</button>
         </div>
       </div>
-      <div class="bg-theme sticky-bottom z-0">
+      <div class="bg-theme sticky-bottom z-0"><div class="studio-locale"><app-language-switcher /></div>
         <ng-container *ngTemplateOutlet="studios"></ng-container>
         @defer (on viewport) {
           <app-account-label></app-account-label>
@@ -34,7 +34,7 @@
       </div>
     </div>
   }
-  <div style="flex: 1 1 auto; overflow: hidden;">
+  <div style="flex: 1 1 auto; min-width:0; overflow: hidden;">
     <router-outlet id="main-content"></router-outlet>
   </div>
 </div>

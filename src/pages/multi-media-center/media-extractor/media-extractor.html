@@ -7,21 +7,13 @@
     </app-tts-file-editor>
   </ng-container>
 </nz-modal>
-<header>
-  <button nz-button class="m-2">
-    @if(menuVisible()){
-      <nz-icon nzType="menu-fold" nzTheme="outline" (click)="toggleMenu()"/>
-    }@else{
-      <nz-icon nzType="menu-unfold" nzTheme="outline" (click)="toggleMenu()" />
-    }
-  </button>
-</header>
+<header class="studio-heading"><button nz-button type="button" (click)="toggleMenu()" [attr.aria-label]="'studioUi.menu' | translate" [attr.aria-expanded]="menuVisible()"><nz-icon nzType="menu-unfold" nzTheme="outline" /></button><div><h1>{{ 'studioUi.extractTitle' | translate }}</h1><p>{{ 'studioUi.extractIntro' | translate }}</p></div></header>
 <div class="border rounded-2 d-flex justify-content-end">
   <button nz-button (click)="reparseAll()" class="m-2">{{ 'mediaStudio.parseAllFiles' | translate }}</button>
 </div>
 <div class="m-1 border-black">
   <div class="file-drop border d-flex justify-content-center align-items-center" style="height: 150px;"
-       (click)="fileInput.click()"
+       role="button" tabindex="0" (keydown.enter)="fileInput.click()" (keydown.space)="$event.preventDefault(); fileInput.click()" (click)="fileInput.click()"
        (drop)="onFileDrop($event)" (dragover)="onDragOver($event)">
     <div class="drop-message">
       <span nz-icon nzType="cloud-upload" nzTheme="outline"></span>
@@ -86,3 +78,5 @@
   </div>
 </div>
 
+
+@if(fileList.length === 0){<div class="studio-empty">{{ 'studioUi.extractEmpty' | translate }}</div>}

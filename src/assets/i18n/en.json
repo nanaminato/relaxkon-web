@@ -1,4 +1,43 @@
 {
+  "imageOptions": {
+    "auto": "Automatic",
+    "transparent": "Transparent",
+    "opaque": "Opaque",
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "hd": "HD",
+    "standard": "Standard",
+    "vivid": "Vivid",
+    "natural": "Natural",
+    "url": "Image URL",
+    "b64_json": "Base64 image"
+},
+  "studioUi": {
+    "settings": "Generation and processing settings",
+    "textContent": "Text content",
+    "extractEmpty": "No files yet. Upload files to extract, preview and edit their content.",
+    "menu": "Toggle studio navigation",
+    "imageTitle": "Turn ideas into images",
+    "imageIntro": "Describe your idea, adjust the settings and preview your results.",
+    "results": "Results",
+    "imageEmpty": "Your next creation starts here",
+    "imageEmptyHint": "Enter a prompt and generate. Your images will appear here.",
+    "ttsTitle": "Give your words a voice",
+    "ttsIntro": "Write text or import a document, then choose a voice and speed to create audio.",
+    "sttTitle": "Turn speech into text",
+    "sttIntro": "Upload audio, choose transcription or translation, and review the result.",
+    "extractTitle": "Extract content from documents",
+    "extractIntro": "Upload files, then review and edit the extracted text.",
+    "audioEmpty": "Your generated audio will appear here",
+    "libraryIntro": "Review your generation tasks, progress and creations in one place.",
+    "libraryEmpty": "No creations yet. Start by generating an image.",
+    "profileIntro": "Review your account details and access.",
+    "profileLoading": "Loading roles…",
+    "profileError": "Unable to load roles. Please try again.",
+    "profileGuest": "Sign in to view your account details.",
+    "securityHint": "Need a new password? Reset it using the email linked to your account."
+},
   "themes": {
     "light": "Light",
     "dark": "Dark",
@@ -321,7 +360,7 @@
     "resolution": "Resolution", "quality": "Quality", "background": "Background", "moderation": "Moderation",
     "style": "Style", "imageFormat": "Image format", "responseFormat": "Response format", "maskImage": "Mask image (mask_url)",
     "maskUrlPlaceholder": "Enter mask image URL", "referenceUrlPlaceholder": "Enter reference image URL", "selectLocalImage": "Select local image",
-    "uploadLocalImage": "Upload local image", "addUrl": "Add URL", "referenceImages": "Reference images (image_urls): {{count}}/16",
+    "uploadLocalImage": "Upload local image", "addUrl": "Add URL", "referenceImages": "Reference images: {{count}}/16",
     "officialFallback": "Official service fallback"
   },
   "mediaStudio": {

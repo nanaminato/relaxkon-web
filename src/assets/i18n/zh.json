@@ -1,4 +1,43 @@
 {
+  "imageOptions": {
+    "auto": "自动",
+    "transparent": "透明",
+    "opaque": "不透明",
+    "low": "低",
+    "medium": "中",
+    "high": "高",
+    "hd": "高清",
+    "standard": "标准",
+    "vivid": "生动",
+    "natural": "自然",
+    "url": "图片链接",
+    "b64_json": "Base64 图片"
+},
+  "studioUi": {
+    "settings": "生成与处理设置",
+    "textContent": "文本内容",
+    "extractEmpty": "还没有文件。上传后可逐个解析、预览和编辑内容。",
+    "menu": "切换工作室导航",
+    "imageTitle": "将灵感变成画面",
+    "imageIntro": "描述你的创意，调整生成参数，在结果区预览作品。",
+    "results": "生成结果",
+    "imageEmpty": "你的下一幅作品，从这里开始",
+    "imageEmptyHint": "填写画面描述并生成，图片将显示在这里。",
+    "ttsTitle": "让文字拥有声音",
+    "ttsIntro": "输入文字或导入文档，选择音色与语速，生成可播放的音频。",
+    "sttTitle": "将声音整理为文字",
+    "sttIntro": "上传音频，选择转写或翻译，并查看处理结果。",
+    "extractTitle": "从文档中提取内容",
+    "extractIntro": "上传文件，解析后检查和编辑文本内容。",
+    "audioEmpty": "生成的音频将在这里播放",
+    "libraryIntro": "集中查看生成任务、进度和作品。",
+    "libraryEmpty": "还没有作品，先创建一个图像生成任务吧。",
+    "profileIntro": "查看你的账户信息和访问权限。",
+    "profileLoading": "正在读取角色…",
+    "profileError": "暂时无法读取角色，请重试。",
+    "profileGuest": "请先登录以查看账户信息。",
+    "securityHint": "需要更新密码？通过账户绑定的邮箱完成重置。"
+},
   "themes": {
     "light": "浅色",
     "dark": "深色",
@@ -320,7 +359,7 @@
     "resolution": "分辨率", "quality": "质量", "background": "背景", "moderation": "审核强度",
     "style": "风格", "imageFormat": "图片格式", "responseFormat": "数据格式", "maskImage": "遮罩图 (mask_url)",
     "maskUrlPlaceholder": "输入遮罩图 URL", "referenceUrlPlaceholder": "输入参考图 URL", "selectLocalImage": "选择本地图片",
-    "uploadLocalImage": "上传本地图片", "addUrl": "添加 URL", "referenceImages": "参考图 (image_urls): {{count}}/16",
+    "uploadLocalImage": "上传本地图片", "addUrl": "添加 URL", "referenceImages": "参考图: {{count}}/16",
     "officialFallback": "官方服务回退"
   },
   "mediaStudio": {
