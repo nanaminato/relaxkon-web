@@ -1,3 +1,4 @@
+import {LocalizationService} from '../normal-services/localization.service';
 import {inject, Injectable} from "@angular/core";
 import {Observable, take} from "rxjs";
 import {ConfigurationService} from "../db-services";
@@ -17,6 +18,7 @@ export class TurboService {
     return `${this.provider.apiUrl ?? ''}api/ai`;
   }
   authService = inject(AuthService);
+  localization = inject(LocalizationService);
   store = inject(Store);
   config: Configuration | null = null;
   constructor() {
@@ -85,10 +87,12 @@ export class TurboService {
   fetchChatBase(url: string, requestBody: any): Observable<string> {
     return new Observable<string>(observer => {
       const abortController = new AbortController();
+      const decoder = new TextDecoder();
       const execute = (hasRetriedAfterRefresh: boolean) => fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept-Language': this.localization.requestLanguage,
           'Authorization': `Bearer ${this.authService.token}`
         },
         body: JSON.stringify(requestBody),
@@ -128,12 +132,15 @@ export class TurboService {
 
         const pump = (): Promise<void> => reader!.read().then(({value, done}) => {
           if (done) {
+            const tail = decoder.decode();
+            if (tail) observer.next(tail);
+            reader.releaseLock();
             observer.complete();
             return;
           }
           // 处理接收到的数据
           if (value) {
-            const chunk = new TextDecoder().decode(value);
+            const chunk = decoder.decode(value, {stream: true});
             observer.next(chunk);
           }
           // 继续读取下一个数据块

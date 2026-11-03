@@ -319,6 +319,9 @@
     "generationFailureSuggestion": "Generation failed. Click “View source result” for details.", "waiting": "Waiting for {{seconds}} seconds; please be patient"
   },
   "notifications": {
+    "invalidCredentials": "Incorrect username or password",
+    "networkError": "Network error. Please try again later.",
+    "loginSuccess": "Signed in successfully",
     "resetSuccess": "Reset complete", "settingsResetSuccess": "Settings have been reset", "applySuccess": "Changes applied", "settingsSaved": "Saved to the local database",
     "databaseResetSuccess": "Local database has been reset", "generationFailed": "Generation failed", "imageGenerationFailed": "Image generation failed", "taskCreated": "Task ID received",
     "taskResultFailed": "Failed to retrieve task result", "taskResultSaved": "Response result saved", "imageReadFailed": "Failed to read image", "imageRatioAdjusted": "Image ratio adjusted automatically",

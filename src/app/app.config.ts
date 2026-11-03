@@ -1,3 +1,4 @@
+import {localizationInterceptor} from '../systems/interceptors/localization.interceptor';
 import {
   ApplicationConfig,
   isDevMode,
@@ -33,7 +34,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes, withPreloading(PreloadAllModules)),
     provideHttpClient(
-      withInterceptors([jwtInterceptor])
+      withInterceptors([localizationInterceptor, jwtInterceptor])
     ),
     provideTranslateService({
       lang: 'zh',

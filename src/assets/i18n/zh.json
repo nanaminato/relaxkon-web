@@ -332,6 +332,9 @@
     "generationFailureSuggestion": "生成失败，请点击“查看源结果”了解具体信息", "waiting": "已等待 {{seconds}} 秒，请耐心等候"
   },
   "notifications": {
+    "invalidCredentials": "用户名或密码错误",
+    "networkError": "网络错误，请稍后重试",
+    "loginSuccess": "登录成功",
     "resetSuccess": "重置成功", "settingsResetSuccess": "参数已重置", "applySuccess": "应用成功", "settingsSaved": "已保存到本地数据库",
     "databaseResetSuccess": "本地数据库已重置", "generationFailed": "生成失败", "imageGenerationFailed": "图片生成失败", "taskCreated": "已获取任务 ID",
     "taskResultFailed": "获取任务结果失败", "taskResultSaved": "响应结果已保存", "imageReadFailed": "图片读取失败", "imageRatioAdjusted": "图像比例已自动调整",

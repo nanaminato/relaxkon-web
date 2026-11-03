@@ -1,3 +1,4 @@
+import {LocalizationService} from '../../../services/normal-services/localization.service';
 import {inject, Injectable} from "@angular/core";
 import {Actions, createEffect, ofType} from "@ngrx/effects";
 import {catchError, map, mergeMap, of, switchMap, tap} from "rxjs";
@@ -30,13 +31,14 @@ export class AuthEffects {
       )
     )
   );
+  localization = inject(LocalizationService);
   messageService = inject(NzMessageService);
   loginSuccess$ = createEffect(
     () =>
       this.actions$.pipe(
         ofType(authActions.loginSuccess),
         tap(action => {
-          this.messageService.success("登录成功")
+          this.messageService.success(this.localization.text('notifications.loginSuccess'))
           this.authService.restore(action.user, action.token, action.refreshToken);
           this.router.navigate(['/chat']);
         })
@@ -60,7 +62,6 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(authActions.loginFailure),
         tap(() => {
-          this.messageService.error("登录失败")
           this.authService.logout();
           this.router.navigate(user_routes.sign_in);
         })

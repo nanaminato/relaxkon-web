@@ -331,6 +331,9 @@
     "generationFailureSuggestion": "生成に失敗しました。詳細は「元の結果を表示」をクリックしてください。", "waiting": "{{seconds}} 秒待機中です。しばらくお待ちください"
   },
   "notifications": {
+    "invalidCredentials": "ユーザー名またはパスワードが正しくありません",
+    "networkError": "ネットワークエラーです。しばらくしてから再試行してください。",
+    "loginSuccess": "ログインしました",
     "resetSuccess": "リセットしました", "settingsResetSuccess": "設定をリセットしました", "applySuccess": "変更を適用しました", "settingsSaved": "ローカルデータベースに保存しました",
     "databaseResetSuccess": "ローカルデータベースをリセットしました", "generationFailed": "生成に失敗しました", "imageGenerationFailed": "画像生成に失敗しました", "taskCreated": "タスク ID を取得しました",
     "taskResultFailed": "タスク結果の取得に失敗しました", "taskResultSaved": "応答結果を保存しました", "imageReadFailed": "画像の読み込みに失敗しました", "imageRatioAdjusted": "画像の比率を自動調整しました",

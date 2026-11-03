@@ -1,3 +1,4 @@
+import {LocalizationService} from '../services/normal-services/localization.service';
 import {inject, Injectable} from "@angular/core";
 import {HttpErrorResponse} from "@angular/common/http";
 import {catchError, finalize, map, Observable, shareReplay, throwError} from "rxjs";
@@ -24,6 +25,7 @@ export class AuthService {
   public user: User | undefined;
   public token: string | undefined;
   public refreshToken: string | undefined;
+  localization = inject(LocalizationService);
   message = inject(NzMessageService);
   call = inject(AuthCallService);
   store = inject(Store);
@@ -48,8 +50,8 @@ export class AuthService {
       catchError((error: unknown) => {
         if (error instanceof HttpErrorResponse) {
           this.message.create("error", error.status === 401 || error.status === 403
-            ? "用户名或者密码错误"
-            : "网络错误，请稍后重试");
+            ? this.localization.text('notifications.invalidCredentials')
+            : this.localization.text('notifications.networkError'));
         }
         return throwError(() => error);
       })

@@ -26,8 +26,13 @@ export class LocalizationService {
     this.translate.setFallbackLang('zh');
   }
 
+  get requestLanguage(): string {
+    const code = this.normalize(this.translate.getCurrentLang());
+    return code === 'jp' ? 'ja' : code;
+  }
+
   normalize(language?: string): AppLanguage {
-    const normalized = language?.toLowerCase().split('-')[0];
+    const normalized = language?.trim().toLowerCase().split(/[-_]/)[0];
     if (normalized === 'ja') return 'jp';
     return normalized === 'en' || normalized === 'jp' || normalized === 'zh' ? normalized : 'zh';
   }
