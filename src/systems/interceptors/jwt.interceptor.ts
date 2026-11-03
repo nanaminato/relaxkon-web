@@ -3,7 +3,7 @@ import {inject} from '@angular/core';
 import {catchError, Observable, switchMap, throwError} from 'rxjs';
 import {AuthService} from '../../auth_module';
 
-const authEndpoint = /\/api\/auth\/(login|refresh|logout)(?:$|[/?])/;
+const authEndpoint = /\/api\/auth\/(login|refresh|logout|password-reset)(?:$|[/?])/;
 const retryHeader = 'X-Access-Token-Retry';
 
 export function jwtInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {

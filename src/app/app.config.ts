@@ -1,3 +1,4 @@
+import {provideAppTranslations} from './app-translations';
 import {localizationInterceptor} from '../systems/interceptors/localization.interceptor';
 import {
   ApplicationConfig,
@@ -13,9 +14,7 @@ import {jwtInterceptor} from "../systems/interceptors/jwt.interceptor";
 import {routes} from "./app.routes";
 import {NZ_I18N, zh_CN} from "ng-zorro-antd/i18n";
 import {provideServiceWorker} from "@angular/service-worker";
-import {provideTranslateService} from "@ngx-translate/core";
 import {CLIPBOARD_OPTIONS, ClipboardButtonComponent,  provideMarkdown} from "ngx-markdown";
-import {provideTranslateHttpLoader} from "@ngx-translate/http-loader";
 import {AuthEffects} from "../systems/store/auth/auth.effects";
 import {HistoryTitleEffect} from "../systems/store/history-title/history-title.effects";
 import {ConfigurationEffects} from "../systems/store/configuration/configuration.effects";
@@ -26,7 +25,6 @@ import {historyTitleReducers} from "../systems/store/history-title/history-title
 import {systemPromptsReducer} from "../systems/store/system-prompts/prompts.reducer";
 import {ChatHistoryEffects} from "../systems/store/chat-history/chat-history.effects";
 import {chatHistoryReducer} from "../systems/store/chat-history/chat-history.reducers";
-import {environment} from "../environments/environment";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -36,14 +34,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(
       withInterceptors([localizationInterceptor, jwtInterceptor])
     ),
-    provideTranslateService({
-      lang: 'zh',
-      fallbackLang: 'zh',
-      loader: provideTranslateHttpLoader({
-        prefix: environment.assets,
-        suffix: '.json'
-      })
-    }),
+    provideAppTranslations(),
 
     provideMarkdown({
       clipboardOptions: {

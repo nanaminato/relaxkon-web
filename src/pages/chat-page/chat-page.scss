@@ -1,40 +1,15 @@
-:host{
-  display: block;
-  width:100%;
-  height:100%;
-}
-.screen-content{
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  min-width: 0;
-  height: 100%;
-  overflow: hidden;
-  position: relative;
-}
-.app-sidebar {
-  flex: 0 0 260px;
-  width: 260px;
-  min-width: 0;
-  border-right: 1px solid var(--ion-color-step-150, #e5e7eb);
-}
-.main-pane {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-}
-
-@media (max-width: 900px) {
-  .app-sidebar {
-    position: absolute;
-    inset: 0 auto 0 0;
-    z-index: 20 !important;
-    width: min(84vw, 320px);
-    max-width: none;
-    box-shadow: 12px 0 28px rgba(0, 0, 0, .18);
-  }
-  /* the backdrop sits under the sidebar (z:20) but above the main pane */
-  .menu-backdrop {
-    z-index: 19;
-  }
-}
+:host { display: block; width: 100%; height: 100%; }
+.screen-content { display: flex; width: 100%; min-width: 0; height: 100%; overflow: hidden; position: relative; background: var(--app-background); }
+.app-sidebar { flex: 0 0 260px; width: 260px; min-width: 0; border-right: 1px solid var(--app-border); background: var(--app-background); }
+.sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 22px 22px 18px; color: var(--app-text); font-size: 19px; font-weight: 700; text-decoration: none; }
+.brand-mark { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 9px; background: #2463cf; color: white; }
+.history-area { flex: 1; min-height: 0; overflow: auto; padding: 0 10px; }
+.main-pane { flex: 1; min-width: 0; overflow: hidden; }
+.sidebar-navigation { flex-shrink: 0; padding: 12px; border-top: 1px solid var(--app-border); }
+.nav-caption { color: var(--app-text-muted); font-size: 11px; margin: 2px 10px 8px; }
+.sidebar-navigation a { display: flex; align-items: center; gap: 12px; padding: 10px; margin: 3px 0; border-radius: 8px; color: var(--app-text-muted); text-decoration: none; font-size: 13px; }
+.sidebar-navigation a:hover, .sidebar-utilities button:hover { background: var(--app-hover); color: var(--app-text); }
+.sidebar-navigation a.nav-active { color: var(--app-accent); background: var(--app-selection); font-weight: 600; }
+.sidebar-utilities { display: flex; gap: 8px; margin-top: 10px; }
+.sidebar-utilities button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px; padding: 8px; border: 1px solid var(--app-border); border-radius: 7px; background: var(--app-surface); color: var(--app-text-muted); font-size: 12px; cursor: pointer; }
+@media (max-width: 900px) { .app-sidebar { position: absolute; inset: 0 auto 0 0; z-index: 20; width: min(84vw, 300px); box-shadow: 12px 0 28px #0b17362b; } .menu-backdrop { position: absolute; inset: 0; width: 100%; border: 0; background: #0b173666; z-index: 19; } }

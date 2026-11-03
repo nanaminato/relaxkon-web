@@ -1,4 +1,2 @@
-.loginBox{
-    width: 260px;
-    height: 60px;
-}
+.loginBox { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; padding: 12px; border-top: 1px solid var(--app-border); background: var(--app-background); }
+.loginBox button { width: auto !important; flex: 1 1 90px; height: auto; min-height: 34px; margin: 0 !important; border: 1px solid var(--app-border); border-radius: 7px; font-size: 12px; color: var(--app-text); }

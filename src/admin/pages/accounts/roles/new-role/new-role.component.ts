@@ -1,3 +1,4 @@
+import {TranslateService} from '@ngx-translate/core';
 import {Component, inject, EventEmitter, Output} from '@angular/core';
 import {
   FormControl,
@@ -23,6 +24,7 @@ import {AccountCallService} from "../../../../services";
   styleUrl: './new-role.component.css'
 })
 export class NewRoleComponent {
+  readonly i18n = inject(TranslateService);
   private readonly fb = inject(NonNullableFormBuilder);
   validateForm: FormGroup<{
     name: FormControl<string>;
@@ -40,7 +42,7 @@ export class NewRoleComponent {
     if (this.validateForm.valid) {
       this.call.addRole(this.validateForm.value.name!).subscribe({
         next: () =>{
-          this.message.success("添加成功");
+          this.message.success(this.i18n.instant('management.addSuccess'));
           this.close.next(true);
         },
         error: (err: any) => {

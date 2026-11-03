@@ -1,8 +1,12 @@
+<label for="chat-model-select" class="visually-hidden">{{'workspace.selectModel' | translate}}</label>
 <div class="d-flex flex-row">
-  <nz-select ngModel="lucy" class="rounded-5 select m-2 bg-theme2 text-theme2"
+  <nz-select nzId="chat-model-select" class="select"
+             [nzPlaceHolder]="(chatStreamChildren.length ? 'workspace.selectModel' : 'workspace.noModels') | translate"
+             [nzDisabled]="!chatStreamChildren.length"
+             [attr.aria-label]="'workspace.selectModel' | translate"
              [(ngModel)]="model" nzMode="default"
              (ngModelChange)="onSelectChange()">
-    <nz-option-group nzLabel="chat">
+    <nz-option-group [nzLabel]="'workspace.chatModels' | translate">
       @for (chat of chatStreamChildren; track chat) {
         <nz-option [nzLabel]="chat.modelName" [nzValue]="chat" >
         </nz-option>

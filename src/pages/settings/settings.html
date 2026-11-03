@@ -1,10 +1,10 @@
 <div class="d-flex flex-column w-100 h-100 bg-theme2 text-theme2">
   <div class="d-flex flex-row justify-content-between p-2 align-items-center" #settingPanel>
-    <button nz-button class="mx-2">
+    <button nz-button class="mx-2" (click)="toggleMenu()" [attr.aria-label]="(menuVisible() ? 'workspace.closeNavigation' : 'workspace.openNavigation') | translate">
       @if(menuVisible()){
-        <nz-icon nzType="menu-fold" nzTheme="outline" (click)="toggleMenu()"/>
+        <nz-icon nzType="menu-fold" nzTheme="outline"/>
       }@else{
-        <nz-icon nzType="menu-unfold" nzTheme="outline" (click)="toggleMenu()" />
+        <nz-icon nzType="menu-unfold" nzTheme="outline" />
       }
     </button>
     <div class="d-flex flex-column pt-2 mx-2">
@@ -13,7 +13,7 @@
       </div>
     </div>
     <div class="py-2 my-auto pe-4 ms-5 ms-sm-0">
-      <button nz-button class="border-1 rounded-2" [routerLink]="['/chat']">
+      <button nz-button class="border-1 rounded-2" [routerLink]="['/chat']" [attr.aria-label]="'accountUi.backToChat' | translate">
         <span nz-icon nzType="close" nzTheme="outline"></span>
       </button>
     </div>
@@ -22,7 +22,7 @@
     <button class="back-to-top text-center"
             nz-button
             (click)="scrollToTop()"
-            nz-tooltip [nzTooltipTitle]="'settings.backToTop' | translate"
+            nz-tooltip [nzTooltipTitle]="'settings.backToTop' | translate" [attr.aria-label]="'settings.backToTop' | translate"
     ><span nz-icon nzType="arrow-up" nzTheme="outline"></span>
     </button>
     <nz-card class="m-2 rounded-4">

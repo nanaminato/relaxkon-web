@@ -31,10 +31,10 @@ nz-select.longest, nz-slider.longest {
   box-sizing: content-box;
 }
 input.ng-dirty.ng-invalid{
-  border: 2px solid #ff0000;
+  border: 1px solid #d96666;
 }
 input.ng-dirty.ng-valid{
-  border: 2px solid #6bc502;
+  border: 1px solid var(--app-border, #e2e8f1);
 }
 .menu{
   max-width: 250px;

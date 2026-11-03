@@ -1,3 +1,4 @@
+import {LanguageSwitcher} from '../../shared/language-switcher';
 import {Component, ElementRef, inject, OnDestroy, Renderer2, ViewChild} from '@angular/core';
 import {NzUploadFile, NzUploadModule} from "ng-zorro-antd/upload";
 import {firstValueFrom, forkJoin, map, Observable, Subject, Subscription} from "rxjs";
@@ -54,6 +55,7 @@ import {historyTitleActions} from "../../systems/store/history-title/history-tit
   styleUrl: './chat-main.css',
   standalone: true,
   imports: [
+    LanguageSwitcher,
     NzModalModule,
     ModelEditor,
     NzIconModule,
@@ -291,6 +293,10 @@ export class ChatMainComponent implements OnDestroy{
 
   config: Configuration | undefined;
   fileList: NzUploadFile[] = [];
+  useStarter(key: string): void {
+    this.inputText = this.localization.text(key);
+  }
+
   inputText: string = '';
   animalModel: ChatModel | undefined;
   scrollSubject: Subject<boolean> | undefined;

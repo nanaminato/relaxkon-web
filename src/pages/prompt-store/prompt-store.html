@@ -40,11 +40,11 @@
 </nz-modal>
 <div class="d-flex flex-column w-100 h-100 bg-theme text-theme">
   <div class="d-flex flex-row justify-content-between p-2">
-    <button nz-button class="mx-2">
+    <button nz-button class="mx-2" (click)="toggleMenu()" [attr.aria-label]="(menuVisible() ? 'workspace.closeNavigation' : 'workspace.openNavigation') | translate">
       @if(menuVisible()){
-        <nz-icon nzType="menu-fold" nzTheme="outline" (click)="toggleMenu()"/>
+        <nz-icon nzType="menu-fold" nzTheme="outline"/>
       }@else{
-        <nz-icon nzType="menu-unfold" nzTheme="outline" (click)="toggleMenu()" />
+        <nz-icon nzType="menu-unfold" nzTheme="outline" />
       }
     </button>
     <div class="d-flex flex-column p-2 mx-2">
@@ -53,7 +53,7 @@
       </div>
     </div>
     <div class="p-2 my-auto px-4">
-      <button nz-button class="border-1 rounded-2" [routerLink]="['/chat']">
+      <button nz-button class="border-1 rounded-2" [routerLink]="['/chat']" [attr.aria-label]="'accountUi.backToChat' | translate">
         <span nz-icon nzType="close" nzTheme="outline"></span>
       </button>
     </div>

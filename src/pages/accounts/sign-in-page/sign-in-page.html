@@ -1,58 +1,36 @@
-<div class="bg-theme2 text-theme2 h-100 d-flex justify-content-center">
-  <nz-card class="col-10 col-sm-9 col-lg-9 col-xl-7 border-0">
-    <form novalidate [formGroup]="validateForm" (ngSubmit)="submitForm()">
-      <div class="form-group">
-        <label>{{'account.username' | translate}}</label>
-        <input class="form-control" name="username" formControlName="username" autocomplete="username">
-        @if (validateForm.controls['username'].invalid && validateForm.controls['username'].dirty) {
-          <li>
-            {{ 'account.userTip' | translate }}
-          </li>
-        }
+<section class="auth-card">
+  <h1>{{'accountUi.welcome' | translate}}</h1>
+  <p class="auth-intro">{{'accountUi.signInDescription' | translate}}</p>
+  <form novalidate [formGroup]="validateForm" (ngSubmit)="submitForm()">
+    <div class="field">
+      <label for="login-username">{{'account.username' | translate}}</label>
+      <input id="login-username" class="form-control" formControlName="username" autocomplete="username" [placeholder]="'account.pleaseUsername' | translate" [attr.aria-invalid]="validateForm.controls.username.invalid && validateForm.controls.username.touched" aria-describedby="username-error">
+      @if (validateForm.controls.username.invalid && validateForm.controls.username.touched) { <p id="username-error" class="field-error" role="alert">{{'account.userTip' | translate}}</p> }
+    </div>
+    <div class="field">
+      <label for="login-password">{{'account.password' | translate}}</label>
+      <div class="password-control">
+        <input id="login-password" class="form-control" [type]="passwordVisible ? 'text' : 'password'" formControlName="password" autocomplete="current-password" [placeholder]="'account.pleasePassword' | translate" [attr.aria-invalid]="validateForm.controls.password.invalid && validateForm.controls.password.touched" aria-describedby="password-error">
+        <button type="button" class="password-visibility-toggle" (click)="togglePasswordVisibility()" [attr.aria-label]="(passwordVisible ? 'account.hidePassword' : 'account.showPassword') | translate" [attr.aria-pressed]="passwordVisible"><span nz-icon [nzType]="passwordVisible ? 'eye-invisible' : 'eye'" aria-hidden="true"></span></button>
       </div>
-      <div class="form-group">
-        <label>{{'account.password' | translate}}</label>
-        <div class="password-control">
-          <input class="form-control" [type]="passwordVisible ? 'text' : 'password'" name="password"
-                 formControlName="password" autocomplete="current-password">
-          <button type="button" class="password-visibility-toggle" (click)="togglePasswordVisibility()"
-                  [attr.aria-label]="(passwordVisible ? 'account.hidePassword' : 'account.showPassword') | translate"
-                  [attr.aria-pressed]="passwordVisible">
-            <span nz-icon [nzType]="passwordVisible ? 'eye-invisible' : 'eye'" nzTheme="outline"></span>
-          </button>
-        </div>
-        @if (validateForm.controls['password'].invalid && validateForm.controls['password'].dirty) {
-          <li>
-            {{ 'account.passwordTip' | translate }}
-          </li>
-        }
+      @if (validateForm.controls.password.invalid && validateForm.controls.password.touched) { <p id="password-error" class="field-error" role="alert">{{'account.passwordTip' | translate}}</p> }
+    </div>
+    <div class="login-options">
+      <label class="remember"><input type="checkbox" formControlName="remember">{{'account.rememberMe' | translate}}</label>
+      <a routerLink="../forgot-me-password">{{'account.forgotPassword' | translate}}</a>
+    </div>
+    <div class="field">
+      <label for="login-captcha">{{'account.verificationCode' | translate}}</label>
+      <div class="captcha-row">
+        <input id="login-captcha" class="form-control" formControlName="captcha" autocomplete="off" maxlength="6" [placeholder]="'accountUi.captchaPlaceholder' | translate">
+        <button type="button" class="captcha-refresh" (click)="generateVerificationCode()" [disabled]="captchaLoading() || busy()" [attr.aria-label]="'accountUi.refreshCaptcha' | translate">
+          @if (codeUrl) { <img [src]="codeUrl" width="154" height="46" [alt]="'account.verificationCode' | translate"> }
+        </button>
       </div>
-      <div nz-row class="m-2 d-flex justify-content-between">
-        <div >
-          <label nz-checkbox formControlName="remember">
-            <span>{{'account.rememberMe' | translate}}</span>
-          </label>
-        </div>
-        <div>
-          <a class="login-form-forgot" [routerLink]="['../forgot-me-password']">{{'account.forgotPassword' | translate}}</a>
-        </div>
-      </div>
-      <div class="form-group m-2">
-        <nz-row>
-          <nz-col class="my-2">
-            <label class="me-2"><img [src]="codeUrl" width="200" height="50" [alt]="'account.verificationCode' | translate" (click)="generateVerificationCode()"> </label>
-          </nz-col>
-          <nz-col class="d-flex justify-content-center align-items-center my-2">
-            <input type="text" #vCode style="height: 40px">
-          </nz-col>
-        </nz-row>
-      </div>
-      <button class="btn btn-primary" >{{'account.signIn' | translate}}</button>
-      <div class="d-flex flex-row-reverse">
-        <a [routerLink]="['../register']" class="login-form-register">{{'account.registerNow' | translate}}</a>
-      </div>
-    </form>
-  </nz-card>
-</div>
-
-
+      <p class="captcha-hint">{{(captchaLoading() ? 'accountUi.loadingCaptcha' : codeUrl ? 'accountUi.refreshCaptcha' : 'accountUi.retryCaptcha') | translate}}</p>
+      @if (validateForm.controls.captcha.invalid && validateForm.controls.captcha.touched) { <p class="field-error" role="alert">{{'accountUi.captchaPlaceholder' | translate}}</p> }
+    </div>
+    <button type="submit" class="primary-button" [disabled]="busy() || captchaLoading() || !code">{{(busy() ? 'accountUi.signingIn' : 'account.signIn') | translate}}</button>
+    <p class="auth-alternative">{{'accountUi.noAccount' | translate}} <a routerLink="../register">{{'account.registerNow' | translate}}</a></p>
+  </form>
+</section>

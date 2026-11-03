@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {TranslateModule} from '@ngx-translate/core';
+import {inject,  Component } from '@angular/core';
 import {NzSkeletonComponent} from "ng-zorro-antd/skeleton";
 import {ActivatedRoute, RouterLink} from "@angular/router";
 import {NzPopconfirmDirective, NzPopconfirmModule} from "ng-zorro-antd/popconfirm";
@@ -13,6 +15,7 @@ import {ReloadService} from "../../../auth_module/reload.service";
   selector: 'app-keys',
   standalone: true,
   imports: [
+    TranslateModule,
     RouterLink,
     NzPopconfirmModule,
     KeyExhibitComponent
@@ -21,6 +24,7 @@ import {ReloadService} from "../../../auth_module/reload.service";
   styleUrl: './keys.component.css'
 })
 export class KeysComponent {
+  readonly i18n = inject(TranslateService);
   keys: SupplierKey[] | undefined;
   constructor(private call: KeyCallService, private message: NzMessageService,
               private route: ActivatedRoute,
@@ -49,11 +53,11 @@ export class KeysComponent {
       next: keys=>{
         this.keys = keys;
         if(refresh){
-          this.message.success("刷新成功");
+          this.message.success(this.i18n.instant('management.refreshSuccess'));
         }
       },
       error: err => {
-        this.message.error("获取账户信息失败")
+        this.message.error(this.i18n.instant('management.accountsFailed'))
       }
     });
   }

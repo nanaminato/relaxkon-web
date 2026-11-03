@@ -1,4 +1,5 @@
-import {Injectable} from "@angular/core";
+import {TranslateService} from '@ngx-translate/core';
+import {inject, Injectable} from "@angular/core";
 import {NzMessageService} from "ng-zorro-antd/message";
 import {ActivatedRouteSnapshot, Router, RouterStateSnapshot} from "@angular/router";
 import {AuthService} from "../../auth_module";
@@ -8,6 +9,7 @@ import {AuthService} from "../../auth_module";
   providedIn: "root"
 })
 export class AdminAuthGuard {
+  readonly i18n = inject(TranslateService);
   constructor(private message: NzMessageService,
               private authService: AuthService,
               private router: Router) {
@@ -17,7 +19,7 @@ export class AdminAuthGuard {
     if(this.authService.isLogin){
       return true;
     }else{
-      this.message.error("还没有登录哦");
+      this.message.error(this.i18n.instant('management.notSignedIn'));
       this.router.navigate(['/accounts', 'sign-in']);
       return false;
     }

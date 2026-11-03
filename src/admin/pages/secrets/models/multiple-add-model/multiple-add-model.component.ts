@@ -1,4 +1,6 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {TranslateModule} from '@ngx-translate/core';
+import {inject, Component, EventEmitter, Input, Output} from '@angular/core';
 import {Model} from "../../../../models/keys";
 import {NzMessageService} from "ng-zorro-antd/message";
 import {KeyCallService} from "../../../../services";
@@ -11,11 +13,13 @@ import {NzButtonComponent} from "ng-zorro-antd/button";
   styleUrl: './multiple-add-model.component.css',
   standalone: true,
   imports: [
+    TranslateModule,
     FormsModule,
     NzButtonComponent
   ]
 })
 export class MultipleAddModelComponent {
+  readonly i18n = inject(TranslateService);
 
   @Output("close")
   close = new EventEmitter();
@@ -64,7 +68,7 @@ export class MultipleAddModelComponent {
             vision: model.vision ?? false,
           }).subscribe({
             next: () =>{
-              this.message.success("添加成功");
+              this.message.success(this.i18n.instant('management.addSuccess'));
               this.close.next(true);
             },
             error: (err: any) => {

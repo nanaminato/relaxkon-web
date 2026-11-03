@@ -15,7 +15,7 @@ import {SwipeDeleteDirective} from "../../directives/SwipeDeleteDirective";
 @Component({
   selector: 'app-chat-history',
   templateUrl: './chat-history.html',
-  styleUrl: './chat-history.scss',
+  styleUrl: './chat-history.css',
   imports: [
     NzButtonModule,
     NzIconModule,

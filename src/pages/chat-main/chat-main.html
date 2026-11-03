@@ -1,11 +1,3 @@
-<!-- 简化后的 chat-main 模板：
-     - 移除 ballHelper（浮动的管理/添加系统信息按钮）
-     - 移除 miniHead 顶部条（含模型选择/编辑/紧凑操作行）
-     - 移除系统信息相关的模态（添加系统信息、管理系统上下文）
-     - 保留编辑消息模态（用于编辑对话中的某条消息）
-     - 保留菜单切换按钮、logo、对话列表与底部输入区
-     - 模型选择移到选择文件的左边；
-       模型选择、清除按钮、插入标记在工具栏中向上对齐 -->
 @defer (on immediate) {
   <nz-modal [(nzVisible)]="isVisible" [nzTitle]="'chat-main.edit' | translate"
             (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()">
@@ -17,35 +9,30 @@
   <div></div>
 }
 <ng-template #logo>
-  <div
-    class="w-100 h-100 d-flex position-relative align-items-center justify-content-center">
-    <div class="d-flex flex-column">
-      <div class="mb-3 h-[72px] w-[72px]">
-        <div class="d-flex align-items-center justify-content-center rounded-full text-black">
-          <svg width="41" height="41" viewBox="0 0 41 41" xmlns="http://www.w3.org/2000/svg"
-               class="h-2/3 w-2/3" role="img">
-            <text x="-9999" y="-9999">ChatGPT</text>
-            <path
-              d="M37.5324 16.8707C37.9808 15.5241 38.1363 14.0974 37.9886 12.6859C37.8409 11.2744 37.3934 9.91076 36.676 8.68622C35.6126 6.83404 33.9882 5.3676 32.0373 4.4985C30.0864 3.62941 27.9098 3.40259 25.8215 3.85078C24.8796 2.7893 23.7219 1.94125 22.4257 1.36341C21.1295 0.785575 19.7249 0.491269 18.3058 0.500197C16.1708 0.495044 14.0893 1.16803 12.3614 2.42214C10.6335 3.67624 9.34853 5.44666 8.6917 7.47815C7.30085 7.76286 5.98686 8.3414 4.8377 9.17505C3.68854 10.0087 2.73073 11.0782 2.02839 12.312C0.956464 14.1591 0.498905 16.2988 0.721698 18.4228C0.944492 20.5467 1.83612 22.5449 3.268 24.1293C2.81966 25.4759 2.66413 26.9026 2.81182 28.3141C2.95951 29.7256 3.40701 31.0892 4.12437 32.3138C5.18791 34.1659 6.8123 35.6322 8.76321 36.5013C10.7141 37.3704 12.8907 37.5973 14.9789 37.1492C15.9208 38.2107 17.0786 39.0587 18.3747 39.6366C19.6709 40.2144 21.0755 40.5087 22.4946 40.4998C24.6307 40.5054 26.7133 39.8321 28.4418 38.5772C30.1704 37.3223 31.4556 35.5506 32.1119 33.5179C33.5027 33.2332 34.8167 32.6547 35.9659 31.821C37.115 30.9874 38.0728 29.9178 38.7752 28.684C39.8458 26.8371 40.3023 24.6979 40.0789 22.5748C39.8556 20.4517 38.9639 18.4544 37.5324 16.8707ZM22.4978 37.8849C20.7443 37.8874 19.0459 37.2733 17.6994 36.1501C17.7601 36.117 17.8666 36.0586 17.936 36.0161L25.9004 31.4156C26.1003 31.3019 26.2663 31.137 26.3813 30.9378C26.4964 30.7386 26.5563 30.5124 26.5549 30.2825V19.0542L29.9213 20.998C29.9389 21.0068 29.9541 21.0198 29.9656 21.0359C29.977 21.052 29.9842 21.0707 29.9867 21.0902V30.3889C29.9842 32.375 29.1946 34.2791 27.7909 35.6841C26.3872 37.0892 24.4838 37.8806 22.4978 37.8849ZM6.39227 31.0064C5.51397 29.4888 5.19742 27.7107 5.49804 25.9832C5.55718 26.0187 5.66048 26.0818 5.73461 26.1244L13.699 30.7248C13.8975 30.8408 14.1233 30.902 14.3532 30.902C14.583 30.902 14.8088 30.8408 15.0073 30.7248L24.731 25.1103V28.9979C24.7321 29.0177 24.7283 29.0376 24.7199 29.0556C24.7115 29.0736 24.6988 29.0893 24.6829 29.1012L16.6317 33.7497C14.9096 34.7416 12.8643 35.0467 10.9647 34.5958C9.06504 34.1449 7.38587 32.9762 6.39227 31.0064ZM4.29707 13.6194C5.17171 12.0999 6.55213 10.9367 8.20629 10.3444C8.20629 10.4124 8.19949 10.5264 8.19949 10.6124V19.7676C8.19697 19.9975 8.25684 20.2238 8.37202 20.4229C8.4872 20.6221 8.65333 20.787 8.85313 20.9012L18.5783 26.5128L15.9776 29.4943C15.9641 29.5132 15.9464 29.5289 15.926 29.5403C15.9056 29.5517 15.883 29.5585 15.8598 29.5601L7.00473 24.7919C5.28091 23.8479 4.00106 22.3055 3.39205 20.4798C2.78305 18.6541 2.88687 16.6717 3.68264 14.9172C3.86507 14.5131 4.07214 14.1135 4.29707 13.6194ZM34.2414 19.2625L24.5406 13.6942L27.0985 10.7204C27.112 10.7016 27.1296 10.6859 27.15 10.6745C27.1704 10.6631 27.1929 10.6563 27.2161 10.6546L36.0713 15.4229C37.7396 16.3305 39.0043 17.7943 39.6543 19.5344C40.3043 21.2745 40.2988 23.1767 39.6391 24.9132C38.9794 26.6498 37.7063 28.1065 36.0335 29.0045C34.3607 29.9025 32.4219 30.167 30.564 29.7441C30.5474 29.7386 30.5323 29.7294 30.5201 29.7175C30.5079 29.7056 30.4989 29.6912 30.4937 29.6755V20.4535C30.4961 20.2228 30.4362 19.9958 30.321 19.7959C30.2058 19.5959 30.0393 19.4304 29.8389 19.3161L34.2414 19.2625ZM36.1166 12.9214L27.3069 8.17528C27.1077 8.0643 26.8826 8.0061 26.654 8.0061C26.4254 8.0061 26.2003 8.0643 26.0011 8.17528L16.2415 13.8158L19.2089 6.85329C19.219 6.83452 19.2333 6.81853 19.2506 6.80658C19.2679 6.79463 19.2876 6.78701 19.3081 6.78429L28.1633 6.76029C29.9116 6.7654 31.6089 7.37902 32.9626 8.49994C34.3163 9.62086 35.2535 11.1946 35.641 12.9471C35.4668 12.937 35.2923 12.9299 35.1166 12.9214H36.1166ZM11.7762 18.6596V10.7394C11.7762 10.7224 11.7832 10.7059 11.7944 10.6922C11.8055 10.6786 11.8204 10.6684 11.8369 10.6628L20.6659 6.76364C20.6855 6.75766 20.7063 6.75681 20.7263 6.76125C20.7463 6.76569 20.7649 6.77531 20.78 6.78929L23.7336 13.728L17.422 17.3012L11.7762 18.6596ZM13.2196 24.3393L18.5768 21.2132L24.9244 24.3393V30.1156C24.9248 30.1336 24.9183 30.1514 24.9071 30.1663C24.896 30.1812 24.8807 30.1925 24.8634 30.1989L16.0753 34.0389C16.0549 34.0459 16.033 34.0482 16.0114 34.0455C15.9897 34.0427 15.969 34.0349 15.9508 34.0229L13.2396 30.3045C13.2278 30.2918 13.2195 30.2765 13.2152 30.26C13.211 30.2435 13.211 30.2264 13.2152 30.2099V24.3393H13.2196Z"
-              fill="currentColor"></path>
-          </svg>
-        </div>
-      </div>
-      <div class="mb-5 fs-5">{{ 'help' | translate}}</div>
+  <section class="empty-state">
+    <span class="empty-mark" aria-hidden="true">T</span>
+    <h1>{{'workspace.chatWelcome' | translate}}</h1>
+    <p>{{'workspace.chatDescription' | translate}}</p>
+    <div class="starter-grid">
+      <button type="button" (click)="useStarter('workspace.planPrompt')"><span nz-icon nzType="bulb" aria-hidden="true"></span><strong>{{'workspace.plan' | translate}}</strong><small>{{'workspace.planHint' | translate}}</small></button>
+      <button type="button" (click)="useStarter('workspace.writePrompt')"><span nz-icon nzType="edit" aria-hidden="true"></span><strong>{{'workspace.write' | translate}}</strong><small>{{'workspace.writeHint' | translate}}</small></button>
+      <button type="button" (click)="useStarter('workspace.codePrompt')"><span nz-icon nzType="code" aria-hidden="true"></span><strong>{{'workspace.code' | translate}}</strong><small>{{'workspace.codeHint' | translate}}</small></button>
     </div>
-  </div>
+  </section>
 </ng-template>
-<div class="chat-main w-100 h-100 bg-theme2 text-theme2">
+<div class="chat-main w-100 h-100 bg-theme2 text-theme">
   <!-- 顶部菜单切换按钮（独立、低 z-index，不放在 sticky-top 容器中） -->
   <div class="chat-topbar px-2 py-2">
     <button nz-button class="bg-theme2 text-theme2 border-0" type="button" (click)="toggleMenu()"
-            [attr.aria-label]="menuVisible() ? 'Close navigation' : 'Open navigation'">
+            [attr.aria-label]="(menuVisible() ? 'workspace.closeNavigation' : 'workspace.openNavigation') | translate">
       @if(menuVisible()){
         <nz-icon nzType="menu-fold" nzTheme="outline" />
       }@else{
         <nz-icon nzType="menu-unfold" nzTheme="outline" />
       }
     </button>
+    <div class="chat-heading"><strong>{{'universal.aiChat' | translate}}</strong><span>{{'workspace.chatSubtitle' | translate}}</span></div>
+    <app-language-switcher></app-language-switcher>
   </div>
   <div class="chat-messages" #chatPanel>
     @if (showLogo()) {
@@ -87,17 +74,17 @@
         <div class="composer-tools align-items-start">
           <button type="button" class="text-theme2 border-1 border-theme2 bg-theme2 rounded-2"
                   (click)="clearContext()"
-                  nz-tooltip [nzTooltipTitle]="'chat-main.clearContext' | translate ">
+                  nz-tooltip [nzTooltipTitle]="'chat-main.clearContext' | translate" [attr.aria-label]="'chat-main.clearContext' | translate">
             <img src="assets/svgs/clear.svg" width="30" height="20" [alt]="'chat-main.clear' | translate ">
           </button>
           <button type="button" class="text-theme2 border-1 border-theme2 bg-theme2 rounded-2"
                   (click)="insertInlineCodeFlags()"
-                  nz-tooltip [nzTooltipTitle]="'chat-main.insertInlineCode' | translate">
+                  nz-tooltip [nzTooltipTitle]="'chat-main.insertInlineCode' | translate" [attr.aria-label]="'chat-main.insertInlineCode' | translate">
             <span nz-icon nzType="italic" nzTheme="outline"></span>
           </button>
           <button type="button" class="text-theme2 border-1 border-theme2 bg-theme2 rounded-2"
                   (click)="insertCodeFlags()"
-                  nz-tooltip [nzTooltipTitle]="'chat-main.insertCodeBlock' | translate">
+                  nz-tooltip [nzTooltipTitle]="'chat-main.insertCodeBlock' | translate" [attr.aria-label]="'chat-main.insertCodeBlock' | translate">
             <span nz-icon nzType="code" nzTheme="outline"></span>
           </button>
         </div>
@@ -109,11 +96,13 @@
                     [nzAutosize]="{minRows: 2,maxRows: 6}"
                     [(ngModel)]="inputText"
                     (keydown)="handlePromptKeydown($event)"
+                    [attr.aria-label]="'workspace.message' | translate"
                     class="flex-grow-1 text-theme ask-box bg-transparent"></textarea>
         <div class="d-flex flex-column-reverse">
-          <button nz-button type="button" class="rounded-5 bg-dark send-button"
+          <button nz-button type="button" class="send-button"
                   [nzSize]="'small'"
-                  [class.bg-opacity-10]="isFade()"
+                  [class.send-muted]="isFade()"
+                  [attr.aria-label]="(answering ? 'workspace.stopResponse' : 'workspace.sendMessage') | translate"
                   nz-tooltip [nzTooltipTitle]="miniPhone()? '': 'chat-main.ctrlEnterShortcut' | translate "
                   (click)="buttonControlGPT()"
                   [disabled]="!enableTouch()">

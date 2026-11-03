@@ -1,3 +1,5 @@
+import {TranslateService} from '@ngx-translate/core';
+import {TranslateModule} from '@ngx-translate/core';
 import {Component, inject, EventEmitter, Output} from '@angular/core';
 import {
   FormControl,
@@ -16,6 +18,7 @@ import {Model} from '../../../../models/keys'
   selector: 'app-new-model',
   standalone: true,
   imports: [
+    TranslateModule,
     FormsModule,
     ReactiveFormsModule,
     NzButtonComponent
@@ -24,6 +27,7 @@ import {Model} from '../../../../models/keys'
   styleUrl: './new-model.component.css'
 })
 export class NewModelComponent {
+  readonly i18n = inject(TranslateService);
   private readonly fb = inject(NonNullableFormBuilder);
   validateForm: FormGroup<{
     name: FormControl<string>;
@@ -59,7 +63,7 @@ export class NewModelComponent {
         vision: this.validateForm.value.vision!
       }).subscribe({
         next: () =>{
-          this.message.success("添加成功");
+          this.message.success(this.i18n.instant('management.addSuccess'));
           this.close.next(true);
         },
         error: (err: any) => {

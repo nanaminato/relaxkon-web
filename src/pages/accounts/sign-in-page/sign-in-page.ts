@@ -1,101 +1,80 @@
-import {Component, ElementRef, inject, Inject, ViewChild} from '@angular/core';
-import {Router, RouterLink} from "@angular/router";
-import {NzCardModule} from "ng-zorro-antd/card";
-import {NzButtonModule} from "ng-zorro-antd/button";
-import {NzIconModule} from "ng-zorro-antd/icon";
-import {TranslateModule} from "@ngx-translate/core";
-import {NzColDirective, NzRowDirective} from "ng-zorro-antd/grid";
-import {
-  FormControl,
-  FormGroup,
-  FormsModule,
-  NonNullableFormBuilder,
-  ReactiveFormsModule,
-  Validators
-} from "@angular/forms";
-import {NzCheckboxComponent} from "ng-zorro-antd/checkbox";
-import {NzMessageService} from "ng-zorro-antd/message";
-import {VerificationService} from "../../../auth_module";
-import {Store} from "@ngrx/store";
-import {authActions} from "../../../systems/store/system.actions";
-import {LocalizationService} from '../../../services/normal-services';
+import {Component, DestroyRef, inject, signal} from '@angular/core';
+import {RouterLink} from '@angular/router';
+import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {TranslateModule} from '@ngx-translate/core';
+import {NzIconModule} from 'ng-zorro-antd/icon';
+import {NzMessageService} from 'ng-zorro-antd/message';
+import {Store} from '@ngrx/store';
+import {Actions, ofType} from '@ngrx/effects';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {finalize, Subscription} from 'rxjs';
+import {VerificationService} from '../../../auth_module';
+import {authActions} from '../../../systems/store/system.actions';
+import {LocalizationService} from '../../../services/normal-services/localization.service';
 
 @Component({
-  standalone: true,
-  imports: [
-    NzCardModule,
-    RouterLink,
-    NzButtonModule,
-    NzIconModule,
-    TranslateModule,
-    NzColDirective,
-    ReactiveFormsModule,
-    NzRowDirective,
-    NzCheckboxComponent,
-    FormsModule
-  ],
-  selector: 'app-sign-in-page',
-  templateUrl: './sign-in-page.html',
-  styleUrl: './sign-in-page.css'
+  selector: 'app-sign-in-page', standalone: true,
+  imports: [RouterLink, ReactiveFormsModule, TranslateModule, NzIconModule],
+  templateUrl: './sign-in-page.html', styleUrls: ['../auth-form.css', './sign-in-page.css']
 })
 export class SignInPage {
-  private fb = inject(NonNullableFormBuilder)
-  validateForm: FormGroup<{
-    username: FormControl<string>;
-    password: FormControl<string>;
-    remember: FormControl<boolean>;
-  }> = this.fb.group({
-    username: ['', [Validators.required,Validators.minLength(3), Validators.maxLength(20)]],
-    password: ['', [Validators.required,Validators.minLength(6), Validators.maxLength(20)]],
-    remember: [true]
+  private readonly fb = inject(NonNullableFormBuilder);
+  private readonly verification = inject(VerificationService);
+  private readonly message = inject(NzMessageService);
+  private readonly localization = inject(LocalizationService);
+  private readonly store = inject(Store);
+  private readonly actions = inject(Actions);
+  private captchaRequest?: Subscription;
+  readonly busy = signal(false);
+  readonly captchaLoading = signal(false);
+  readonly validateForm = this.fb.group({
+    username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
+    password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(20)]],
+    remember: [true],
+    captcha: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]]
   });
-  verificationService: VerificationService = inject(VerificationService);
-  message: NzMessageService = inject(NzMessageService);
-  private localization = inject(LocalizationService);
-  router: Router = inject(Router);
-  @ViewChild("vCode")
-  vCode: ElementRef |undefined;
-  store = inject(Store);
   passwordVisible = false;
+  code?: string;
+  codeUrl?: string;
 
-  togglePasswordVisibility(): void {
-    this.passwordVisible = !this.passwordVisible;
+  constructor() {
+    inject(DestroyRef).onDestroy(() => this.captchaRequest?.unsubscribe());
+    this.actions.pipe(ofType(authActions.loginSuccess, authActions.loginFailure), takeUntilDestroyed()).subscribe(action => {
+      if (!this.busy()) return;
+      this.busy.set(false);
+      if (action.type === authActions.loginFailure.type) this.generateVerificationCode();
+    });
   }
+
+  ngOnInit(): void { this.generateVerificationCode(); }
+  togglePasswordVisibility(): void { this.passwordVisible = !this.passwordVisible; }
 
   submitForm(): void {
-    if (this.validateForm.valid) {
-      if(this.code?.toLowerCase()!==this.vCode?.nativeElement.value.toLowerCase()){
-        this.message.error(this.localization.text('notifications.invalidVerificationCode'));
-        this.generateVerificationCode();
-        return;
-      }
-      let username = this.validateForm.value.username;
-      let password = this.validateForm.value.password!;
-      this.store.dispatch(authActions.login({ username: username!, password: password! }));
-    } else {
-      Object.values(this.validateForm.controls).forEach(control => {
-        if (control.invalid) {
-          control.markAsDirty();
-          control.updateValueAndValidity({ onlySelf: true });
-        }
-      });
+    if (this.busy() || this.captchaLoading()) return;
+    this.validateForm.markAllAsTouched();
+    if (this.validateForm.invalid) return;
+    const {username, password, captcha} = this.validateForm.getRawValue();
+    if (!this.code || captcha.trim().toLowerCase() !== this.code.toLowerCase()) {
+      this.message.error(this.localization.text('notifications.invalidVerificationCode'));
+      this.generateVerificationCode(); return;
     }
-  }
-  ngOnInit(): void {
-    this.generateVerificationCode();
-  }
-  code: string | undefined;
-  codeUrl: string | undefined;
-  generateVerificationCode() {
-    this.verificationService.generateVerificationCode()
-      .subscribe(
-      {
-        next: (value:any) => {
-          this.code = value.code;
-          this.codeUrl = 'data:image/jpeg;base64,' + value.img;
-        }
-      }
-    );
+    this.busy.set(true);
+    this.store.dispatch(authActions.login({username, password}));
   }
 
+  generateVerificationCode(): void {
+    this.captchaRequest?.unsubscribe();
+    this.code = undefined;
+    this.validateForm.controls.captcha.reset();
+    this.captchaLoading.set(true);
+    this.captchaRequest = this.verification.generateVerificationCode().pipe(
+      finalize(() => this.captchaLoading.set(false))
+    ).subscribe({
+      next: value => {
+        this.code = value.code;
+        this.codeUrl = `data:${value.contentType === 'image/svg+xml' ? 'image/svg+xml' : 'image/jpeg'};base64,${value.img}`;
+      },
+      error: () => { this.codeUrl = undefined; }
+    });
+  }
 }

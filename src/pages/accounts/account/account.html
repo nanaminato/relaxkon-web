@@ -1,23 +1,11 @@
-<div class="d-flex flex-column w-100 h-100 bg-light text-dark">
-  <div class="sticky-top">
-    <div>
-      <div class="d-flex flex-row justify-content-between align-items-center p-2">
-        <button nz-button class="mx-2">
-          @if(menuVisible()){
-            <nz-icon nzType="menu-fold" nzTheme="outline" (click)="toggleMenu()"/>
-          }@else{
-            <nz-icon nzType="menu-unfold" nzTheme="outline" (click)="toggleMenu()" />
-          }
-        </button>
-        <div>{{'account.self' | translate}}</div>
-        <button nz-button [routerLink]="'/chat'">
-          <span nz-icon nzType="rollback" nzTheme="outline"></span>
-        </button>
-      </div>
-    </div>
-  </div>
-  <div class="flex-grow-1">
-    <router-outlet></router-outlet>
-  </div>
+<div class="account-shell">
+  <header class="account-header">
+    <a class="brand" routerLink="/chat" aria-label="Turbo AI"><span class="brand-mark" aria-hidden="true">T</span>Turbo AI</a>
+    <nav>
+      <app-language-switcher></app-language-switcher>
+      <a class="back-link" routerLink="/chat"><span aria-hidden="true">←</span> {{'accountUi.backToChat' | translate}}</a>
+    </nav>
+  </header>
+  <main class="account-content"><router-outlet></router-outlet></main>
+  <footer>Turbo AI <span aria-hidden="true">·</span> {{'accountUi.footer' | translate}}</footer>
 </div>
-

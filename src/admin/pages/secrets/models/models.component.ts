@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {TranslateModule} from '@ngx-translate/core';
+import {inject,  Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -26,6 +28,7 @@ import { KeyCallService } from '../../../services';
   selector: 'app-models',
   standalone: true,
   imports: [
+    TranslateModule,
     FormsModule,
     RouterLink,
     NzButtonModule,
@@ -50,6 +53,7 @@ import { KeyCallService } from '../../../services';
   styleUrl: './models.component.css'
 })
 export class ModelsComponent {
+  readonly i18n = inject(TranslateService);
   models: Model[] | undefined;
   displayModels: Model[] = [];
   searchText = '';
@@ -75,13 +79,13 @@ export class ModelsComponent {
         this.models = models;
         this.filterModels();
         if (refresh) {
-          this.message.success('刷新成功');
+          this.message.success(this.i18n.instant('management.refreshSuccess'));
         }
       },
       error: (err: any) => {
         this.models = [];
         this.filterModels();
-        this.message.error('获取模型信息失败');
+        this.message.error(this.i18n.instant('management.modelsFailed'));
       }
     });
   }
@@ -102,11 +106,11 @@ export class ModelsComponent {
   delete(roleId: number) {
     this.call.deleteModel(roleId).subscribe({
       next: () => {
-        this.message.success('删除成功');
+        this.message.success(this.i18n.instant('management.deleteSuccess'));
         this.fetchModels(true);
       },
       error: () => {
-        this.message.error('删除错误');
+        this.message.error(this.i18n.instant('management.deleteFailed'));
       }
     });
   }

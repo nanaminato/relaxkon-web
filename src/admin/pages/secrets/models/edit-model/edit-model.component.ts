@@ -1,3 +1,5 @@
+import {TranslateService} from '@ngx-translate/core';
+import {TranslateModule} from '@ngx-translate/core';
 import {Component, inject, EventEmitter, Input, Output} from '@angular/core';
 import {
   FormControl,
@@ -15,6 +17,7 @@ import {Model} from "../../../../models/keys";
   selector: 'app-edit-model',
   standalone: true,
   imports: [
+    TranslateModule,
     FormsModule,
     ReactiveFormsModule
   ],
@@ -22,6 +25,7 @@ import {Model} from "../../../../models/keys";
   styleUrl: './edit-model.component.css'
 })
 export class EditModelComponent {
+  readonly i18n = inject(TranslateService);
   private readonly fb = inject(NonNullableFormBuilder);
   validateForm: FormGroup<{
     modelId: FormControl<number>;
@@ -66,7 +70,7 @@ export class EditModelComponent {
         })
         .subscribe({
           next: () =>{
-            this.message.success("更改模型成功");
+            this.message.success(this.i18n.instant('management.modelUpdated'));
             this.close.next(true);
           },
           error: (err: any) => {

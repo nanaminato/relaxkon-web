@@ -1,66 +1,39 @@
-<div class="bg-theme2 text-theme2 h-100 d-flex justify-content-center">
-  <nz-card class="col-10 col-sm-9 col-lg-9 col-xl-7 border-0">
-    <form nz-form [formGroup]="validateForm" class="register-form" (ngSubmit)="submitForm()">
-      <div class="form-group">
-        <label>{{ 'account.email' | translate }}</label>
-        <input class="form-control" name="email" formControlName="email"
-               [placeholder]="'account.pleaseEmail' | translate">
-        @if (validateForm.controls['email'].invalid && validateForm.controls['email'].dirty) {
-          <li>
-            {{ 'account.pleaseEmail' | translate }}
-          </li>
-        }
+<section class="auth-card">
+  <h1>{{'accountUi.createAccount' | translate}}</h1>
+  <p class="auth-intro">{{'accountUi.registerDescription' | translate}}</p>
+  <form novalidate [formGroup]="validateForm" (ngSubmit)="submitForm()">
+    <div class="field">
+      <label for="register-email">{{'account.email' | translate}}</label>
+      <input id="register-email" type="email" class="form-control" formControlName="email" autocomplete="email" [placeholder]="'account.pleaseEmail' | translate">
+      @if (validateForm.controls.email.invalid && validateForm.controls.email.dirty) { <p class="field-error" role="alert">{{'account.pleaseEmail' | translate}}</p> }
+    </div>
+    <div class="field">
+      <label for="register-username">{{'account.username' | translate}}</label>
+      <input id="register-username" class="form-control" formControlName="username" autocomplete="username" [placeholder]="'account.pleaseUsername' | translate">
+      @if (validateForm.controls.username.invalid && validateForm.controls.username.dirty) { <p class="field-error" role="alert">{{'account.userTip' | translate}}</p> }
+    </div>
+    <div class="field">
+      <label for="register-password">{{'account.password' | translate}}</label>
+      <input id="register-password" class="form-control" type="password" formControlName="password" autocomplete="new-password" [placeholder]="'account.pleasePassword' | translate">
+      @if (validateForm.controls.password.invalid && validateForm.controls.password.dirty) { <p class="field-error" role="alert">{{'account.passwordTip' | translate}}</p> }
+    </div>
+    <div class="field">
+      <label for="register-confirm">{{'account.confirmPassword' | translate}}</label>
+      <input id="register-confirm" class="form-control" type="password" formControlName="confirm" autocomplete="new-password" [placeholder]="'account.pleaseConfirmPassword' | translate">
+      @if (validateForm.controls.confirm.invalid && validateForm.controls.confirm.dirty) { <p class="field-error" role="alert">{{'account.pleaseConfirmPassword' | translate}}</p> }
+      @else if (validateForm.value.confirm !== validateForm.value.password && validateForm.controls.confirm.dirty) { <p class="field-error" role="alert">{{'account.notWith' | translate}}</p> }
+    </div>
+    <div class="field">
+      <label for="register-captcha">{{'account.verificationCode' | translate}}</label>
+      <div class="captcha-row">
+        <input id="register-captcha" class="form-control" type="text" #vCode autocomplete="off" maxlength="6" [placeholder]="'accountUi.captchaPlaceholder' | translate">
+        <button class="captcha-refresh" type="button" (click)="generateVerificationCode()" [attr.aria-label]="'accountUi.refreshCaptcha' | translate">
+          @if (codeUrl) { <img [src]="codeUrl" width="154" height="46" [alt]="'account.verificationCode' | translate"> }
+        </button>
       </div>
-      <div class="form-group">
-        <label>{{ 'account.username' | translate }}</label>
-        <input class="form-control" name="username" formControlName="username"
-               [placeholder]="'account.pleaseUsername' | translate">
-        @if (validateForm.controls['username'].invalid && validateForm.controls['username'].dirty) {
-          <li>
-            {{ 'account.userTip' | translate }}
-          </li>
-        }
-      </div>
-      <div class="form-group">
-        <label>{{ 'account.password' | translate }}</label>
-        <input class="form-control" type="password" name="password" formControlName="password"
-               [placeholder]="'account.pleasePassword' | translate">
-        @if (validateForm.controls['password'].invalid && validateForm.controls['password'].dirty) {
-          <li>
-            {{ 'account.passwordTip' | translate }}
-          </li>
-        }
-      </div>
-      <div class="form-group">
-        <label>{{ 'account.confirmPassword' | translate }}</label>
-        <input class="form-control" type="password" name="confirm" formControlName="confirm"
-               [placeholder]="'account.pleaseConfirmPassword' | translate">
-        @if (validateForm.controls['confirm'].invalid && validateForm.controls['confirm'].dirty) {
-          <li>
-            {{ 'account.pleaseConfirmPassword' | translate }}
-          </li>
-        } @else if (validateForm.value.confirm !== validateForm.value.password) {
-          <li>
-            {{ 'account.notWith' | translate }}
-          </li>
-        }
-      </div>
-      <div class="form-group m-2">
-        <nz-row>
-          <nz-col class="my-2">
-            <label class="me-2"><img [src]="codeUrl" width="200" height="50" [alt]="'account.verificationCode' | translate" (click)="generateVerificationCode()"> </label>
-          </nz-col>
-          <nz-col class="d-flex justify-content-center align-items-center my-2">
-            <input type="text" #vCode style="height: 40px">
-          </nz-col>
-        </nz-row>
-      </div>
-      <button class="btn btn-primary mt-2" type="submit"
-      >{{ 'account.registerNow' | translate }}
-      </button>
-      <div class="d-flex flex-row-reverse">
-        <a [routerLink]="['../sign-in']">{{ 'account.haveAccount' | translate }}</a>
-      </div>
-    </form>
-  </nz-card>
-</div>
+      <p class="captcha-hint">{{'accountUi.refreshCaptcha' | translate}}</p>
+    </div>
+    <button type="submit" class="primary-button">{{'account.registerNow' | translate}}</button>
+    <p class="auth-alternative"><a routerLink="../sign-in">{{'account.haveAccount' | translate}}</a></p>
+  </form>
+</section>

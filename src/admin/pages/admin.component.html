@@ -1,57 +1,24 @@
-<nz-layout class="app-layout">
-  <nz-sider class="menu-sidebar"
-            nzCollapsible
-            nzWidth="256px"
-            nzBreakpoint="md"
-            [(nzCollapsed)]="isCollapsed"
-            [nzTrigger]="null">
-    <div class="sidebar-logo">
-      <a href="/chat" target="_self">
-        <img src="assets/admin/icons/favicon.ico" alt="logo">
-        <h1>Turbo AI Control Center</h1>
-      </a>
-    </div>
-    <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="isCollapsed">
-      <li nz-submenu nzOpen nzTitle="控制台" nzIcon="dashboard">
-        <ul>
-          <li nz-menu-item nzMatchRouter>
-            <a routerLink="secrets/models">模型</a>
-          </li>
-          <li nz-menu-item nzMatchRouter>
-            <a  routerLink="secrets/keys">接口密钥</a>
-          </li>
-        </ul>
-      </li>
-      <li nz-submenu nzOpen nzTitle="账户信息" nzIcon="form">
-        <ul>
-          <li nz-menu-item nzMatchRouter>
-            <a routerLink="accounts/account-management">账户</a>
-          </li>
-          <li nz-menu-item nzMatchRouter>
-            <a routerLink="accounts/roles">身份</a>
-          </li>
-          <li nz-menu-item nzMatchRouter>
-            <a  routerLink="accounts/account-info">管理员</a>
-          </li>
-        </ul>
-      </li>
-    </ul>
-  </nz-sider>
-  <nz-layout>
-    <nz-header>
-      <div class="app-header">
-        <span class="header-trigger" (click)="isCollapsed = !isCollapsed">
-            <span class="trigger"
-                  nz-icon
-                  [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"
-            ></span>
-        </span>
-      </div>
-    </nz-header>
-    <nz-content>
-      <div class="inner-content">
-        <router-outlet></router-outlet>
-      </div>
-    </nz-content>
-  </nz-layout>
-</nz-layout>
+<div class="admin-workspace" [class.navigation-collapsed]="isCollapsed">
+  @if (compact && !isCollapsed) { <button class="admin-backdrop" (click)="isCollapsed = true" [attr.aria-label]="'workspace.closeNavigation' | translate"></button> }
+  <aside class="admin-navigation" id="admin-navigation" [attr.aria-label]="'admin.controlCenter' | translate" [attr.inert]="isCollapsed ? '' : null">
+    <a class="workspace-brand" routerLink="/chat"><span class="workspace-mark" aria-hidden="true">T</span>Turbo AI</a>
+    <p class="nav-caption">{{'workspace.manage' | translate}}</p>
+    <nav>
+      <a routerLink="secrets/models" routerLinkActive="nav-active" (click)="closeOnMobile()"><span nz-icon nzType="appstore" aria-hidden="true"></span>{{'management.models' | translate}}</a>
+      <a routerLink="secrets/keys" routerLinkActive="nav-active" (click)="closeOnMobile()"><span nz-icon nzType="key" aria-hidden="true"></span>{{'management.keys' | translate}}</a>
+      <p class="nav-caption">{{'management.accountInfo' | translate}}</p>
+      <a routerLink="accounts/account-management" routerLinkActive="nav-active" (click)="closeOnMobile()"><span nz-icon nzType="user" aria-hidden="true"></span>{{'management.accounts' | translate}}</a>
+      <a routerLink="accounts/roles" routerLinkActive="nav-active" (click)="closeOnMobile()"><span nz-icon nzType="team" aria-hidden="true"></span>{{'management.roles' | translate}}</a>
+      <a routerLink="accounts/account-info" routerLinkActive="nav-active" (click)="closeOnMobile()"><span nz-icon nzType="setting" aria-hidden="true"></span>{{'management.admin' | translate}}</a>
+    </nav>
+    <a class="admin-back" routerLink="/chat">← {{'accountUi.backToChat' | translate}}</a>
+  </aside>
+  <div class="admin-main">
+    <header class="workspace-header">
+      <button class="workspace-icon-button" (click)="isCollapsed = !isCollapsed" [attr.aria-expanded]="!isCollapsed" aria-controls="admin-navigation" [attr.aria-label]="(isCollapsed ? 'workspace.openNavigation' : 'workspace.closeNavigation') | translate"><span nz-icon [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'" aria-hidden="true"></span></button>
+      <div><h1>{{'admin.controlCenter' | translate}}</h1><p>{{'workspace.adminDescription' | translate}}</p></div>
+      <app-language-switcher></app-language-switcher>
+    </header>
+    <main class="admin-content"><div class="inner-content"><router-outlet></router-outlet></div></main>
+  </div>
+</div>

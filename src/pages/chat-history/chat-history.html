@@ -6,17 +6,21 @@
             (click)="newChat()"
             class="bg-theme w-100 p-2 z-1 d-flex button-hover justify-content-between text-theme border-0">
       <span>
-        <img src="assets/icon/favicon.ico" width="20" height="20" alt="ico">
+        <span class="new-chat-mark" aria-hidden="true">＋</span>
         {{ 'chat-history.new-chat' | translate}}
       </span>
       <span nz-icon nzType="edit" nzTheme="outline"></span>
     </button>
   </div>
-  <div class="m-2"></div>
+  <p class="history-caption">{{'workspace.recentChats' | translate}}</p>
   @for(history of historyTitles; track history.dataId){
     <div class="history-title bg-theme text-theme d-flex justify-content-start"
          [class.selected]="selectId===history.dataId"
          [class.show-delete]="showdeleteHistory(history.dataId)"
+         role="button" tabindex="0"
+         (keydown.enter)="selectHistory(history.dataId)"
+         (keydown.space)="$event.preventDefault(); selectHistory(history.dataId)"
+         [attr.aria-current]="selectId===history.dataId ? 'page' : null"
          (click)="selectHistory(history.dataId)"
          (contextmenu)="onRightClick($event, history.dataId)"
          appSwipeDelete
@@ -27,8 +31,8 @@
         {{history.title}}
       </span>
       @if(deleteButtonsVisible[history.dataId]){
-        <button class="delete-btn"
-                (click)="deleteHistory(history.dataId)">{{ 'universal.delete' | translate }}</button>
+        <button class="delete-btn" (keydown)="$event.stopPropagation()"
+                (click)="$event.stopPropagation(); deleteHistory(history.dataId)">{{ 'universal.delete' | translate }}</button>
       }
     </div>
   }

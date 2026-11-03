@@ -1,4 +1,6 @@
-import {Component, OnInit} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {TranslateModule} from '@ngx-translate/core';
+import {inject, Component, OnInit} from '@angular/core';
 import {NzMessageService} from "ng-zorro-antd/message";
 import {NzSkeletonComponent} from "ng-zorro-antd/skeleton";
 import {ActivatedRoute, RouterLink} from "@angular/router";
@@ -12,6 +14,7 @@ import { admin_routes } from '../../../routes';
   templateUrl: './account-management.component.html',
   styleUrl: './account-management.component.css',
   imports: [
+    TranslateModule,
     NzSkeletonComponent,
     RouterLink,
     NzPopconfirmDirective
@@ -19,6 +22,7 @@ import { admin_routes } from '../../../routes';
   standalone: true
 })
 export class AccountManagementComponent implements OnInit{
+  readonly i18n = inject(TranslateService);
     accounts: Account[] | undefined;
     constructor(private call: AccountCallService, private message: NzMessageService,
                 private route: ActivatedRoute) {
@@ -43,7 +47,7 @@ export class AccountManagementComponent implements OnInit{
       this.call.deleteAccountById(id)
         .subscribe({
           next: msg=>{
-            this.message.success("删除成功")
+            this.message.success(this.i18n.instant('management.deleteSuccess'))
             this.refresh();
           },
           error: err=>{
@@ -56,11 +60,11 @@ export class AccountManagementComponent implements OnInit{
         next: accounts=>{
           this.accounts = accounts;
           if(refresh){
-            this.message.success("刷新成功");
+            this.message.success(this.i18n.instant('management.refreshSuccess'));
           }
         },
         error: err => {
-          this.message.error("获取账户信息失败")
+          this.message.error(this.i18n.instant('management.accountsFailed'))
         }
       });
     }

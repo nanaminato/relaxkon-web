@@ -1,3 +1,5 @@
+import {TranslateService} from '@ngx-translate/core';
+import {TranslateModule} from '@ngx-translate/core';
 import { Component, inject } from '@angular/core';
 import {
   FormControl,
@@ -17,6 +19,7 @@ import {admin_routes} from "../../../../routes";
   selector: 'app-account-create',
   standalone: true,
   imports: [
+    TranslateModule,
     FormsModule,
     ReactiveFormsModule,
     NzTooltipDirective
@@ -25,6 +28,7 @@ import {admin_routes} from "../../../../routes";
   styleUrl: './account-create.component.css'
 })
 export class AccountCreateComponent {
+  readonly i18n = inject(TranslateService);
   private readonly fb = inject(NonNullableFormBuilder);
   constructor(
     private message: NzMessageService,
@@ -56,7 +60,7 @@ export class AccountCreateComponent {
   roles: Role[] = [];
   allRoles: Role[] | undefined;
   actionTip(roleId: number){
-    return this.roles.find(r=>r.roleId===roleId)!==undefined?'移除':'添加';
+    return this.roles.find(r=>r.roleId===roleId)!==undefined?this.i18n.instant('management.remove'):this.i18n.instant('management.add');
   }
   active(roleId: number){
     return this.roles.find(r=>r.roleId===roleId)!==undefined;
@@ -66,11 +70,11 @@ export class AccountCreateComponent {
       next: roles=>{
         this.allRoles = roles;
         if(refresh){
-          this.message.success("刷新成功");
+          this.message.success(this.i18n.instant('management.refreshSuccess'));
         }
       },
       error:() => {
-        this.message.error("获取账户信息失败")
+        this.message.error(this.i18n.instant('management.accountsFailed'))
       }
     })
   }
@@ -87,7 +91,7 @@ export class AccountCreateComponent {
         })
         .subscribe({
           next: () =>{
-            this.message.success('创建账户成功');
+            this.message.success(this.i18n.instant('management.accountCreated'));
             this.router.navigate(admin_routes.management);
           },
           error: (err: any) => {

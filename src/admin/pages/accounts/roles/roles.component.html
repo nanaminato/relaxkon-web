@@ -1,6 +1,6 @@
 <nz-modal [(nzVisible)]="newRoleVisible"
           [nzFooter]="[]"
-          [nzTitle]="'添加身份'"
+          [nzTitle]="'management.addRole' | translate"
           (nzOnCancel)="newRoleVisible = false"
           (nzOnOk)="newRoleVisible = false"
 >
@@ -10,7 +10,7 @@
 </nz-modal>
 <nz-modal [(nzVisible)]="editRoleVisible"
           [nzFooter]="[]"
-          [nzTitle]="'添加身份'"
+          [nzTitle]="'management.edit' | translate"
           (nzOnCancel)="editRoleVisible = false"
           (nzOnOk)="editRoleVisible = false"
 >
@@ -21,18 +21,19 @@
 
 <div class="overflow-y-scroll h-100">
   <div class="d-flex flex-row-reverse sticky-top z-1 bg-white">
+    <div class="list-heading"><h2>{{'management.roles' | translate}}</h2><p>{{'workspace.rolesDescription' | translate}}</p></div>
     <div class="my-1">
-      <button class="btn btn-primary mx-1" (click)="newRoleVisible = true">添加</button>
+      <button class="btn btn-primary mx-1" (click)="newRoleVisible = true">{{'management.add' | translate}}</button>
       <button class="btn btn-primary mx-1"
               (click)="refresh()"
-      >刷新</button>
+      >{{'management.refresh' | translate}}</button>
     </div>
   </div>
   <table class="table table-sm table-striped table-bordered">
     <thead>
-    <th scope="col">身份ID</th>
-    <th scope="col">身份名称</th>
-    <th>操作</th>
+    <th scope="col">{{'management.roleId' | translate}}</th>
+    <th scope="col">{{'management.roleNameLabel' | translate}}</th>
+    <th>{{'management.actions' | translate}}</th>
     </thead>
 
     @if(roles===undefined){
@@ -46,20 +47,20 @@
             <td>
               <div class="d-flex">
                 <button class="btn btn-primary mx-1" (click)="editARole(role)">
-                  编辑
+                  {{'management.edit' | translate}}
                 </button>
                 <button class="btn btn-warning mx-1"
                         nz-popconfirm
-                        nzPopconfirmTitle="确定要删除这个身份吗,这将删除所有与该身份关联的关系?"
+                        [nzPopconfirmTitle]="'management.confirmRoleDelete' | translate"
                         nzPopconfirmPlacement="bottom"
                         (nzOnConfirm)="delete(role.roleId)">
-                  删除
+                  {{'management.delete' | translate}}
                 </button>
                 <button class="btn btn-secondary mx-1"
-                        nz-tooltip nzTooltipTitle="查看具有该身份的账户"
+                        nz-tooltip [nzTooltipTitle]="'management.viewAccounts' | translate"
                   [routerLink]="['../account-management']" [queryParams]="{ roleId: role.roleId }"
                   >
-                  关联账户
+                  {{'management.relatedAccounts' | translate}}
                 </button>
               </div>
             </td>

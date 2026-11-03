@@ -1,3 +1,4 @@
+import {TranslateService} from '@ngx-translate/core';
 import {inject, Injectable} from "@angular/core";
 import {RequestService} from "./request.service";
 import {ChatHistoryTitle, ChatInterface} from "../models";
@@ -8,6 +9,7 @@ import {GenerateTask} from "../models/media";
   providedIn: "root"
 })
 export class RequestManagerService{
+  readonly i18n = inject(TranslateService);
   requestService = inject(RequestService);
   dbService = inject(DbService);
   // 拉取title并更新数据库
@@ -55,7 +57,7 @@ export class RequestManagerService{
           },
           error: error=>{
             reject({
-              error: "服务错误"
+              error: this.i18n.instant('management.serviceError')
             })
           }
         })
@@ -70,7 +72,7 @@ export class RequestManagerService{
           },
           error: error=>{
             reject({
-              error: "服务错误"
+              error: this.i18n.instant('management.serviceError')
             })
           }
         })
@@ -85,7 +87,7 @@ export class RequestManagerService{
           },
           error: error=>{
             reject({
-              error: "服务错误"
+              error: this.i18n.instant('management.serviceError')
             })
           }
         })

@@ -6,10 +6,10 @@
         <img class="mx-2" nz-image [ngSrc]="getIcon(chatModel?.role)" [nzFallback]="'assets/svgs/programmer.png'" width="20" height="20" [alt]="'universal.icon' | translate"/>
         <div class="dialogue-name mx-2">{{ getHeadName(chatModel) }}</div>
         @if(active){
-          <div nz-tooltip [nzTooltipTitle]="'dialog.inContext' | translate" class="active rounded-4 mx-2"></div>
+          <div nz-tooltip [nzTooltipTitle]="'dialog.inContext' | translate" [attr.aria-label]="'dialog.inContext' | translate" class="active rounded-4 mx-2"></div>
         }
         <div class="dialogue-actions">
-          <button nz-tooltip (click)="reRequest()" [nzTooltipTitle]="'dialog.regenerate' | translate" class="rounded-4 mx-0"
+          <button nz-tooltip (click)="reRequest()" [nzTooltipTitle]="'dialog.regenerate' | translate" [attr.aria-label]="'dialog.regenerate' | translate" class="rounded-4 mx-0"
                   [class.d-flex]="isMiniView()"
                   [class.flex-row]="isMiniView()"
                   [class.align-items-center]="isMiniView()"
@@ -21,22 +21,22 @@
           </button>
           @if(showActions()){
             <div class="dialogue-secondary-actions" animate.enter="enter-animation">
-              <button nz-tooltip (click)="triggerEdit()" [nzTooltipTitle]="'dialog.edit' | translate" class="rounded-4 mx-2" nz-button>
+              <button nz-tooltip (click)="triggerEdit()" [nzTooltipTitle]="'dialog.edit' | translate" [attr.aria-label]="'dialog.edit' | translate" class="rounded-4 mx-2" nz-button>
                 <span nz-icon nzType="edit" nzTheme="outline"></span>
               </button>
-              <button nz-tooltip (click)="triggerStartAsContext()" [nzTooltipTitle]="'dialog.startContextFromHere' | translate" class="rounded-4" nz-button>
+              <button nz-tooltip (click)="triggerStartAsContext()" [nzTooltipTitle]="'dialog.startContextFromHere' | translate" [attr.aria-label]="'dialog.startContextFromHere' | translate" class="rounded-4" nz-button>
                 <span nz-icon nzType="sort-ascending" nzTheme="outline"></span>
               </button>
-              <button nz-tooltip (click)="triggerDelete()" [nzTooltipTitle]="'dialog.deleteContent' | translate" class="rounded-4 mx-2" nz-button>
+              <button nz-tooltip (click)="triggerDelete()" [nzTooltipTitle]="'dialog.deleteContent' | translate" [attr.aria-label]="'dialog.deleteContent' | translate" class="rounded-4 mx-2" nz-button>
                 <span nz-icon nzType="delete" nzTheme="outline"></span>
               </button>
-              <button nz-tooltip (click)="copyAllContent()" [nzTooltipTitle]="'dialog.copyContent' | translate" class="rounded-4" nz-button>
+              <button nz-tooltip (click)="copyAllContent()" [nzTooltipTitle]="'dialog.copyContent' | translate" [attr.aria-label]="'dialog.copyContent' | translate" class="rounded-4" nz-button>
                 <span nz-icon nzType="copy" nzTheme="outline"></span>
               </button>
             </div>
           }@else{
             <div>
-              <button type="button" class="rounded-4 mx-2" nz-button (click)="toggleActions()" [attr.aria-label]="'More message actions'">
+              <button type="button" class="rounded-4 mx-2" nz-button (click)="toggleActions()" [attr.aria-label]="'workspace.moreActions' | translate">
                 <span nz-icon nzType="more" nzTheme="outline"></span>
               </button>
             </div>
@@ -44,7 +44,7 @@
         </div>
       </div>
     </div>
-    <div class="flex-grow-1 centered px-5 my-2 w-100">
+    <div class="dialogue-content flex-grow-1 centered my-2 w-100">
       <div [style]="getFontSize()">
         @defer (on immediate){
           <app-chat [chatModel]="chatModel"

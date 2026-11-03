@@ -1,3 +1,5 @@
+import {TranslatePipe} from '@ngx-translate/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Component, inject} from '@angular/core';
 import {FormsModule} from "@angular/forms";
 import {NzSelectModule} from "ng-zorro-antd/select";
@@ -15,6 +17,7 @@ import {configurationActions} from "../../../systems/store/configuration/configu
   imports: [
     FormsModule,
     NzSelectModule,
+    TranslatePipe,
   ],
   standalone: true
 })
@@ -25,19 +28,17 @@ export class ModelSelector {
   store = inject(Store);
   configService = inject(ConfigurationService);
   constructor() {
-    this.store.select(selectConfig).subscribe(config => {
+    this.store.select(selectConfig).pipe(takeUntilDestroyed()).subscribe(config => {
       this.config = config;
       this.buildSelector();
-      this.model = config!.model;
+      this.model = config?.model;
     });
   }
   buildSelector(){
-    this.chatStreamChildren.length = 0;
-    for(let model of this.config!.chatConfiguration!.models!){
-      this.chatStreamChildren.push(model)
-    }
+    this.chatStreamChildren = [...(this.config?.chatConfiguration?.models ?? [])];
   }
   async onSelectChange() {
+    if (!this.config || !this.model) return;
     this.config!.model = this.model!;
     this.store.dispatch(configurationActions.configUpdate({config: this.config!}))
     this.configService.saveConfigToDb(this.config!)

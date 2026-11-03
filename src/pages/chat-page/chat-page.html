@@ -1,51 +1,23 @@
 <div class="screen-content w-100 h-100">
-  @if(visible()){
-    @if(isCompact()){
-      <div class="menu-backdrop" (click)="hideMenu()"></div>
-    }
-    <aside class="app-sidebar p-0 m-0 d-flex flex-column h-100 z-2 menu" aria-label="Conversation navigation">
-      <div class="bg-theme overflow-y-scroll scrollbar-y-none flex-grow-1">
-        <!-- 历史记录标记 -->
-        @defer (on immediate) {
-          <app-chat-history ></app-chat-history>
-        } @placeholder {
-          <nz-skeleton></nz-skeleton>
-        }
+  @if (visible()) {
+    @if (isCompact()) { <button class="menu-backdrop" (click)="hideMenu()" [attr.aria-label]="'workspace.closeNavigation' | translate"></button> }
+    <aside class="app-sidebar d-flex flex-column h-100" [attr.aria-label]="'workspace.conversationNavigation' | translate">
+      <a class="sidebar-brand" routerLink="/chat" (click)="closeMenuIfCompact()"><span class="brand-mark" aria-hidden="true">T</span>Turbo AI</a>
+      <div class="history-area">
+        @defer (on immediate) { <app-chat-history></app-chat-history> } @placeholder { <nz-skeleton></nz-skeleton> }
       </div>
-      <div class="bg-theme sticky-bottom z-0">
-        <ng-template #studios>
-          <div class="w-100 d-flex flex-column">
-            <button nz-button class="rounded-2 bg-light text-dark mx-2 my-1 d-flex flex-row" (click)="closeMenuIfCompact()" routerLink="/chat"><img height="25" width="25" src="assets/icon/aichat_11zon.jpg">{{'universal.aiChat' | translate}}</button>
-            <button nz-button class="rounded-2 bg-light text-dark mx-2 my-1 d-flex flex-row" (click)="closeMenuIfCompact()" routerLink="/image-studio"><img height="25" width="25" src="assets/icon/aipainting_11zon.jpg">{{'universal.aiPainting' | translate}}</button>
-            <button nz-button class="rounded-2 bg-light text-dark mx-2 my-1 d-flex flex-row" (click)="closeMenuIfCompact()" routerLink="/media-studio"><span nz-icon nzType="node-index" nzTheme="outline"></span>{{ 'universal.mediaStudio' | translate }}</button>
-          </div>
-        </ng-template>
-        <ng-container *ngTemplateOutlet="studios"></ng-container>
-        <div class="w-100">
-          <div class="d-flex flex-row">
-            <button class="rounded-5 m-2 bg-theme text-theme" nz-button
-                    (click)="openSettingPage()"
-            >
-              {{ 'chat-history.settings' | translate}}<span nz-icon nzType="setting" nzTheme="outline"></span>
-            </button>
-            <button class="rounded-5 m-2 d-flex flex-row align-items-center bg-theme text-theme" nz-button
-                    (click)="openPromptPage()"
-            >
-              {{ 'chat-history.prompts' | translate}}<span nz-icon nzType="appstore" nzTheme="outline"></span>
-            </button>
-          </div>
-          @defer (on viewport) {
-            <app-account-label></app-account-label>
-          } @placeholder {
-            <nz-skeleton></nz-skeleton>
-          }
+      <nav class="sidebar-navigation">
+        <p class="nav-caption">{{'workspace.workspace' | translate}}</p>
+        <a routerLink="/chat" routerLinkActive="nav-active" [routerLinkActiveOptions]="{exact: true}" (click)="closeMenuIfCompact()"><span nz-icon nzType="message" aria-hidden="true"></span>{{'universal.aiChat' | translate}}</a>
+        <a routerLink="/image-studio" (click)="closeMenuIfCompact()"><span nz-icon nzType="picture" aria-hidden="true"></span>{{'universal.image-studio' | translate}}</a>
+        <a routerLink="/media-studio" (click)="closeMenuIfCompact()"><span nz-icon nzType="sound" aria-hidden="true"></span>{{'universal.mediaStudio' | translate}}</a>
+        <div class="sidebar-utilities">
+          <button (click)="openSettingPage()"><span nz-icon nzType="setting" aria-hidden="true"></span>{{'chat-history.settings' | translate}}</button>
+          <button (click)="openPromptPage()"><span nz-icon nzType="appstore" aria-hidden="true"></span>{{'chat-history.prompts' | translate}}</button>
         </div>
-      </div>
+      </nav>
+      <app-account-label></app-account-label>
     </aside>
-  }@else{
-    <div></div>
   }
-  <main class="main-pane">
-    <router-outlet id="main-content"></router-outlet>
-  </main>
+  <main class="main-pane"><router-outlet id="main-content"></router-outlet></main>
 </div>

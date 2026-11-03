@@ -1,43 +1,32 @@
 // Theme tokens live in one place. Components should use the semantic utility
 // classes below (or these variables) instead of hard-coded light/dark colors.
 
-html {
-  --app-background: #ffffff;
+html, html[data-theme='next-light'] {
+  --app-background: #f7f9fc;
   --app-surface: #ffffff;
-  --app-surface-muted: #f3f3f3;
-  --app-text: #000000;
-  --app-text-muted: #525252;
-  --app-border: #000000;
-  --app-hover: #f3f3f3;
-  --app-selection: #d9f3ff;
+  --app-surface-muted: #f0f4f9;
+  --app-text: #182539;
+  --app-text-muted: #748095;
+  --app-border: #e2e8f1;
+  --app-hover: #edf2f9;
+  --app-selection: #e8f0ff;
   --app-control-background: #ffffff;
-  --app-control-text: #000000;
-}
-
-html[data-theme='next-light'] {
-  --app-background: #e7f8ff;
-  --app-surface: #ffffff;
-  --app-surface-muted: #f3f3f3;
-  --app-text: #000000;
-  --app-text-muted: #525252;
-  --app-border: #000000;
-  --app-hover: #f3f3f3;
-  --app-selection: #d9f3ff;
-  --app-control-background: #ffffff;
-  --app-control-text: #000000;
+  --app-control-text: #182539;
+  --app-accent: #2463cf;
 }
 
 html[data-theme='next-dark'] {
-  --app-background: #000000;
-  --app-surface: #343541;
-  --app-surface-muted: #363739;
-  --app-text: #d1d5db;
-  --app-text-muted: #d1d5db;
-  --app-border: #f5f5f5;
-  --app-hover: #363739;
-  --app-selection: #363739;
-  --app-control-background: #343541;
-  --app-control-text: #d1d5db;
+  --app-background: #101827;
+  --app-surface: #182234;
+  --app-surface-muted: #202d42;
+  --app-text: #e7edf7;
+  --app-text-muted: #a1aec2;
+  --app-border: #33425b;
+  --app-hover: #25334b;
+  --app-selection: #243c61;
+  --app-control-background: #182234;
+  --app-control-text: #e7edf7;
+  --app-accent: #7aa7fa;
 }
 
 html,

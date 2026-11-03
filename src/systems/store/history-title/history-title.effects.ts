@@ -1,3 +1,4 @@
+import {TranslateService} from '@ngx-translate/core';
 import {Actions, createEffect, ofType} from "@ngrx/effects";
 import {inject, Injectable} from "@angular/core";
 import {historyTitleActions} from "./history-title.actions";
@@ -13,6 +14,7 @@ import {NzMessageService} from "ng-zorro-antd/message";
 
 @Injectable()
 export class HistoryTitleEffect {
+  readonly i18n = inject(TranslateService);
   actions$ = inject(Actions)
   store = inject(Store)
   historyTitleService = inject(HistoryTitleService)
@@ -26,7 +28,7 @@ export class HistoryTitleEffect {
         this.store.select(selectHistoryTitle),
       ),
       mergeMap(([action, historyTitles]) => {
-        let userId = this.authService.user!.id;
+        let userId = this.authService.user?.id;
         if (!userId) {
           // 用户未登录，直接返回已有historyTitles
           return of(historyTitleActions.loadSuccess({ historyTitles }));
@@ -40,7 +42,7 @@ export class HistoryTitleEffect {
           }),
           catchError((err) => {
             // 提取具体的错误信息
-            const errorMessage = err.error?.message || err.message || '服务器连接失败，请稍后再试';
+            const errorMessage = err.error?.message || err.message || this.i18n.instant('management.connectionFailed');
             return of(historyTitleActions.loadFailure({ error: errorMessage }));
           })
         );
@@ -63,7 +65,7 @@ export class HistoryTitleEffect {
         this.store.select(selectHistoryTitle)
       ),
       mergeMap(([action,historyTitles]) => {
-        let userId = this.authService.user!.id;
+        let userId = this.authService.user?.id;
         if (!userId) {
           return of(historyTitleActions.loadSuccess({ historyTitles }));
         }
@@ -80,7 +82,7 @@ export class HistoryTitleEffect {
           }),
           catchError((err) => {
             // 提取具体的错误信息
-            const errorMessage = err.error?.message || err.message || '服务器连接失败，请稍后再试';
+            const errorMessage = err.error?.message || err.message || this.i18n.instant('management.connectionFailed');
             return of(historyTitleActions.loadFailure({ error: errorMessage }));
           })
         );
@@ -115,7 +117,7 @@ export class HistoryTitleEffect {
         ofType(historyTitleActions.loadFailure),
         // 使用 tap 执行副作用（弹窗），不改变流
         tap(({ error }) => {
-          this.messageService.error(`加载历史记录失败: ${error}`, {
+          this.messageService.error(this.i18n.instant('management.historyLoadFailed', {error}), {
             nzDuration: 3000 // 持续3秒
           });
         })

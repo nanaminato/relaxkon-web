@@ -1,4 +1,6 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {TranslateModule} from '@ngx-translate/core';
+import {inject, Component, EventEmitter, Input, Output} from '@angular/core';
 import {NzCardComponent} from "ng-zorro-antd/card";
 import {NzPopconfirmDirective, NzPopconfirmModule} from "ng-zorro-antd/popconfirm";
 import {RouterLink} from "@angular/router";
@@ -12,6 +14,7 @@ import {ReactiveFormsModule} from "@angular/forms";
   selector: 'app-key-exhibit',
   standalone: true,
     imports: [
+    TranslateModule,
         NzCardComponent,
         NzPopconfirmModule,
         RouterLink,
@@ -21,6 +24,7 @@ import {ReactiveFormsModule} from "@angular/forms";
   styleUrl: './key-exhibit.component.css'
 })
 export class KeyExhibitComponent {
+  readonly i18n = inject(TranslateService);
   constructor(private call: KeyCallService,private message: NzMessageService) {
     this.fetchTypes();
   }
@@ -33,7 +37,7 @@ export class KeyExhibitComponent {
     this.call.deleteKey(id)
       .subscribe({
         next: msg=>{
-          this.message.success("删除成功")
+          this.message.success(this.i18n.instant('management.deleteSuccess'))
           this.refresh.next(true);
         },
         error: err=>{
@@ -47,7 +51,7 @@ export class KeyExhibitComponent {
         this.types = types;
       },
       error: err => {
-        this.message.error("加载密钥类型失败")
+        this.message.error(this.i18n.instant('management.keyTypesFailed'))
       }
     })
   }
@@ -55,6 +59,6 @@ export class KeyExhibitComponent {
 
   getKeyDescription(requestIdentifier: number | undefined) {
     let type = this.types?.find(t=>t.requestIdentifier === requestIdentifier);
-    return type === undefined? "未知":type.type;
+    return type === undefined? this.i18n.instant('management.unknown'):type.type;
   }
 }

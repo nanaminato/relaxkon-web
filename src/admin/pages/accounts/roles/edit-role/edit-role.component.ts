@@ -1,3 +1,5 @@
+import {TranslateService} from '@ngx-translate/core';
+import {TranslateModule} from '@ngx-translate/core';
 import {Component, inject, EventEmitter, Input, Output} from '@angular/core';
 import {
   FormControl,
@@ -15,6 +17,7 @@ import {Role} from "../../../../models/accounts";
   selector: 'app-edit-role',
   standalone: true,
   imports: [
+    TranslateModule,
     ReactiveFormsModule,
     FormsModule
   ],
@@ -22,6 +25,7 @@ import {Role} from "../../../../models/accounts";
   styleUrl: './edit-role.component.css'
 })
 export class EditRoleComponent {
+  readonly i18n = inject(TranslateService);
   private readonly fb = inject(NonNullableFormBuilder);
   validateForm: FormGroup<{
     roleId: FormControl<number>;
@@ -54,7 +58,7 @@ export class EditRoleComponent {
         })
         .subscribe({
         next: () =>{
-          this.message.success("更改身份成功");
+          this.message.success(this.i18n.instant('management.roleUpdated'));
           this.close.next(true);
         },
         error: (err: any) => {

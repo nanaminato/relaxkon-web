@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {TranslateModule} from '@ngx-translate/core';
+import {inject,  Component } from '@angular/core';
 import {NzSkeletonComponent} from "ng-zorro-antd/skeleton";
 import {RouterLink} from "@angular/router";
 import {NzMessageService} from "ng-zorro-antd/message";
@@ -14,6 +16,7 @@ import {AccountCallService} from "../../../services";
   selector: 'app-roles',
   standalone: true,
   imports: [
+    TranslateModule,
     NzSkeletonComponent,
     RouterLink,
     NewRoleComponent,
@@ -26,6 +29,7 @@ import {AccountCallService} from "../../../services";
   styleUrl: './roles.component.css'
 })
 export class RolesComponent {
+  readonly i18n = inject(TranslateService);
   roles: Role[] | undefined;
   constructor(private message: NzMessageService, private call: AccountCallService) {
   }
@@ -40,11 +44,11 @@ export class RolesComponent {
     this.call.deleteRoleById(roleId)
       .subscribe({
         next: msg=>{
-          this.message.success("删除成功");
+          this.message.success(this.i18n.instant('management.deleteSuccess'));
           this.fetchRoles(true);
         },
         error: (err:any)=>{
-          this.message.error("删除错误");
+          this.message.error(this.i18n.instant('management.deleteFailed'));
         }
       })
   }
@@ -53,11 +57,11 @@ export class RolesComponent {
       next: roles=>{
         this.roles = roles;
         if(refresh){
-          this.message.success("刷新成功");
+          this.message.success(this.i18n.instant('management.refreshSuccess'));
         }
       },
       error:(err: any) => {
-        this.message.error("获取账户信息失败")
+        this.message.error(this.i18n.instant('management.accountsFailed'))
       }
     })
   }

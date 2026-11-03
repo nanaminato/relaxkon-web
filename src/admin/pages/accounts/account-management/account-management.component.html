@@ -1,20 +1,20 @@
 <div class="overflow-y-scroll h-100">
   <div class="d-flex flex-row-reverse sticky-top z-1">
     <div class="my-1">
-      <button class="btn btn-primary mx-1" [routerLink]="['create']" [queryParams]="{returnUrl: admin_routes.management.join('/')}">添加</button>
+      <button class="btn btn-primary mx-1" [routerLink]="['create']" [queryParams]="{returnUrl: admin_routes.management.join('/')}">{{'management.add' | translate}}</button>
       <button class="btn btn-primary mx-1"
               (click)="refresh()"
-      >刷新</button>
+      >{{'management.refresh' | translate}}</button>
     </div>
   </div>
   <table class="table table-sm table-striped table-bordered">
     <thead>
-    <th scope="col">账户ID</th>
-    <th scope="col">用户名</th>
-    <th scope="col">邮箱</th>
-    <th scope="col">密码</th>
-    <th scope="col">身份</th>
-    <th>操作</th>
+    <th scope="col">{{'management.accountId' | translate}}</th>
+    <th scope="col">{{'management.username' | translate}}</th>
+    <th scope="col">{{'management.email' | translate}}</th>
+    <th scope="col">{{'management.password' | translate}}</th>
+    <th scope="col">{{'management.roles' | translate}}</th>
+    <th>{{'management.actions' | translate}}</th>
     </thead>
 
     @if(accounts===undefined){
@@ -37,14 +37,14 @@
             <td>
               <div class="d-flex">
                 <button class="btn btn-primary mx-1" [routerLink]="['edit',''+account.accountId]" [queryParams]="{returnUrl: admin_routes.management.join('/')}">
-                  编辑
+                  {{'management.edit' | translate}}
                 </button>
                 <button class="btn btn-warning mx-1"
                         nz-popconfirm
-                        nzPopconfirmTitle="确定要删除这个账户?此操作不可逆！"
+                        [nzPopconfirmTitle]="'management.confirmAccountDelete' | translate"
                         nzPopconfirmPlacement="bottom"
                         (nzOnConfirm)="delete(account.accountId)">
-                  删除
+                  {{'management.delete' | translate}}
                 </button>
               </div>
             </td>

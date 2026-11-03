@@ -1,32 +1,11 @@
-import {Component, inject} from '@angular/core';
-import {RouterLink, RouterOutlet} from "@angular/router";
-import {TranslateModule} from "@ngx-translate/core";
-import {NzButtonModule} from "ng-zorro-antd/button";
-import {NzCardModule} from "ng-zorro-antd/card";
-import {NzIconModule} from "ng-zorro-antd/icon";
-import {SizeReportService} from "../../../services/normal-services";
+import {LanguageSwitcher} from '../../../shared/language-switcher';
+import {Component} from '@angular/core';
+import {RouterLink, RouterOutlet} from '@angular/router';
+import {TranslateModule} from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-account',
-  templateUrl: './account.html',
-  styleUrl: './account.css',
-  imports: [
-    RouterOutlet,
-    TranslateModule,
-    NzButtonModule,
-    NzCardModule,
-    NzIconModule,
-    RouterLink,
-  ],
-  standalone: true
+  selector: 'app-account', standalone: true,
+  imports: [RouterOutlet, RouterLink, TranslateModule, LanguageSwitcher],
+  templateUrl: './account.html', styleUrl: './account.css'
 })
-export class Account {
-  sizeReportService: SizeReportService = inject(SizeReportService);
-  menuVisible() {
-    return this.sizeReportService.menuVisible;
-  }
-
-  toggleMenu() {
-    this.sizeReportService.toggleMenu()
-  }
-}
+export class Account {}

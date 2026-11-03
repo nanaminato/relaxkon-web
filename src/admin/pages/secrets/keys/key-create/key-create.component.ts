@@ -1,3 +1,5 @@
+import {TranslateService} from '@ngx-translate/core';
+import {TranslateModule} from '@ngx-translate/core';
 import { Component, inject } from '@angular/core';
 import {
   FormControl,
@@ -21,6 +23,7 @@ import {NzOptionComponent, NzSelectComponent} from "ng-zorro-antd/select";
   selector: 'app-key-create',
   standalone: true,
   imports: [
+    TranslateModule,
     FormsModule,
     ReactiveFormsModule,
     NzTooltipDirective,
@@ -32,6 +35,7 @@ import {NzOptionComponent, NzSelectComponent} from "ng-zorro-antd/select";
   styleUrl: './key-create.component.css'
 })
 export class KeyCreateComponent {
+  readonly i18n = inject(TranslateService);
   private readonly fb = inject(NonNullableFormBuilder);
   constructor(
     private message: NzMessageService,
@@ -67,7 +71,7 @@ export class KeyCreateComponent {
   modelKeyBinds: ModelKeyBind[] = [];
   allModels: Model[] | undefined;
   actionTip(modelId: number){
-    return this.modelKeyBinds.find(r=>r.modelId===modelId)!==undefined?'移除':'添加';
+    return this.modelKeyBinds.find(r=>r.modelId===modelId)!==undefined?this.i18n.instant('management.remove'):this.i18n.instant('management.add');
   }
   active(modelId: number){
     return this.modelKeyBinds.find(r=>r.modelId===modelId)!==undefined;
@@ -78,7 +82,7 @@ export class KeyCreateComponent {
         this.types = types;
       },
       error: err => {
-        this.message.error("加载密钥类型失败")
+        this.message.error(this.i18n.instant('management.keyTypesFailed'))
       }
     })
   }
@@ -87,11 +91,11 @@ export class KeyCreateComponent {
       next: models=>{
         this.allModels = models;
         if(refresh){
-          this.message.success("刷新成功");
+          this.message.success(this.i18n.instant('management.refreshSuccess'));
         }
       },
       error:() => {
-        this.message.error("获取模型信息失败")
+        this.message.error(this.i18n.instant('management.modelsFailed'))
       }
     })
   }
@@ -109,7 +113,7 @@ export class KeyCreateComponent {
         })
         .subscribe({
           next: () =>{
-            this.message.success('创建密钥成功');
+            this.message.success(this.i18n.instant('management.keyCreated'));
             this.router.navigate(admin_routes.keys);
           },
           error: (err: any) => {

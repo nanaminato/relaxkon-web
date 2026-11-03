@@ -1,5 +1,6 @@
+import {MermaidLoaderService} from '../../../services/normal-services/mermaid-loader.service';
 import {
-  Component, Input
+  Component, Input, inject, signal, OnInit
 } from '@angular/core';
 import {MarkdownModule} from "ngx-markdown";
 import {CopiedButton} from "./copied-button/copied-button";
@@ -14,8 +15,17 @@ import {ChatModel} from "../../../models";
     CopiedButton,
   ]
 })
-export class MarkdownRoot
+export class MarkdownRoot implements OnInit
 {
+  private readonly mermaidLoader = inject(MermaidLoaderService);
+  readonly mermaidReady = signal(false);
+
+  ngOnInit(): void {
+    void this.mermaidLoader.load().then(() => this.mermaidReady.set(true)).catch(() => {
+      // Keep the response readable as code if the optional renderer cannot load.
+    });
+  }
+
   @Input()
   set chatModel(value: ChatModel | undefined) {
     this._chatModel = value;

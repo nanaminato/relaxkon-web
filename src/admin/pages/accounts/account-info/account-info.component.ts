@@ -1,4 +1,6 @@
-import {Component} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {TranslateModule} from '@ngx-translate/core';
+import {inject, Component} from '@angular/core';
 import {NzMessageService} from "ng-zorro-antd/message";
 import {Router} from "@angular/router";
 import {catchError} from "rxjs";
@@ -15,6 +17,7 @@ import {NzInputDirective} from "ng-zorro-antd/input";
   selector: 'app-account-info',
   standalone: true,
   imports: [
+    TranslateModule,
     NzCardComponent,
     FormsModule,
     NzInputDirective,
@@ -23,6 +26,7 @@ import {NzInputDirective} from "ng-zorro-antd/input";
   styleUrl: './account-info.component.css'
 })
 export class AccountInfoComponent {
+  readonly i18n = inject(TranslateService);
   constructor(private message: NzMessageService,
               private verificationService: VerificationService,
               private router: Router,
@@ -44,17 +48,17 @@ export class AccountInfoComponent {
       catchError((err: any) => {
         if (err instanceof HttpErrorResponse) {
           if (err.status === 401 || err.status === 403) {
-            this.message.error("身份信息已经过期，请重新登录");
+            this.message.error(this.i18n.instant('management.sessionExpired'));
             this.router.navigate(admin_routes.sign_in);
           }
         } else {
-          this.message.error("网络错误")
+          this.message.error(this.i18n.instant('management.networkError'))
         }
         throw err;
       })
     ).subscribe({
       next: value => {
-        this.message.success("验证成功");
+        this.message.success(this.i18n.instant('management.verified'));
         // console.log("ok")
       }
     });

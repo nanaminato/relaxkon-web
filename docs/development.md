@@ -61,3 +61,19 @@ src/
 - 所有 API 地址应通过 `ServiceProvider` 读取，避免在组件中写死后端地址。
 - 不要将令牌、供应商 API 密钥、真实账户或生产配置提交到仓库。
 - 修改依赖、路由、构建配置或资源后，至少运行一次生产构建；修改行为时补充或更新测试。
+
+## 多语言回归与按需图表
+
+运行 `npm run test:i18n` 校验中、英、日的键集合、插值参数与静态引用；再运行 `npm test -- --watch=false --browsers=ChromeHeadless` 验证语言传递、UTF-8 流式解码及 Mermaid 动态加载/渲染。新增界面文案必须同时补齐三种语言。
+
+Mermaid 在聊天组件实例化后异步加载，加载失败时仍显示可读的 Markdown 代码。不要将它重新放回 `angular.json` 全局脚本。生产构建继续执行原有 5 MB 首包警告预算。
+
+验证码接口使用 `contentType: image/svg+xml`；前端根据返回格式生成 data URL，缺少此字段时兼容旧服务端的 JPEG。
+
+账户页的翻译配置集中于 `src/app/app-translations.ts`。静态翻译文件必须使用 `useHttpBackend: true`，绕过依赖 TranslateService 的语言/认证拦截器，避免初始化循环依赖。`app-translations.spec.ts` 使用真实 HTTP 翻译加载器复现和防止回归；不要仅靠模拟 TranslateService 的测试判断资源已成功加载。
+
+## 工作空间视觉与语言一致性
+
+聊天、管理后台、图像和多媒体工作室共享 `src/theme/theme.scss` 的语义颜色；跨组件卡片、表格及表单样式集中于 `src/theme/workspace.scss`。新增界面使用 `--app-surface`、`--app-text`、`--app-border` 和 `--app-accent` 等变量，避免破坏深色主题。
+
+账户、聊天和后台统一使用 `LanguageSwitcher`，通过现有 IndexedDB 配置保存语言；快速连续切换会合并过期选择并串行写入，保留原主题与模型设置。翻译检查覆盖三语言键一致性、插值参数、条件表达式引用、重复键和英文中的未翻译文案。供应商名称、协议字段及语言自称保留原文。

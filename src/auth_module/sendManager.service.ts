@@ -1,3 +1,4 @@
+import {TranslateService} from '@ngx-translate/core';
 import {inject, Injectable} from "@angular/core";
 import {ChatHistory, ChatHistoryTitle, ChatInterface} from "../models";
 import {SendService} from "./send.service";
@@ -7,13 +8,14 @@ import {GenerateTask} from "../models/media";
   providedIn: "root"
 })
 export class SendManagerService{
+  readonly i18n = inject(TranslateService);
   sendService = inject(SendService);
   sendHistory(chatHistory: ChatHistoryTitle): Promise<string>{
     return new Promise((resolve,reject)=>{
       this.sendService.sendHistory(chatHistory)
         .subscribe({
           next: (msg:any)=>{
-            resolve("上传历史（会话）标题成功")
+            resolve(this.i18n.instant('management.syncSuccess'))
           },
           error: err => {
             reject()
@@ -26,7 +28,7 @@ export class SendManagerService{
       this.sendService.sendMessage(historyDataId,chatMessage)
         .subscribe({
           next: (msg:any)=>{
-            resolve("上传信息成功")
+            resolve(this.i18n.instant('management.messageUploaded'))
           },
           error: err => {
             reject()
@@ -39,7 +41,7 @@ export class SendManagerService{
       this.sendService.sendTask(task)
         .subscribe({
           next: (msg:any)=>{
-            resolve("上传生成任务成功")
+            resolve(this.i18n.instant('management.taskUploaded'))
           },
           error: err => {
             reject()
@@ -52,7 +54,7 @@ export class SendManagerService{
       this.sendService.updateHistory(chatHistory)
         .subscribe({
           next: (msg:any)=>{
-            resolve("更新会话（历史）标题成功")
+            resolve(this.i18n.instant('management.historyUpdated'))
           },
           error: err => {
             reject()
@@ -65,7 +67,7 @@ export class SendManagerService{
       this.sendService.updateMessage(historyDataId,chatMessage)
         .subscribe({
           next: (msg:any)=>{
-            resolve("更新信息成功")
+            resolve(this.i18n.instant('management.messageUpdated'))
           },
           error: err => {
             reject()
@@ -78,7 +80,7 @@ export class SendManagerService{
       this.sendService.updateTask(task)
         .subscribe({
           next: (msg:any)=>{
-            resolve("更新生成任务成功")
+            resolve(this.i18n.instant('management.taskUpdated'))
           },
           error: err => {
             reject()
@@ -91,7 +93,7 @@ export class SendManagerService{
       this.sendService.deleteHistory(historyDataId)
         .subscribe({
           next: (msg:any)=>{
-            resolve("删除会话（历史）标题成功")
+            resolve(this.i18n.instant('management.historyDeleted'))
           },
           error: err => {
             reject()
@@ -104,7 +106,7 @@ export class SendManagerService{
       this.sendService.deleteMessage(historyDataId,messageDataId)
         .subscribe({
           next: (msg:any)=>{
-            resolve("删除消息成功")
+            resolve(this.i18n.instant('management.messageDeleted'))
           },
           error: err => {
             reject()
@@ -117,7 +119,7 @@ export class SendManagerService{
       this.sendService.deleteTask(taskId)
         .subscribe({
           next: (msg:any)=>{
-            resolve("删除生成结果成功")
+            resolve(this.i18n.instant('management.taskDeleted'))
           },
           error: err => {
             reject()

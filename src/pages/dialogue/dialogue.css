@@ -4,11 +4,11 @@
   background: #79c0ff;
 }
 .chat-box {
-  width: min(900px, calc(100% - 24px));
+  width: min(840px, calc(100% - 48px));
   display: flex;
   margin: auto;
   align-items: center;
-  padding: 8px;
+  padding: 24px 8px;
   box-sizing: border-box;
 }
 .dialogue-header, .dialogue-identity, .dialogue-actions, .dialogue-secondary-actions {
@@ -78,3 +78,9 @@
   }
 }
 
+
+.dialogue-content { padding: 2px 38px; color: var(--app-text); line-height: 1.8; overflow-wrap: anywhere; }
+.dialogue-name { color: var(--app-text); font-size: 13px; font-weight: 650; }
+.dialogue-actions { margin-left: auto; }
+.dialogue-actions button { border-color: var(--app-border); border-radius: 7px !important; color: var(--app-text-muted); background: var(--app-surface); }
+@media (max-width: 600px) { .dialogue-content { padding: 0 12px; } .chat-box { padding: 18px 8px; } }

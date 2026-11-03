@@ -1,3 +1,5 @@
+import {TranslateService} from '@ngx-translate/core';
+import {TranslateModule} from '@ngx-translate/core';
 import { Component, inject } from '@angular/core';
 import {NzInputNumberComponent} from "ng-zorro-antd/input-number";
 import {NzTooltipDirective} from "ng-zorro-antd/tooltip";
@@ -20,6 +22,7 @@ import {NzOptionComponent, NzSelectComponent} from "ng-zorro-antd/select";
   selector: 'app-key-edit',
   standalone: true,
   imports: [
+    TranslateModule,
     NzInputNumberComponent,
     NzTooltipDirective,
     ReactiveFormsModule,
@@ -31,6 +34,7 @@ import {NzOptionComponent, NzSelectComponent} from "ng-zorro-antd/select";
   styleUrl: './key-edit.component.css'
 })
 export class KeyEditComponent {
+  readonly i18n = inject(TranslateService);
   private readonly fb = inject(NonNullableFormBuilder);
   constructor(
     private message: NzMessageService,
@@ -86,7 +90,7 @@ export class KeyEditComponent {
   allModels: Model[] | undefined;
   types:KeyTypes[] | undefined;
   actionTip(modelId: number){
-    return this.modelKeyBinds.find(r=>r.modelId===modelId)!==undefined?'移除':'添加';
+    return this.modelKeyBinds.find(r=>r.modelId===modelId)!==undefined?this.i18n.instant('management.remove'):this.i18n.instant('management.add');
   }
   active(modelId: number){
     return this.modelKeyBinds.find(r=>r.modelId===modelId)!==undefined;
@@ -96,11 +100,11 @@ export class KeyEditComponent {
       next: models=>{
         this.allModels = models;
         if(refresh){
-          this.message.success("刷新成功");
+          this.message.success(this.i18n.instant('management.refreshSuccess'));
         }
       },
       error:() => {
-        this.message.error("获取模型信息失败")
+        this.message.error(this.i18n.instant('management.modelsFailed'))
       }
     })
   }
@@ -110,7 +114,7 @@ export class KeyEditComponent {
         this.types = types;
       },
       error: err => {
-        this.message.error("加载密钥类型失败")
+        this.message.error(this.i18n.instant('management.keyTypesFailed'))
       }
     })
   }
@@ -129,7 +133,7 @@ export class KeyEditComponent {
         })
         .subscribe({
           next: () =>{
-            this.message.success('更改密钥成功');
+            this.message.success(this.i18n.instant('management.keyUpdated'));
             this.router.navigate(admin_routes.keys);
           },
           error: (err: any) => {

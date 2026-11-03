@@ -23,7 +23,10 @@ export class LocalizationService {
 
   constructor() {
     this.translate.addLangs(this.languages.map(({code}) => code));
-    this.translate.setFallbackLang('zh');
+  }
+
+  get currentLanguage(): AppLanguage {
+    return this.normalize(this.translate.getCurrentLang());
   }
 
   get requestLanguage(): string {

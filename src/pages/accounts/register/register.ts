@@ -1,9 +1,4 @@
 import {Component, ElementRef, inject, ViewChild} from '@angular/core';
-import {NzButtonComponent} from "ng-zorro-antd/button";
-import {NzCardComponent} from "ng-zorro-antd/card";
-import {NzColDirective, NzRowDirective} from "ng-zorro-antd/grid";
-import {NzFormControlComponent, NzFormDirective, NzFormItemComponent, NzFormLabelComponent} from "ng-zorro-antd/form";
-import {NzInputDirective} from "ng-zorro-antd/input";
 import {
   FormControl,
   FormGroup,
@@ -20,15 +15,11 @@ import {LocalizationService} from '../../../services/normal-services';
 @Component({
   selector: 'app-register',
   templateUrl: './register.html',
-  styleUrl: './register.css',
+  styleUrls: ['../auth-form.css'],
   imports: [
     TranslateModule,
     RouterLink,
-    ReactiveFormsModule,
-    NzCardComponent,
-    NzFormDirective,
-    NzColDirective,
-    NzRowDirective
+    ReactiveFormsModule
   ],
   standalone: true
 })
@@ -53,7 +44,7 @@ export class Register {
         {
           next: (value:any) => {
             this.code = value.code;
-            this.codeUrl = 'data:image/jpeg;base64,' + value.img;
+            this.codeUrl = `data:${value.contentType === 'image/svg+xml' ? 'image/svg+xml' : 'image/jpeg'};base64,${value.img}`;
           }
         }
       );
@@ -62,7 +53,7 @@ export class Register {
   vCode: ElementRef |undefined;
   submitForm(): void {
     if (this.validateForm.valid&&this.validateForm.value.confirm===this.validateForm.value.password) {
-      if(this.code?.toLowerCase()!==this.vCode?.nativeElement.value.toLowerCase()){
+      if(!this.code || this.code.toLowerCase()!==this.vCode?.nativeElement.value.trim().toLowerCase()){
         this.message.error(this.localization.text('notifications.invalidVerificationCode'));
         this.generateVerificationCode();
         return;

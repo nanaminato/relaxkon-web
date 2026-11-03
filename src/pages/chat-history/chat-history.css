@@ -1,47 +1,13 @@
-.history-title {
-  width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  padding: 5px 10px;
-  font-size: 1em;
-  cursor: pointer;
-}
-.history-title .delete-btn {
-  position: absolute;
-  right: 10px;
-  background-color: red;
-  color: white;
-  border: none;
-  padding: 4px 8px;
-  border-radius: 4px;
-}
+.history-title { position: relative; width: 100%; overflow: hidden; white-space: nowrap; padding: 11px 12px; margin: 3px 0; border-radius: 8px; font-size: 13px; cursor: pointer; }
+.history-title > span { overflow: hidden; text-overflow: ellipsis; }
+.history-title:hover { background: var(--app-hover) !important; }
+.history-title.selected { background: var(--app-selection) !important; color: var(--app-accent) !important; }
+.history-title .delete-btn { position: absolute; right: 6px; top: 6px; background: #b93b4d; color: white; border: 0; padding: 4px 8px; border-radius: 5px; font-size: 12px; }
+.show-delete { outline: 1px solid #d96666; }
+.history-caption { padding: 12px 12px 3px; margin: 0; color: var(--app-text-muted); font-size: 11px; }
+.new-chat-mark { margin-right: 6px; font-size: 19px; color: var(--app-accent); }
+.context-menu { position: fixed; background: var(--app-surface); color: var(--app-text); border: 1px solid var(--app-border); border-radius: 8px; box-shadow: 0 6px 20px #1825391a; z-index: 1000; min-width: 110px; padding: 4px; user-select: none; }
+.context-menu-item { padding: 8px 10px; cursor: pointer; border-radius: 5px; font-size: 13px; }
+.context-menu-item:hover { background: var(--app-hover); }
 
-.selected {
-  background: lightblue !important;
-}
-
-.show-delete {
-  border: 1px solid red;
-}
-
-.context-menu {
-  position: fixed;
-  background: white;
-  border: 1px solid #ccc;
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-  width: 100px;
-  user-select: none;
-}
-
-.context-menu-item {
-  padding: 8px 10px;
-  cursor: pointer;
-}
-
-.context-menu-item:hover {
-  background-color: #eee;
-}
-
-/*# sourceMappingURL=chat-history.css.map */
+.sticky-top button { min-height: 40px; padding: 9px 10px !important; border: 1px solid var(--app-border) !important; border-radius: 8px; background: var(--app-surface) !important; font-size: 13px; }

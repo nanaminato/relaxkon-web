@@ -1,3 +1,4 @@
+import {TranslateService} from '@ngx-translate/core';
 import {Component, inject, ElementRef, ViewChild} from '@angular/core';
 import {Router, RouterLink} from "@angular/router";
 import {NzCardModule} from "ng-zorro-antd/card";
@@ -35,6 +36,7 @@ import {AuthService, VerificationService} from "../../../../auth_module";
   standalone: true
 })
 export class SignInPageComponent {
+  readonly i18n = inject(TranslateService);
   private readonly fb = inject(NonNullableFormBuilder);
   validateForm: FormGroup<{
     username: FormControl<string>;
@@ -61,7 +63,7 @@ export class SignInPageComponent {
   submitForm(): void {
     if (this.validateForm.valid) {
       if(this.code?.toLowerCase()!==this.vCode?.nativeElement.value.toLowerCase()){
-        this.message.error("验证码错误");
+        this.message.error(this.i18n.instant('management.invalidCaptcha'));
         this.generateVerificationCode();
         return;
       }
@@ -96,7 +98,7 @@ export class SignInPageComponent {
         {
           next: (value:any) => {
             this.code = value.code;
-            this.codeUrl = 'data:image/jpeg;base64,' + value.img;
+            this.codeUrl = `data:${value.contentType === 'image/svg+xml' ? 'image/svg+xml' : 'image/jpeg'};base64,${value.img}`;
           }
         }
       );
