@@ -394,6 +394,10 @@
   "admin": { "controlCenter": "Admin console" },
   "help": "How can I help you today?",
   "management": {
+    "syncRetryPending": "Saved on this device. Sync has not completed.",
+    "retrySync": "Retry sync",
+    "syncQueued": "Saved; sync queued",
+    "saveFailed": "Unable to save. Please try again.",
     "addModel": "Add model",
     "addModels": "Add multiple models",
     "editModel": "Update model",

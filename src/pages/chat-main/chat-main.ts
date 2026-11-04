@@ -1,3 +1,5 @@
+import {ChatSessionFacade} from '../../services/chat/chat-session.facade';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {LanguageSwitcher} from '../../shared/language-switcher';
 import {Component, ElementRef, inject, OnDestroy, Renderer2, ViewChild} from '@angular/core';
 import {NzUploadFile, NzUploadModule} from "ng-zorro-antd/upload";
@@ -34,11 +36,10 @@ import {
   SystemRole,
   UserRole
 } from "../../models";
-import {ChatDataService, HistoryTitleService} from "../../services/db-services";
+import {ChatDataService} from "../../services/db-services";
 import {TaskType, UserTask} from "../../models/operations";
-import {ErrorType, ResponseError} from "../../errors";
 import {ParseService} from "../../services/fetch_services";
-import {AuthService, SendManagerService} from "../../auth_module";
+import {SendManagerService} from "../../auth_module";
 import {MenuAbleService} from "../../services/normal-services/menu-able.service";
 import {Bs64Handler, ChatContextHandler} from "../../services/handlers";
 import {RequestType} from "../../models/enumerates";
@@ -72,11 +73,12 @@ import {historyTitleActions} from "../../systems/store/history-title/history-tit
     NzSkeletonModule,
     TranslateModule,
   ],
-  providers: [
-  ]
+  providers: [ChatSessionFacade]
 })
 export class ChatMainComponent implements OnDestroy{
   private localization = inject(LocalizationService);
+  private readonly session = inject(ChatSessionFacade);
+  private draftVersion = 0;
 
   async parseAllFile(userModel: ChatModel): Promise<boolean> {
     if (!userModel.fileList || userModel.fileList.length === 0) return true;
@@ -113,8 +115,16 @@ export class ChatMainComponent implements OnDestroy{
     }
     this.answering = true;
 
+    const version = this.draftVersion;
     //构建请求文件列表
-    await this.buildFileList();
+    try { await this.buildFileList(); }
+    catch {
+      if (version !== this.draftVersion) return;
+      this.answering = false;
+      this.notification.error(this.localization.text('management.saveFailed'), '');
+      return;
+    }
+    if (version !== this.draftVersion) return;
 
     // 添加用户请求
 
@@ -124,6 +134,7 @@ export class ChatMainComponent implements OnDestroy{
     this.chatModels.push(userModel);
     let parseStatus = await this.parseAllFile(userModel);//!!!!!
 
+    if (version !== this.draftVersion) return;
     if(!parseStatus){
       this.answering = false;
       return;
@@ -154,65 +165,23 @@ export class ChatMainComponent implements OnDestroy{
     this.animalModel = assistantModel;
     this.responseSubscription = this.subscriptionResponse(response,assistantModel);
   }
-  handleTitleWhenNewResponse(model: ChatModel){
-    if (this.chatHistoryModel?.title === '') {
-      if(this.inputText===''){
-        if(this.chatFileList.length>=1){
-          this.chatHistoryModel.title = this.chatFileList[0].fileName.substring(0,25);
-        }else{
-          this.chatHistoryModel.title = this.localization.text('chat-main.untitledConversation');
-        }
-      }else{
-        this.chatHistoryModel.title = this.inputText.substring(0,25);
-      }
-      // 保存历史消息标题到indexed db
-      let title = {
-        dataId: this.chatHistoryModel.dataId!,
-        title: this.chatHistoryModel.title,
-        userId: this.auth.user?.id!
-      };
-      this.chatHistoryService.putHistoryTitle(title).then(()=>{
-        this.store.dispatch(historyTitleActions.newHistoryTitle({title: title}))
-        // 保存到服务器数据库
-        this.sendManagerService.sendHistory(title).then((msg:any)=>{
-          // 保存消息到服务器数据库
-          this.sendManagerService.sendMessage(this.chatHistoryModel!.dataId!,model as ChatInterface);
-        })
-      })
+  handleTitleWhenNewResponse(model: ChatModel) {
+    const history = this.chatHistoryModel!;
+    if (!history.title) {
+      history.title = this.inputText.substring(0, 25) || this.chatFileList[0]?.fileName.substring(0, 25)
+        || this.localization.text('chat-main.untitledConversation');
+      const title = {dataId: history.dataId!, title: history.title, userId: history.userId};
+      this.store.dispatch(historyTitleActions.newHistoryTitle({title}));
       this.notifyChatHistoryIdentifier = true;
-    }else{
-      this.sendManagerService.sendMessage(this.chatHistoryModel!.dataId!,model as ChatInterface);
     }
+    void this.session.saveUser(history, model);
   }
   subscriptionResponse(subject: Observable<string>, model: ChatModel): Subscription{
-    let collector = '';
-    model.content = '';
-    return subject!.subscribe({
-      next: (data: any) => {
-        collector += data;
-        model.content = collector;
-        this.nextSubscribe(true);
-      },
-      error: (error: ResponseError) => {
-        if(error.type===ErrorType.NotAuthorize){
-          model.content = '';
-          model.content += this.localization.text('chat-main.authorizationRequired');
-        }else{
-          model.content += this.localization.text('chat-main.responseInterrupted');
-        }
-
-        model.finish = true;
-        this.nextSubscribe(false);
-        this.answering = false;
-        this.finalizeResponse();
-        this.sendManagerService.updateMessage(this.chatHistoryModel?.dataId!,model as ChatInterface)
-      },
-      complete: () => {
-        this.answering = false;
-        model.finish = true;
-        this.sendManagerService.updateMessage(this.chatHistoryModel?.dataId!,model as ChatInterface)
-        this.finalizeResponse();
-      }
+    const history = this.chatHistoryModel!;
+    return this.session.response(subject, history, model).subscribe({
+      next: () => this.nextSubscribe(true),
+      error: () => { this.answering = false; this.finalizeResponse(); },
+      complete: () => { this.answering = false; this.finalizeResponse(); }
     });
   }
 
@@ -228,16 +197,18 @@ export class ChatMainComponent implements OnDestroy{
       model.finish = true;
     }
     this.scrollSubject?.complete();
+    for (const subscription of this.responseHolder) subscription.unsubscribe();
+    this.responseHolder = [];
     if (this.responseSubscription&&!this.responseSubscription.closed) {
       if(this.animalModel){
         this.animalModel.finish = true;
       }
       this.responseSubscription.unsubscribe();
     }
-    this.syncHistorySession();
   }
   syncHistorySession(){
-    this.chatDataService.putHistory(this.chatHistoryModel!);
+    void this.chatDataService.putHistory(this.chatHistoryModel!).catch(() =>
+      this.notification.error(this.localization.text('management.saveFailed'), ''));
   }
 
   nextSubscribe(data: boolean) {
@@ -255,6 +226,8 @@ export class ChatMainComponent implements OnDestroy{
   }
 
   ngOnDestroy(): void {
+    this.draftVersion++;
+    this.finalizeResponse();
     if (this.responseSubscription) {
       this.responseSubscription.unsubscribe();
     }
@@ -340,6 +313,8 @@ export class ChatMainComponent implements OnDestroy{
   }
 
   async reGenerateHandle($event: number) {
+    if (this.answering) return;
+    const version = this.draftVersion;
     // tackle since model
     let reModel = this.chatModels.find(m=>m.dataId===$event);
     if(reModel===undefined){
@@ -350,7 +325,8 @@ export class ChatMainComponent implements OnDestroy{
       this.notification.error(this.localization.text('notifications.operationNotAllowed'), this.localization.text('notifications.systemPromptCannotRegenerate'));
       return;
     }
-    let parseStatus = await this.parseAllFile(reModel);//!!!!!
+    let parseStatus = await this.parseAllFile(reModel);
+    if (version !== this.draftVersion) return;
 
     if(!parseStatus){
       return;
@@ -395,6 +371,7 @@ export class ChatMainComponent implements OnDestroy{
     let response: Observable<string> = this.modelFetchService.getFetchResponse(
       fetchParam,generateModel!.model);
     // 订阅返回的数据
+    this.answering = true;
     let animalSubscription = this.subscriptionResponse(response,generateModel!);
     this.responseHolder.push(animalSubscription);
   }
@@ -439,11 +416,9 @@ export class ChatMainComponent implements OnDestroy{
   contextMemoryService = inject(ContextMemoryService);
   render = inject(Renderer2)
   chatDataService = inject(ChatDataService);
-  chatHistoryService = inject(HistoryTitleService)
   notification = inject(NzNotificationService);
   private modelFetchService: ModelFetchService = inject(ModelFetchService);
   private parseService: ParseService = inject(ParseService);
-  private auth: AuthService = inject(AuthService);
   private sendManagerService: SendManagerService = inject(SendManagerService);
   private bs64Handler: Bs64Handler = inject(Bs64Handler);
   store = inject(Store);
@@ -454,17 +429,23 @@ export class ChatMainComponent implements OnDestroy{
     }
     this.menuAbleService.enableChat();
     // 添加默认值
-    this.store.select(selectConfig).subscribe((config: Configuration | null)=>{
-      this.config = config!;
+    this.store.select(selectConfig).pipe(takeUntilDestroyed()).subscribe((config: Configuration | null)=>{
+      this.config = config ? structuredClone(config) : undefined;
     });
-    this.store.select(selectChatHistory).subscribe((chatHistory: ChatHistoryModel) => {
+    this.store.select(selectChatHistory).pipe(takeUntilDestroyed()).subscribe((chatHistory: ChatHistoryModel) => {
       let defaultContext = {
         pointer: undefined,
         systems: [],
       }
-      this.chatHistoryModel = chatHistory;
+      if (this.answering && this.chatHistoryModel?.dataId === chatHistory.dataId) return;
+      this.draftVersion++;
+      this.answering = false;
+      this.finalizeResponse();
+      for (const subscription of this.responseHolder) subscription.unsubscribe();
+      this.responseHolder = [];
+      this.chatHistoryModel = this.session.draft(chatHistory);
       this.chatContext = chatHistory
-        ? this.contextMemoryService.getValue(chatHistory.dataId!) || defaultContext
+        ? this.contextMemoryService.getValue(chatHistory.dataId!, chatHistory.userId) || defaultContext
         : defaultContext;
     })
 
@@ -503,7 +484,7 @@ export class ChatMainComponent implements OnDestroy{
   editBeforeModel: ChatModel | undefined;
   awareContextChange(){
     this.contextMemoryService.setValue(this.chatHistoryModel?.dataId!,
-      this.chatContext);
+      this.chatContext, this.chatHistoryModel?.userId);
   }
   cloneChatModel(model2: ChatModel | undefined){
     return new ChatModel(model2?.role,model2?.content,model2?.fileList,model2?.dataId,model2?.finish,model2?.model);
@@ -530,7 +511,7 @@ export class ChatMainComponent implements OnDestroy{
             this.chatContext.systems = this.chatContext.systems?.filter(si=>si.id!==model.dataId);
           }
           this.chatHistoryModel?.chatList?.chatModel!.splice(index, 1); // 删除符合条件的元素
-          this.chatDataService.deleteChatModel($event.id);
+          this.chatDataService.deleteChatModel($event.id, this.chatHistoryModel!.dataId!, this.chatHistoryModel!.userId);
           this.sendManagerService.deleteMessage(this.chatHistoryModel?.dataId!,$event.id);
         }
         this.chatDataService.putHistory(this.chatHistoryModel!).then(()=>{
@@ -588,50 +569,25 @@ export class ChatMainComponent implements OnDestroy{
     return false;
   };
   async buildFileList() {
-    // 构建非图像文件
-    const promises = this.fileList.map((file) => this.readFile(file));
-    await Promise.all(promises);
+    const version = this.draftVersion;
+    const files = await Promise.all(this.fileList.map(file => this.readFile(file)));
+    if (version === this.draftVersion) this.chatFileList = files;
   }
 
-  readFile(file: NzUploadFile): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
+  readFile(file: NzUploadFile): Promise<FileAdds> {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => {
-        if(file.type?.startsWith("image")){
-          const base64String = reader.result as string;
-          const afile: FileAdds = {
-            fileName: file.name,
-            fileType: file.type,
-            fileSize: file.size,
-            fileContent: base64String,
-          };
-          this.chatFileList.push(afile);
-        }else {
-          const arrayBuffer = reader.result as ArrayBuffer;
-          const base64String = this.bs64Handler.arrayBufferToBase64(arrayBuffer);
-          const afile: FileAdds = {
-            fileName: file.name,
-            fileType: file.type,
-            fileSize: file.size,
-            fileContent: base64String,
-          };
-          this.chatFileList.push(afile);
-        }
-        resolve();
-      };
-
-      if (file) {
-        if(file.type?.startsWith("image")){
-          // @ts-ignore
-          reader.readAsDataURL(file);
-        }else{
-          // @ts-ignore
-          reader.readAsArrayBuffer(file);
-        }
-      }
+      reader.onerror = () => reject(reader.error);
+      reader.onabort = () => reject(new Error('File read cancelled'));
+      reader.onload = () => resolve({
+        fileName: file.name, fileType: file.type, fileSize: file.size,
+        fileContent: file.type?.startsWith('image') ? reader.result as string
+          : this.bs64Handler.arrayBufferToBase64(reader.result as ArrayBuffer)
+      });
+      if (file.type?.startsWith('image')) reader.readAsDataURL(file as unknown as Blob);
+      else reader.readAsArrayBuffer(file as unknown as Blob);
     });
   }
-
 
   protected readonly RequestType = RequestType;
 

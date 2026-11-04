@@ -1,3 +1,4 @@
+import {SyncEffects} from '../services/sync/sync.effects';
 import {provideAppTranslations} from './app-translations';
 import {localizationInterceptor} from '../systems/interceptors/localization.interceptor';
 import {
@@ -54,11 +55,11 @@ export const appConfig: ApplicationConfig = {
       },
       {
         runtimeChecks: {
-          strictStateImmutability: false,
-          strictActionImmutability: false,
+          strictStateImmutability: true,
+          strictActionImmutability: true,
         }
       }),
-    provideEffects(AuthEffects, ConfigurationEffects, HistoryTitleEffect,
+    provideEffects(SyncEffects, AuthEffects, ConfigurationEffects, HistoryTitleEffect,
       SystemPromptsEffects, SystemEffects, ChatHistoryEffects),
     provideStoreDevtools({
       maxAge: 25, // Retains last 25 states

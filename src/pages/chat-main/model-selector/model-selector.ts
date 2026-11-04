@@ -29,7 +29,7 @@ export class ModelSelector {
   configService = inject(ConfigurationService);
   constructor() {
     this.store.select(selectConfig).pipe(takeUntilDestroyed()).subscribe(config => {
-      this.config = config;
+      this.config = config ? structuredClone(config) : null;
       this.buildSelector();
       this.model = config?.model;
     });
@@ -39,8 +39,8 @@ export class ModelSelector {
   }
   async onSelectChange() {
     if (!this.config || !this.model) return;
-    this.config!.model = this.model!;
-    this.store.dispatch(configurationActions.configUpdate({config: this.config!}))
+    this.config = {...this.config, model: {...this.model}};
+    this.store.dispatch(configurationActions.configUpdate({config: structuredClone(this.config!)}))
     this.configService.saveConfigToDb(this.config!)
   }
 }

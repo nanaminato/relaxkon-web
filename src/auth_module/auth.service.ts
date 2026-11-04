@@ -59,7 +59,7 @@ export class AuthService {
   }
 
   restore(user: User, token: string, refreshToken: string) {
-    this.user = user;
+    this.user = structuredClone(user);
     this.token = token;
     this.refreshToken = refreshToken;
     localStorage.setItem(this.tokenKey, token);

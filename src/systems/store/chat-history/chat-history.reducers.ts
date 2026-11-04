@@ -12,6 +12,8 @@ export const initialState: ChatHistoryState = {
 
 export const chatHistoryReducer = createReducer(
   initialState,
+  on(chatHistoryActions.syncApplied, (state, {expectedSessionId, historyModel}) =>
+    state.history.dataId === expectedSessionId ? {history: historyModel} : state),
   on(chatHistoryActions.loadFromDbSuccess, chatHistoryActions.newChatSuccess, (state, { historyModel }) => ({
     ...state,
     history: {
@@ -22,7 +24,7 @@ export const chatHistoryReducer = createReducer(
     }
   })),
 
-  on(chatHistoryActions.loadFromHttpSuccess, (state, { mergedChatList }) => ({
+  on(chatHistoryActions.loadFromHttpSuccess, (state, { mergedChatList }) => mergedChatList.dateId !== state.history.dataId ? state : ({
     history: {
       ...state.history,
       chatList: mergedChatList

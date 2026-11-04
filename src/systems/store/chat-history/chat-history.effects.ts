@@ -4,9 +4,9 @@ import {Store} from "@ngrx/store";
 import {ChatDataService} from "../../../services/db-services";
 import {Actions, createEffect, ofType} from "@ngrx/effects";
 import {chatHistoryActions} from "./chat-history.actions";
-import {catchError, concatMap, from, map, of, switchMap, take} from "rxjs";
+import {catchError, concatMap, filter, from, map, of, switchMap, take, withLatestFrom} from "rxjs";
 import {ChatHistoryModel, ChatInterface, ChatListModel, ChatModel} from "../../../models";
-import {chatActions} from "../system.actions";
+import {authActions, chatActions} from "../system.actions";
 import {selectChatHistory} from "./chat-history.selectors";
 import {historyTitleActions} from "../history-title/history-title.actions";
 
@@ -24,13 +24,15 @@ export class ChatHistoryEffects {
   ));
 
   newChat$ = createEffect(() => this.actions$.pipe(
-    ofType(chatActions.startNewChat),
+    ofType(chatActions.startNewChat, authActions.logout, authActions.loginSuccess),
     map(() => chatHistoryActions.newChat()),
   ));
 
 
   newChatContext$ = createEffect(() => this.actions$.pipe(
     ofType(chatHistoryActions.newChat, historyTitleActions.deleteSuccess),
+    withLatestFrom(this.store.select(selectChatHistory)),
+    filter(([action, current]) => !('dataId' in action) || action.dataId === current.dataId),
     map(() => {
       const chatHistoryModel = new ChatHistoryModel();
       chatHistoryModel.userId = this.auth.user?.id ?? undefined;
@@ -80,7 +82,7 @@ export class ChatHistoryEffects {
               m.model
             )}
           )
-          mergedChatList = mergeChatLists(existingChatList, new ChatListModel(dataId, ch));
+          mergedChatList = new ChatListModel(dataId, ch);
         } else {
           mergedChatList = existingChatList;
         }
@@ -97,6 +99,7 @@ export class ChatHistoryEffects {
         return this.store.select(selectChatHistory).pipe(
           take(1),
           concatMap(history => {
+            if (history.dataId !== mergedChatList.dateId) return of({type: '[Chat] Stale Save Ignored'});
             const newHistory: ChatHistoryModel = {
               ...history,
               chatList: mergedChatList

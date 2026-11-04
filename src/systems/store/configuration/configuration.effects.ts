@@ -1,4 +1,4 @@
-import {catchError, from, map, mergeMap, of, tap, withLatestFrom} from "rxjs";
+import {catchError, concatMap, from, map, mergeMap, of, tap, withLatestFrom} from "rxjs";
 import {inject, Injectable} from "@angular/core";
 import {Actions, createEffect, ofType} from "@ngrx/effects";
 import {ConfigurationService, DbService} from "../../../services/db-services";
@@ -18,20 +18,25 @@ export class ConfigurationEffects {
       ofType(configurationActions.load),
       mergeMap(() =>
         from(this.dbService.getConfiguration()).pipe(
-          map(config => {
-            if(config){
-              return configurationActions.loadSuccess({config})
-            }else{
+          concatMap(async config => {
+            if (!config) {
               config = this.configurationService.default_configuration();
-              this.dbService.setConfiguration(config);
-              return configurationActions.loadSuccess({config})
+              await this.dbService.setConfiguration(config);
             }
+            return configurationActions.loadSuccess({config});
           }),
           catchError(error => of(configurationActions.loadFailure()))
         )
       )
     )
   );
+  persistConfiguration$ = createEffect(() => this.actions$.pipe(
+    ofType(configurationActions.configUpdate),
+    concatMap(({config}) => from(this.dbService.setConfiguration(config)).pipe(
+      map(() => ({type: '[Configuration] Saved'})),
+      catchError(() => of(configurationActions.loadFailure()))
+    ))
+  ));
   store = inject(Store);
   updateAppView$ = createEffect(() =>
       this.actions$.pipe(

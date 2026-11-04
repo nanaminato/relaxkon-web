@@ -23,6 +23,6 @@ export class HistoryTitleService{
     return await this.dbService.addOrUpdateHistoryTitles(historyTitle);
   }
   async deleteHistoryTitle(historyTitle: ChatHistoryTitle){
-    return await this.dbService.deleteHistoryTitles(historyTitle.dataId);
+    return await this.dbService.deleteHistoryTitles(historyTitle.dataId, historyTitle.userId);
   }
 }

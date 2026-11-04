@@ -1,3 +1,4 @@
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Component, EventEmitter, inject, OnInit, Output} from '@angular/core';
 import {Configuration, DisplayModel, displayModels} from "../../../models";
 import {NumerService} from "../../../services/fetch_services";
@@ -34,12 +35,10 @@ export class ModelCenter implements OnInit {
   store = inject(Store);
   constructor() {
     //本地已经设置为可用的模型
-    this.store.select(selectConfig).subscribe(config => {
-      this.config = config;
+    this.store.select(selectConfig).pipe(takeUntilDestroyed()).subscribe(config => {
+      this.config = config ? structuredClone(config) : null;
       if(config){
-        config.chatConfiguration.models.forEach(m=>{
-          this.selectedModels.push(m);
-        })
+        this.selectedModels = structuredClone(config.chatConfiguration.models);
       }
     });
   }
@@ -94,9 +93,9 @@ export class ModelCenter implements OnInit {
     }
   }
   save(){
-    let config: Configuration = {...this.config!};
+    let config: Configuration = structuredClone(this.config!);
     config.chatConfiguration!.models = [...this.selectedModels];
-    this.store.dispatch(configurationActions.configUpdate({config: config}))
+    this.store.dispatch(configurationActions.configUpdate({config: structuredClone(config)}))
     this.closeAction.next(true);
   }
 

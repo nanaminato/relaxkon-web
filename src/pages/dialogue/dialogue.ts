@@ -1,3 +1,4 @@
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Component, EventEmitter, inject, Input, Output, signal} from '@angular/core';
 import {ClipboardService} from "ngx-clipboard";
 import {NzNotificationService} from "ng-zorro-antd/notification";
@@ -40,7 +41,7 @@ export class Dialogue {
   config: Configuration | null = null;
   store = inject(Store);
   constructor() {
-    this.store.select(selectConfig).subscribe(config => {
+    this.store.select(selectConfig).pipe(takeUntilDestroyed()).subscribe(config => {
       this.config = config;
     });
   }

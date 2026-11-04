@@ -1,3 +1,4 @@
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Component, ElementRef, inject, ViewChild} from '@angular/core';
 import {ClipboardModule, ClipboardService} from "ngx-clipboard";
 import {NzButtonModule} from "ng-zorro-antd/button";
@@ -26,7 +27,7 @@ export class ExportPrompts {
   prompts: SystemPromptItem[] | undefined;
   store = inject(Store)
   constructor(private clipboardService: ClipboardService) {
-    this.store.select(selectPrompt).subscribe((prompts: SystemPromptItem[] | undefined) => {
+    this.store.select(selectPrompt).pipe(takeUntilDestroyed()).subscribe((prompts: SystemPromptItem[] | undefined) => {
       this.prompts = prompts;
     })
   }

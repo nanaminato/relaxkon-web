@@ -14,7 +14,7 @@ export const configurationReducer = createReducer(
   on(configurationActions.load, (state) => ({
     ...state,
   })),
-  on(configurationActions.loadSuccess, (state, { config }) => ({
+  on(configurationActions.loadSuccess, configurationActions.configUpdate, (state, { config }) => ({
     ...state,
     config,
   })),

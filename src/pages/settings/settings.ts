@@ -1,3 +1,5 @@
+import {configurationActions} from '../../systems/store/configuration/configuration.actions';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Component, ElementRef, inject, Renderer2, ViewChild} from '@angular/core';
 import {NzNotificationService} from "ng-zorro-antd/notification";
 import {NzFormModule} from "ng-zorro-antd/form";
@@ -61,8 +63,8 @@ export class Settings {
               private message: NzMessageService,
               private dbService: DbService
               ) {
-    this.store.select(selectConfig).subscribe(config => {
-      this.config = config;
+    this.store.select(selectConfig).pipe(takeUntilDestroyed()).subscribe(config => {
+      this.config = config ? structuredClone(config) : null;
       if(config){
         this.loadProperties();
       }
@@ -76,7 +78,8 @@ export class Settings {
   }
 
   async resetConfiguration() {
-    await this.configurationService.resetConfig()
+    await this.configurationService.resetConfig();
+    this.store.dispatch(configurationActions.load());
     this.notification
       .create(
         "success",
@@ -88,6 +91,7 @@ export class Settings {
 
   async applyChangeRightNow() {
     await this.configurationService.saveConfigToDb(this.config!);
+    this.store.dispatch(configurationActions.configUpdate({config: structuredClone(this.config!)}));
     this.notification
       .create(
         "success",
@@ -124,6 +128,7 @@ export class Settings {
   async handleConfigInput($event: Configuration) {
     this.config = $event;
     await this.configurationService.saveConfigToDb($event);
+    this.store.dispatch(configurationActions.configUpdate({config: structuredClone($event)}));
   }
 
   protected readonly themeOptions = themeOptions;

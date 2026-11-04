@@ -6,7 +6,7 @@ import {catchError, concatMap, from, map, mergeMap, of, switchMap, take, tap, wi
 import {Store} from "@ngrx/store";
 import {addWithMerge} from "./addWithMerge";
 import {ChatDataService, HistoryTitleService} from "../../../services/db-services";
-import {AuthService, RequestService, SendService} from "../../../auth_module";
+import {AuthService, RequestService, SendManagerService} from "../../../auth_module";
 import {ChatHistoryTitle} from "../../../models";
 import {selectHistoryTitle} from "./history-title.selectors";
 import {authActions} from "../system.actions";
@@ -18,7 +18,7 @@ export class HistoryTitleEffect {
   actions$ = inject(Actions)
   store = inject(Store)
   historyTitleService = inject(HistoryTitleService)
-  private sendService: SendService = inject(SendService);
+  private sendService = inject(SendManagerService);
   private chatDataService: ChatDataService = inject(ChatDataService);
   authService = inject(AuthService)
   loadHistoryFromDb$ = createEffect(() =>
@@ -37,7 +37,7 @@ export class HistoryTitleEffect {
           map(dbHistoryTitles => {
             // 如果接口返回 undefined，保证赋予空数组，避免报错
             const safeDbTitles = dbHistoryTitles ?? [];
-            const merged = addWithMerge(historyTitles, safeDbTitles);
+            const merged = addWithMerge(historyTitles.filter(item => item.userId === undefined), safeDbTitles);
             return historyTitleActions.loadSuccess({ historyTitles: merged });
           }),
           catchError((err) => {
@@ -77,7 +77,7 @@ export class HistoryTitleEffect {
         return this.requestService.requestHistories(ids).pipe(
           map(responseHistoryTitles => {
             const safeResponse = responseHistoryTitles ?? [];
-            const merged = addWithMerge(historyTitles, safeResponse);
+            const merged = addWithMerge(historyTitles.filter(item => item.userId === undefined), safeResponse);
             return historyTitleActions.loadSuccess({ historyTitles: merged });
           }),
           catchError((err) => {
@@ -101,9 +101,8 @@ export class HistoryTitleEffect {
             return of(historyTitleActions.deleteFailure({error: 'HistoryTitle not found'}));
           }
           // 串行执行多个异步请求
-          return from(this.historyTitleService.deleteHistoryTitle(historyTitle)).pipe(
-            mergeMap(() => from(this.sendService.deleteHistory(historyTitle.dataId))),
-            mergeMap(() => from(this.chatDataService.deleteHistoriesByTitleId(historyTitle.dataId))),
+          return from(this.sendService.deleteHistory(historyTitle.dataId)).pipe(
+            mergeMap(() => from(this.chatDataService.deleteHistoriesByTitleId(historyTitle.dataId, historyTitle.userId))),
             map(() => historyTitleActions.deleteSuccess({ dataId })),
             catchError(error => of(historyTitleActions.deleteFailure({error})))
           )

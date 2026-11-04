@@ -1,3 +1,4 @@
+import {AuthService} from '../../auth_module/auth.service';
 import {inject, Injectable} from "@angular/core";
 import {ChatHistory, ChatHistoryModel, ChatListModel, ChatModel} from "../../models";
 import {DbService} from "./db.service";
@@ -7,12 +8,14 @@ import {DbService} from "./db.service";
 })
 export class ChatDataService{
   dbService = inject(DbService);
+  private readonly auth = inject(AuthService);
   async getChatHistory(dataId: number): Promise<ChatHistoryModel | undefined> {
     try {
-      const data = await this.dbService.getHistory(dataId);
+      const owner = this.auth.user?.id;
+      const data = await this.dbService.getHistory(dataId, owner) ?? await this.dbService.getHistory(dataId);
       if(!data) return undefined;
       let list = (data!.chatList.map(async (chatModelId) => {
-        let chatInterface = await this.dbService.getChatInterface(chatModelId);
+        let chatInterface = await this.dbService.getChatInterface(chatModelId, dataId, data.userId);
         if(chatInterface === undefined) return undefined;
         return new ChatModel(
           chatInterface.role,
@@ -42,60 +45,24 @@ export class ChatDataService{
       throw error; // Propagate the error or handle it according to your needs
     }
   }
-  async deleteHistoriesByTitleId(titleId: number){
-    try{
-      const data = await this.dbService.getHistory(titleId);
-      if(!data) return undefined;
-      data!.chatList.map(async (chatModelId: any) => {
-        await this.dbService.deleteChatInterface(chatModelId);
-      });
-      await this.dbService.deleteHistory(titleId);
-    }catch (error){
-
-    }
-  }
-  async putHistory(history: ChatHistoryModel){
-    if(!history) return;
-    let chatList = history.chatList!.chatModel!.map(async h => {
-      const chat = h;
-      let exist = await this.dbService.checkChatModelExists(chat.dataId!);
-      if(exist&& !chat.markAsChanged){
-        // 已经存在并且没有被标记为已经更改
-        return chat.dataId;
-      }else{
-        await this.dbService.putChatInterface({
-          role: chat.role,
-          content: chat.content,
-          fileList: chat.fileList,
-          dataId: chat.dataId!,
-          finish: true,
-          model: chat.model
-        });
-        return chat.dataId;
-      }
-    });
-    return await Promise.all(chatList)
-      .then(async (completedChatList) => {
-        try {
-          return await this.dbService.addOrUpdateHistory(<ChatHistory>{
-            title: history.title,
-            dataId: history.dataId!,
-            chatList: completedChatList,
-            userId: history.userId
-          });
-        } catch (e) {
-          return 1;
-        }
-      })
-      .catch((error) => {
-        // 处理错误
-        console.error("An error occurred:", error);
-      });
-
+  async deleteHistoriesByTitleId(titleId: number, userId = this.auth.user?.id) {
+    await this.dbService.deleteSession(titleId, userId);
   }
 
+  async putHistory(history: ChatHistoryModel) {
+    if (!history) return;
+    // Capture the draft before awaiting: callers may continue streaming or switch sessions.
+    const messages = structuredClone((history.chatList?.chatModel ?? []).map(chat => ({
+      role: chat.role, content: chat.content, fileList: chat.fileList,
+      dataId: chat.dataId!, finish: chat.finish, model: chat.model
+    })));
+    await this.dbService.saveSession({
+      title: history.title, dataId: history.dataId!,
+      chatList: messages.map(chat => chat.dataId), userId: history.userId
+    }, messages);
+  }
 
-  deleteChatModel(id: number) {
-    return this.dbService.deleteChatInterface(id);
+  deleteChatModel(id: number, historyId: number, userId?: number) {
+    return this.dbService.deleteChatInterface(id, historyId, userId);
   }
 }

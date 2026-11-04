@@ -1,6 +1,6 @@
 import {TestBed} from '@angular/core/testing';
 import {Store} from '@ngrx/store';
-import {of, toArray, firstValueFrom} from 'rxjs';
+import {of, toArray, firstValueFrom, Subject} from 'rxjs';
 import {AuthService} from '../../auth_module';
 import {ServiceProvider} from '../../roots';
 import {LocalizationService} from '../normal-services/localization.service';
@@ -36,14 +36,33 @@ describe('Multilingual chat streaming', () => {
       {provide: LocalizationService, useValue: {requestLanguage: 'ja'}}
     ]});
     const text = '你好、日本語🙂';
-    const bytes = new TextEncoder().encode(text);
+    const bytes = new TextEncoder().encode(`data: ${JSON.stringify({type: 'delta', text})}\n\ndata: {"type":"completed"}\n\n`);
     const stream = new ReadableStream<Uint8Array>({start(controller) {
       for (const byte of bytes) controller.enqueue(new Uint8Array([byte]));
       controller.close();
     }});
-    const fetchSpy = spyOn(window, 'fetch').and.resolveTo(new Response(stream));
+    const fetchSpy = spyOn(window, 'fetch').and.resolveTo(new Response(stream, {headers: {'Content-Type': 'text/event-stream'}}));
     const chunks = await firstValueFrom(TestBed.inject(TurboService).fetchChatBase('/api/ai/chat', {}).pipe(toArray()));
     expect(chunks.join('')).toBe(text);
     expect((fetchSpy.calls.mostRecent().args[1]?.headers as Record<string, string>)['Accept-Language']).toBe('ja');
+  });  it('does not restart a cancelled chat after token refresh completes', async () => {
+    const refresh = new Subject<string>();
+    const auth = {token: 'expired', refreshToken: 'refresh', refreshAccessToken: jasmine.createSpy().and.returnValue(refresh)};
+    TestBed.configureTestingModule({providers: [
+      {provide: Store, useValue: {select: () => of(null)}},
+      {provide: ServiceProvider, useValue: {apiUrl: '/'}},
+      {provide: AuthService, useValue: auth},
+      {provide: LocalizationService, useValue: {requestLanguage: 'en'}}
+    ]});
+    const fetchSpy = spyOn(window, 'fetch').and.resolveTo(new Response('', {status: 401}));
+    const subscription = TestBed.inject(TurboService).fetchChatBase('/api/ai/chat', {}).subscribe();
+    await new Promise(resolve => setTimeout(resolve, 0));
+    expect(auth.refreshAccessToken).toHaveBeenCalled();
+    subscription.unsubscribe();
+    refresh.next('new-token');
+    refresh.complete();
+    await new Promise(resolve => setTimeout(resolve, 0));
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
   });
+
 });

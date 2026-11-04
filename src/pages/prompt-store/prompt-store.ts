@@ -1,3 +1,4 @@
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Component, inject, } from '@angular/core';
 import {NzNotificationService} from "ng-zorro-antd/notification";
 import {NzModalModule} from "ng-zorro-antd/modal";
@@ -51,8 +52,8 @@ export class PromptStore {
   localization = inject(LocalizationService);
   store = inject(Store)
   constructor() {
-    this.store.select(selectPrompt).subscribe((prompts: SystemPromptItem[] | undefined) => {
-      this.systemPrompts = prompts;
+    this.store.select(selectPrompt).pipe(takeUntilDestroyed()).subscribe((prompts: SystemPromptItem[] | undefined) => {
+      this.systemPrompts = structuredClone(prompts);
       this.filter()
     })
   }

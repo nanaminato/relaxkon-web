@@ -12,6 +12,7 @@ export class SystemEffects{
     this.actions$.pipe(
       ofType(dbActions.loadSuccess),
       switchMap(() => [
+        historyTitleActions.loadFromDb(),
         historyTitleActions.loadFromHttp(),
         configurationActions.load(),
         systemPromptActions.load(),

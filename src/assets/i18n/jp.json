@@ -393,6 +393,10 @@
   "admin": { "controlCenter": "管理コンソール" },
   "help": "どのようなサポートが必要ですか？",
   "management": {
+    "syncRetryPending": "この端末に保存済みです。同期はまだ完了していません。",
+    "retrySync": "同期を再試行",
+    "syncQueued": "保存しました。同期待ちです",
+    "saveFailed": "保存できませんでした。もう一度お試しください。",
     "addModel": "モデルを追加",
     "addModels": "複数モデルを追加",
     "editModel": "モデルを更新",

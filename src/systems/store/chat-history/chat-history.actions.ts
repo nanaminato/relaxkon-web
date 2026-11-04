@@ -4,6 +4,7 @@ import {ChatHistoryModel, ChatListModel} from "../../../models";
 export const chatHistoryActions = createActionGroup({
   source: 'chatHistory',
   events: {
+    'sync applied': props<{expectedSessionId: number, historyModel: ChatHistoryModel}>(),
     'load session': props<{ sessionId: number }>(),
 
     'load from db': props<{ sessionId: number }>(),

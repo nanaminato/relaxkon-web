@@ -1,3 +1,4 @@
+import {SyncStatus} from '../shared/sync-status';
 import {
   Component,
   HostListener,
@@ -30,6 +31,7 @@ import {Store} from "@ngrx/store";
     NzIconModule,
     NzSkeletonModule,
     RouterOutlet,
+    SyncStatus,
   ],
   providers: [
 

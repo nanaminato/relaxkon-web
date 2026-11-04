@@ -1,3 +1,4 @@
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Component, HostListener, inject,} from '@angular/core';
 import {NzButtonModule} from "ng-zorro-antd/button";
 import {NzIconModule} from "ng-zorro-antd/icon";
@@ -32,7 +33,7 @@ export class ChatHistory
   sizeReportService: SizeReportService = inject(SizeReportService);
   store = inject(Store);
   constructor() {
-    this.store.select(selectHistoryTitle).subscribe((histories: ChatHistoryTitle[]) => {
+    this.store.select(selectHistoryTitle).pipe(takeUntilDestroyed()).subscribe((histories: ChatHistoryTitle[]) => {
       this.historyTitles = histories;
       if(histories.length > 0 && this.selectId === -1) {
         this.selectId = histories[0].dataId;

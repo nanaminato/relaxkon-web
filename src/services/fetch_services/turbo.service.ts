@@ -1,6 +1,7 @@
+import {readChatStream} from '../chat/chat-stream';
 import {LocalizationService} from '../normal-services/localization.service';
 import {inject, Injectable} from "@angular/core";
-import {Observable, take} from "rxjs";
+import {Observable, firstValueFrom} from "rxjs";
 import {AuthService} from "../../auth_module";
 import {ServiceProvider} from "../../roots";
 import {ChatPacket, Configuration, Message, VisionMessage} from "../../models";
@@ -41,76 +42,38 @@ export class TurboService {
   fetchChatBase(url: string, requestBody: any): Observable<string> {
     return new Observable<string>(observer => {
       const abortController = new AbortController();
-      const decoder = new TextDecoder();
-      const execute = (hasRetriedAfterRefresh: boolean) => fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept-Language': this.localization.requestLanguage,
-          'Authorization': `Bearer ${this.authService.token}`
-        },
-        body: JSON.stringify(requestBody),
-        signal: abortController.signal
-      }).then(response => {
-        if (response.status === 401 && !hasRetriedAfterRefresh && this.authService.refreshToken) {
-          this.authService.refreshAccessToken().pipe(take(1)).subscribe({
-            next: () => execute(true),
-            error: () => observer.error({ type: ErrorType.NotAuthorize })
-          });
-          return;
-        }
-        let error: ResponseError | undefined;
-        if (!response.ok) {
-          switch (response.status){
-            case 401:
-            case 403:
-              error = {
-                type: ErrorType.NotAuthorize,
-              }
-              break;
-            default:
-              error = {
-                type: ErrorType.Other
-              }
-          }
-          observer.error(error)
-          return ;
-        }
-        const reader = response.body?.getReader();
-        if (!reader) {
-          observer.error({
-            type: ErrorType.NoContent
-          });
-          return ;
-        }
-
-        const pump = (): Promise<void> => reader!.read().then(({value, done}) => {
-          if (done) {
-            const tail = decoder.decode();
-            if (tail) observer.next(tail);
-            reader.releaseLock();
-            observer.complete();
-            return;
-          }
-          // 处理接收到的数据
-          if (value) {
-            const chunk = decoder.decode(value, {stream: true});
-            observer.next(chunk);
-          }
-          // 继续读取下一个数据块
-          return pump();
-        }).catch(error => {
-          observer.error(error);
-          return;
+      const execute = async () => {
+        const request = () => fetch(url, {
+          method: 'POST', headers: {
+            'Content-Type': 'application/json', 'Accept': 'text/event-stream',
+            'Accept-Language': this.localization.requestLanguage,
+            'Authorization': `Bearer ${this.authService.token}`
+          }, body: JSON.stringify(requestBody), signal: abortController.signal
         });
-
-        return pump();
-      }).catch(error => {
-        if (abortController.signal.aborted) return;
-        observer.error(error);
+        let response = await request();
+        if (response.status === 401 && this.authService.refreshToken) {
+          await response.body?.cancel();
+          await firstValueFrom(this.authService.refreshAccessToken());
+          if (abortController.signal.aborted) return;
+          response = await request();
+        }
+        if (!response.ok) throw {
+          type: response.status === 401 || response.status === 403 ? ErrorType.NotAuthorize
+            : response.status === 429 ? ErrorType.Busy : ErrorType.Other,
+          status: response.status
+        } satisfies ResponseError;
+        if (!response.body) throw {type: ErrorType.NoContent};
+        if (!response.headers.get('Content-Type')?.startsWith('text/event-stream'))
+          throw {type: ErrorType.Other, error: 'Unsupported chat stream protocol'};
+        for await (const text of readChatStream(response.body)) {
+          if (abortController.signal.aborted) return;
+          observer.next(text);
+        }
+        observer.complete();
+      };
+      void execute().catch(error => {
+        if (!abortController.signal.aborted) observer.error(error);
       });
-
-      execute(false);
       return () => abortController.abort();
     });
   }

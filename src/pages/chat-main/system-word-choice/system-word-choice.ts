@@ -1,3 +1,4 @@
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Component, EventEmitter, inject, Output} from '@angular/core';
 import {NzFormModule} from "ng-zorro-antd/form";
 import {NgForOf, NgTemplateOutlet} from "@angular/common";
@@ -31,7 +32,7 @@ export class SystemWordChoice {
   systemPrompts: SystemPromptItem[] | undefined;
   store = inject(Store)
   constructor() {
-    this.store.select(selectPrompt).subscribe((prompts: SystemPromptItem[] | undefined) => {
+    this.store.select(selectPrompt).pipe(takeUntilDestroyed()).subscribe((prompts: SystemPromptItem[] | undefined) => {
       this.systemPrompts = prompts;
     })
   }
