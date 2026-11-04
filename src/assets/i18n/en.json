@@ -1,4 +1,14 @@
 {
+  "registrationEmail": {
+    "label": "Email verification code",
+    "placeholder": "Enter the 6-digit email code",
+    "send": "Send code",
+    "sending": "Sending…",
+    "resend": "Resend in {{seconds}}s",
+    "hint": "Codes expire in 10 minutes. Verify again after changing your email.",
+    "sent": "Code sent. Check your inbox and spam folder.",
+    "unavailable": "Unable to send the code. Try again later or contact your administrator."
+  },
   "imageOptions": {
     "auto": "Automatic",
     "transparent": "Transparent",

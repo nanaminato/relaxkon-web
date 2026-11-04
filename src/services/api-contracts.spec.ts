@@ -34,11 +34,19 @@ describe('Backend HTTP contracts', () => {
   afterEach(() => http.verify());
 
   it('uses the exact registration fields including confirm and receives an empty success', async () => {
-    const value = {username: 'user', password: 'secret123', confirm: 'secret123', email: 'test@example.invalid', agree: true, captcha: 'local'};
+    const value = {username: 'user', password: 'secret123', confirm: 'secret123', emailCode: '123456', email: 'test@example.invalid', agree: true, captcha: 'local'};
     const result = firstValueFrom(TestBed.inject(AuthCallService).register(value));
     const request = http.expectOne('/backend/api/auth/register');
-    expect(request.request.body).toEqual({username: value.username, password: value.password, confirm: value.confirm, email: value.email});
+    expect(request.request.body).toEqual({username: value.username, password: value.password, confirm: value.confirm, emailCode: value.emailCode, email: value.email});
     request.flush(null); await result;
+  });
+
+  it('requests a registration email code without transmitting passwords or local captcha values', async () => {
+    const result = firstValueFrom(TestBed.inject(AuthCallService).requestRegistrationCode('user@example.invalid'));
+    const request = http.expectOne('/backend/api/auth/register/email-code');
+    expect(request.request.body).toEqual({email: 'user@example.invalid'});
+    request.flush({code: 'registration_code_sent', message: 'sent', expiresInSeconds: 600, resendAfterSeconds: 60});
+    expect((await result).resendAfterSeconds).toBe(60);
   });
 
   it('preserves token expiry fields and base64 SVG captcha metadata', async () => {

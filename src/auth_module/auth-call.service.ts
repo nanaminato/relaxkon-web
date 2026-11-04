@@ -3,7 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {inject, Injectable} from "@angular/core";
 
 
-import type {LoginRequest, RefreshTokenRequest, RegisterRequest, PasswordResetRequest, PasswordResetConfirmationRequest, TokenResponse, CaptchaResponse, ApiMessageResponse, RoleResponse} from '../contracts';
+import type {EmailCodeRequest, EmailCodeResponse, LoginRequest, RefreshTokenRequest, RegisterRequest, PasswordResetRequest, PasswordResetConfirmationRequest, TokenResponse, CaptchaResponse, ApiMessageResponse, RoleResponse} from '../contracts';
 import {map} from 'rxjs';
 import {roleView} from '../services/api-mappers';
 export type VerificationCodeResponse = CaptchaResponse;
@@ -37,8 +37,12 @@ export class AuthCallService {
     return this.http.post<void>(`${this.provider.apiUrl}api/auth/password-reset/confirm`, {token, newPassword, confirmPassword} satisfies PasswordResetConfirmationRequest);
   }
 
+  requestRegistrationCode(email: string) {
+    return this.http.post<EmailCodeResponse>(`${this.provider.apiUrl}api/auth/register/email-code`, {email} satisfies EmailCodeRequest);
+  }
+
   register(body: RegisterRequest) {
-    return this.http.post<void>(`${this.provider.apiUrl}api/auth/register`, {username: body.username, email: body.email, password: body.password, confirm: body.confirm} satisfies RegisterRequest);
+    return this.http.post<void>(`${this.provider.apiUrl}api/auth/register`, {username: body.username, email: body.email, password: body.password, confirm: body.confirm, emailCode: body.emailCode} satisfies RegisterRequest);
   }
   check_token(){
     return this.http.get<void>(`${this.provider.apiUrl}api/verification/check-token`);

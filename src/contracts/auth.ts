@@ -1,6 +1,6 @@
 export interface LoginRequest { username: string; password: string; deviceName?: string | null; }
 export interface RefreshTokenRequest { refreshToken: string; deviceName?: string | null; }
-export interface RegisterRequest { username: string; email: string; password: string; confirm: string; }
+export interface RegisterRequest { username: string; email: string; password: string; confirm: string; emailCode: string; }
 export interface ChangePasswordRequest { currentPassword: string; newPassword: string; confirmPassword: string; }
 export interface PasswordResetRequest { username: string; email: string; }
 export interface PasswordResetConfirmationRequest { token: string; newPassword: string; confirmPassword: string; }
@@ -20,3 +20,6 @@ export interface AccountResponse { accountId: number; username: string | null; e
 export interface AccountWriteRequest {
   accountId?: number; username: string; email: string; password?: string | null; userRoles?: RoleReferenceRequest[] | null;
 }
+
+export interface EmailCodeRequest { email: string; }
+export interface EmailCodeResponse { code: string; message: string; expiresInSeconds: number; resendAfterSeconds: number; }

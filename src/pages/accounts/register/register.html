@@ -8,6 +8,21 @@
       @if (validateForm.controls.email.invalid && validateForm.controls.email.dirty) { <p class="field-error" role="alert">{{'account.pleaseEmail' | translate}}</p> }
     </div>
     <div class="field">
+      <label for="register-email-code">{{'registrationEmail.label' | translate}}</label>
+      <div class="captcha-row">
+        <input id="register-email-code" class="form-control" formControlName="emailCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" [placeholder]="'registrationEmail.placeholder' | translate">
+        <button class="btn btn-outline-primary" type="button" (click)="sendEmailCode()" [disabled]="sending() || busy() || cooldown() > 0 || validateForm.controls.email.invalid">
+          @if (sending()) { {{'registrationEmail.sending' | translate}} }
+          @else if (cooldown() > 0) { {{'registrationEmail.resend' | translate:{seconds: cooldown()} }} }
+          @else { {{'registrationEmail.send' | translate}} }
+        </button>
+      </div>
+      <p class="captcha-hint">{{'registrationEmail.hint' | translate}}</p>
+      @if (validateForm.controls.emailCode.invalid && validateForm.controls.emailCode.dirty) { <p class="field-error" role="alert">{{'registrationEmail.placeholder' | translate}}</p> }
+      @if (notice()) { <p role="status">{{notice() | translate}}</p> }
+      @if (error()) { <p class="field-error" role="alert">{{error()}}</p> }
+    </div>
+    <div class="field">
       <label for="register-username">{{'account.username' | translate}}</label>
       <input id="register-username" class="form-control" formControlName="username" autocomplete="username" [placeholder]="'account.pleaseUsername' | translate">
       @if (validateForm.controls.username.invalid && validateForm.controls.username.dirty) { <p class="field-error" role="alert">{{'account.userTip' | translate}}</p> }
@@ -33,7 +48,7 @@
       </div>
       <p class="captcha-hint">{{'accountUi.refreshCaptcha' | translate}}</p>
     </div>
-    <button type="submit" class="primary-button">{{'account.registerNow' | translate}}</button>
+    <button type="submit" class="primary-button" [disabled]="busy() || sending()">{{'account.registerNow' | translate}}</button>
     <p class="auth-alternative"><a routerLink="../sign-in">{{'account.haveAccount' | translate}}</a></p>
   </form>
 </section>

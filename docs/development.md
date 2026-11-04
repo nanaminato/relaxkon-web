@@ -97,3 +97,7 @@ Mermaid 在聊天组件实例化后异步加载，加载失败时仍显示可读
 ## HTTP 请求与响应类型
 
 新增或修改接口时使用 `src/contracts/` 中的传输类型，并通过显式映射隔离表单、数据库缓存和供应商字段。不要重新添加 API `any`、把响应对象原样提交或在账户编辑时读取密码。类型对照、同步队列兼容与测试命令见 [API 契约](api-contracts.md)。
+
+## 注册邮件联调
+
+注册请求新增必填 emailCode，邮箱发送接口不接收密码或图形验证码。后端先补齐 registration-email-verification.sql，前端再一起发布；复用后端现有 SMTP，不能通过关闭前端控件绕过验证。字段、限流与测试见 [注册邮箱验证](registration-email-verification.md)。

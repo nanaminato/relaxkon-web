@@ -1,6 +1,6 @@
 # 前端 API 契约
 
-实施日期：2026-11-04。对齐后端 [2a31082](https://github.com/nanaminato/turbo-ai-server/commit/2a31082) 的 `src/Turbo.Auth/Contracts/`，后端设计见 [Controller 契约与官方 SDK](https://github.com/nanaminato/turbo-ai-server/blob/2a31082/docs/api-contracts-and-sdks.md)。
+实施日期：2026-11-04。注册邮箱验证扩展见 [验证流程](registration-email-verification.md)；基础契约对齐后端 [2a31082](https://github.com/nanaminato/turbo-ai-server/commit/2a31082) 的 `src/Turbo.Auth/Contracts/`，后端设计见 [Controller 契约与官方 SDK](https://github.com/nanaminato/turbo-ai-server/blob/2a31082/docs/api-contracts-and-sdks.md)。
 
 ## 类型边界
 
@@ -28,7 +28,7 @@ JSON 类型约定：
 | 范围 | 对齐方式与行为 |
 | --- | --- |
 | 登录、刷新、验证码 | TokenResponse 包含 accessToken、刷新令牌、会话及到期字段；CaptchaResponse 包含 base64 img、code 和 contentType。保留旧服务端缺少 accessToken / contentType 时的既有回退处理 |
-| 注册 | 明确发送 username、email、password、confirm，排除验证码与本地页面状态；修复旧页面漏发 confirm 导致新后端 400 的问题 |
+| 注册 | 明确发送 username、email、password、confirm、emailCode，排除验证码与本地页面状态；修复旧页面漏发 confirm 导致新后端 400 的问题 |
 | 账户管理 | AccountResponse 与 AccountWriteRequest 分离；查询和列表没有 password。编辑从空密码开始，留空不发送密码，角色只提交 roleId，不提交导航关系 |
 | 表单验证 | 登录允许已有密码且最长 512；注册/创建账户密码为 6–128；用户名最长 20，邮箱最长 50；编辑密码可留空。密码重置仍按独立接口的 8–20 规则执行 |
 | 模型与密钥 | 创建发送 ID=0；更新要求正整数 ID 并保持路由/请求体一致。白名单请求排除 Model、SupplierKey、数据库关联 ID 和页面附加字段，保留 providerModelValue、priority、fee、enable；费用 0 与负优先级不被默认值覆盖 |
@@ -61,7 +61,7 @@ npm run test:i18n
 npm run build -- --configuration production --progress=false
 ```
 
-本次完成 80 项 ChromeHeadless 测试、6 项三语言校验及生产构建。`api-contracts.spec.ts` 使用与后端契约一致的 HTTP JSON 样例，覆盖请求白名单、空/可空响应、图像与 APIMart snake_case 字段、错误保持及路径编码；另有账户编辑、注册、图像页面、SSE 和隔离 IndexedDB 队列的行为回归。
+本次完成 87 项 ChromeHeadless 测试、6 项三语言校验及生产构建。`api-contracts.spec.ts` 使用与后端契约一致的 HTTP JSON 样例，覆盖请求白名单、空/可空响应、图像与 APIMart snake_case 字段、错误保持及路径编码；另有账户编辑、注册、图像页面、SSE 和隔离 IndexedDB 队列的行为回归。
 
 类型当前由前后端分别维护，没有引入代码生成或新依赖。后端契约变化时，先核对该版本的 Contracts 和运行中的 Swagger，再修改前端类型、映射与 HTTP 样例，并运行上述检查。不能只改类型断言让编译通过。
 
