@@ -34,4 +34,49 @@ describe('Feature policy editor', () => {
     component.reload();
     expect(component.conflict).toBeFalse(); expect(component.dirty).toBeFalse();
   });
+  it('saves a detached snapshot and accepts the new server revision', () => {
+    component.changed();
+    component.save();
+    const sent = api.save.calls.mostRecent().args[0];
+    expect(sent).toEqual(component.document);
+    expect(sent).not.toBe(component.document);
+    component.document!.features[0].roles['vip'].requestsPerMinute = 9;
+    expect(sent.features[0].roles['vip'].requestsPerMinute).toBe(5);
+    result.next({...sent, revision: 5});
+    expect(component.document!.revision).toBe(5);
+    expect(component.saving).toBeFalse();
+    expect(component.dirty).toBeFalse();
+    expect(component.status).toBe('featureAccess.saved');
+  });
+  it('rejects unchanged and invalid policies before calling the API', () => {
+    component.save();
+    component.document!.features[0].roles['vip'].maxConcurrent = 0;
+    component.changed();
+    component.save();
+    expect(component.valid).toBeFalse();
+    expect(api.save).not.toHaveBeenCalled();
+  });
+  it('removes deleted role grants when reloading', () => {
+    const document = policy();
+    Object.assign(document.features[0].roles, {deleted: {enabled: true}});
+    api.policies.and.returnValue(of(document));
+    component.reload();
+    expect(component.document!.features[0].roles['deleted']).toBeUndefined();
+    expect(component.document!.features[0].roles['user'].enabled).toBeFalse();
+  });
+  it('hides stale policies on reload failure and allows a retry', () => {
+    const pending = new Subject();
+    api.policies.and.returnValue(pending);
+    component.reload();
+    component.reload();
+    expect(api.policies).toHaveBeenCalledTimes(2);
+    expect(component.document).toBeUndefined();
+    pending.error({status: 503});
+    expect(component.loading).toBeFalse();
+    expect(component.status).toBe('featureAccess.loadError');
+    api.policies.and.returnValue(of(policy()));
+    component.reload();
+    expect(component.document!.revision).toBe(4);
+    expect(component.status).toBe('');
+  });
 });
