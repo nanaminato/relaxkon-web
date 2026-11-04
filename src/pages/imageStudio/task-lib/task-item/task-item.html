@@ -29,7 +29,7 @@
     @if(task?.images!==undefined){
       @if(getFormat(task!.task_type)==='image'){
         @for(url of task!.images; track url){
-          <img nz-image class="m-1 task-image" [nzSrc]="getImageUrl(url) | imagePresent"/>
+          <app-authenticated-image [url]="url" [proxy]="useProxy()"></app-authenticated-image>
         }
       }
     }

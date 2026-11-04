@@ -77,3 +77,15 @@ Mermaid 在聊天组件实例化后异步加载，加载失败时仍显示可读
 聊天、管理后台、图像和多媒体工作室共享 `src/theme/theme.scss` 的语义颜色；跨组件卡片、表格及表单样式集中于 `src/theme/workspace.scss`。新增界面使用 `--app-surface`、`--app-text`、`--app-border` 和 `--app-accent` 等变量，避免破坏深色主题。
 
 账户、聊天和后台统一使用 `LanguageSwitcher`，通过现有 IndexedDB 配置保存语言；快速连续切换会合并过期选择并串行写入，保留原主题与模型设置。翻译检查覆盖三语言键一致性、插值参数、条件表达式引用、重复键和英文中的未翻译文案。供应商名称、协议字段及语言自称保留原文。
+
+## 可配置功能权限与限额
+
+管理端 `/admin/feature-access` 从服务端读取功能清单和角色，不在浏览器写死普通用户、VIP 或管理员的配额。管理员可逐项配置启用状态、每分钟/每日请求数和最大并发数。空白表示不限，整数必须在 1–2147483647 范围内。多个已启用角色采用最宽松限制；没有启用授权则拒绝访问。管理员并不自动绕过功能配额。
+
+- `GET /api/feature-access/policies` 和 `PUT /api/feature-access/policies` 交换 `{revision, features: [{key, roles: {[roleName]: {enabled, requestsPerMinute, requestsPerDay, maxConcurrent}}}]}`。
+- 保存携带读取时的 revision。409 表示配置冲突，必须重新加载，不会覆盖其他管理员的更改。重新加载按钮明确丢弃未保存编辑。
+- `GET /api/feature-access/me` 返回 `{canManagePolicies, features: [{key, enabled, requestsPerMinute, requestsPerDay, maxConcurrent}]}`。账户页显示此快照，不代表剩余额度。
+- 管理页面和子路由使用服务端实时管理权限，网络失败时拒绝进入。界面不是安全边界，后端必须验证每个请求及实时角色。升级时同时部署前后端。
+- 新角色初始为禁用，删除或重命名角色的旧授权不会转移。重新加载并保存会去除已经不存在的角色授权。
+- 图像代理改为通过 HttpClient 携带 bearer 令牌取得 Blob，取消或销毁组件时释放请求及对象 URL。代理主机白名单在服务端设置，不把令牌写入 URL。
+- 服务端数据库表、初始拒绝策略、UTC 计数窗口、并发租约与部署顺序见服务端文档。先完成服务端迁移及管理员策略配置，再开放业务流量。

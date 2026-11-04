@@ -1,17 +1,15 @@
+import {AuthenticatedImage} from '../../../../shared/authenticated-image';
 import {Component, EventEmitter, inject, input, Input, Output} from '@angular/core';
 import {GenerateTask} from "../../../../models/media";
 import {NzColDirective} from "ng-zorro-antd/grid";
-import {NzImageDirective, NzImageModule} from "ng-zorro-antd/image";
 import {NzButtonComponent} from "ng-zorro-antd/button";
 import {NzPopconfirmDirective} from "ng-zorro-antd/popconfirm";
 import {UniversalService} from "../../../../services/db-services/universal.service";
 import {NzNotificationService} from "ng-zorro-antd/notification";
 import {TranslateModule} from "@ngx-translate/core";
-import {ImagePresentPipe} from "../../../../pipes";
 import {ApimartService} from "../../../../services/fetch_services/apimart.service";
 import {SendManagerService} from "../../../../auth_module";
 import {LocalizationService} from '../../../../services/normal-services';
-import {ServiceProvider} from '../../../../roots';
 
 @Component({
   selector: 'app-task-item',
@@ -19,13 +17,11 @@ import {ServiceProvider} from '../../../../roots';
   styleUrls: ['./task-item.scss'],
   standalone: true,
   imports: [
+    AuthenticatedImage,
     NzColDirective,
-    NzImageDirective,
-    NzImageModule,
     NzButtonComponent,
     NzPopconfirmDirective,
-    TranslateModule,
-    ImagePresentPipe
+    TranslateModule
   ]
 })
 export class TaskItem {
@@ -34,7 +30,6 @@ export class TaskItem {
   private apiMartService: ApimartService = inject(ApimartService)
   private sendService: SendManagerService = inject(SendManagerService)
   private localization = inject(LocalizationService)
-  private provider = inject(ServiceProvider)
   @Input()
   index: number | undefined;
   @Output()
@@ -85,18 +80,5 @@ export class TaskItem {
       return taskType.substring(index + 1).trim();
     }
     return taskType.trim();
-  }
-  getImageUrl(url: string): string {
-    if (this.useProxy() && url&&url.startsWith("http")) {
-      try {
-        const urlObj = new URL(url);
-        const imageServerBaseUrl = new URL(this.provider.apiUrl, window.location.origin).origin;
-        return `${imageServerBaseUrl}/api/image_proxy/get?url=${encodeURIComponent(url)}`;
-
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    return url;
   }
 }

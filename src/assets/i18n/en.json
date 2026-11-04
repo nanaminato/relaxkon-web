@@ -588,5 +588,30 @@
     "apimartImage": "APIMart images",
     "pageUnavailable": "This page is unavailable",
     "pageUnavailableHint": "Return to chat and try again."
-}
+},
+  "featureAccess": {
+    "title": "Feature access",
+    "description": "Configure access and request limits for each feature and role. Changes apply on the server.",
+    "mergeHint": "Enabled roles combine: the most permissive limit wins. A blank limit means unlimited. No enabled role means no access.",
+    "limitHint": "Use positive whole numbers (up to 2147483647). Disable access to block requests. Blank means unlimited. Limits use UTC fixed windows and count admitted requests, including provider failures.",
+    "loadError": "Could not load access settings. Please retry.",
+    "discardReload": "Discard changes and reload",
+    "saving": "Saving…",
+    "save": "Save changes",
+    "loading": "Loading access settings…",
+    "enabled": "Enabled",
+    "perMinute": "Requests / minute",
+    "perDay": "Requests / day",
+    "concurrent": "Concurrent requests",
+    "saved": "Changes saved.",
+    "conflict": "Another administrator changed the policy. Reload before editing again.",
+    "saveError": "Could not save. Your edits are preserved.",
+    "invalid": "Limits must be positive whole numbers (up to 2147483647) or blank.",
+    "myAccess": "My feature access",
+    "statusHint": "This is a snapshot of your configured limits, not remaining usage. The server checks every request.",
+    "disabled": "Disabled",
+    "unlimited": "Unlimited",
+    "generatedImage": "Generated image",
+    "imageError": "Could not load the protected image."
+  }
 }

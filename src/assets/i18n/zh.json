@@ -587,5 +587,30 @@
     "apimartImage": "APIMart 图像",
     "pageUnavailable": "页面暂时无法打开",
     "pageUnavailableHint": "请返回聊天页面后重试。"
-}
+},
+  "featureAccess": {
+    "title": "功能权限",
+    "description": "为各功能和角色配置权限及请求限制。更改在服务端生效。",
+    "mergeHint": "多个已启用角色合并，采用最宽松的限制。空白表示不限。无已启用角色则拒绝访问。",
+    "limitHint": "请输入正整数（不超过 2147483647）。禁用权限可禁止请求，空白表示不限。限制按 UTC 固定窗口统计已接受的请求，供应商失败也计数。",
+    "loadError": "无法加载权限设置，请重试。",
+    "discardReload": "放弃更改并重新加载",
+    "saving": "保存中…",
+    "save": "保存更改",
+    "loading": "正在加载权限设置…",
+    "enabled": "已启用",
+    "perMinute": "每分钟请求数",
+    "perDay": "每日请求数",
+    "concurrent": "并发请求数",
+    "saved": "更改已保存。",
+    "conflict": "其他管理员已更改策略，请重新加载后编辑。",
+    "saveError": "保存失败，编辑内容已保留。",
+    "invalid": "限制必须是正整数（不超过 2147483647）或空白。",
+    "myAccess": "我的功能权限",
+    "statusHint": "此处显示已配置限制的快照，并非剩余额度。服务端会检查每次请求。",
+    "disabled": "已禁用",
+    "unlimited": "不限",
+    "generatedImage": "生成的图像",
+    "imageError": "无法加载受保护的图像。"
+  }
 }

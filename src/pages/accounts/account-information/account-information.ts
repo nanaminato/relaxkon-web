@@ -1,3 +1,4 @@
+import {FeatureAccessStatus} from '../../../shared/feature-access-status';
 import {Component, inject, OnInit} from '@angular/core';
 import {RouterLink} from "@angular/router";
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -15,6 +16,7 @@ import {TranslateModule} from '@ngx-translate/core';
   styleUrl: './account-information.css',
   imports: [
     RouterLink,
+    FeatureAccessStatus,
     TranslateModule
   ],
   standalone: true

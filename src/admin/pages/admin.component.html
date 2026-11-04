@@ -4,6 +4,7 @@
     <a class="workspace-brand" routerLink="/chat"><span class="workspace-mark" aria-hidden="true">T</span>Turbo AI</a>
     <p class="nav-caption">{{'workspace.manage' | translate}}</p>
     <nav>
+      <a routerLink="feature-access" routerLinkActive="nav-active" (click)="closeOnMobile()">{{'featureAccess.title' | translate}}</a>
       <a routerLink="secrets/models" routerLinkActive="nav-active" (click)="closeOnMobile()"><span nz-icon nzType="appstore" aria-hidden="true"></span>{{'management.models' | translate}}</a>
       <a routerLink="secrets/keys" routerLinkActive="nav-active" (click)="closeOnMobile()"><span nz-icon nzType="key" aria-hidden="true"></span>{{'management.keys' | translate}}</a>
       <p class="nav-caption">{{'management.accountInfo' | translate}}</p>

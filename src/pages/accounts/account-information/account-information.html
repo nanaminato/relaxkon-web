@@ -10,6 +10,7 @@
         @else{ @for(role of roles;track role.roleId){<span class="role-tag">{{role.name}}</span>} @empty{ {{'universal.none' | translate}} } }
       </dd></div>
     </dl>
+    <app-feature-access-status></app-feature-access-status>
     <aside><p>{{'studioUi.securityHint' | translate}}</p><a routerLink="/accounts/forgot-me-password">{{'account.forgotPassword' | translate}} →</a></aside>
     <div class="profile-actions"><a class="btn btn-primary" routerLink="/chat">{{'accountUi.backToChat' | translate}}</a><button class="btn btn-outline-secondary" (click)="logout()">{{'account.signOut' | translate}}</button></div>
   }@else{<p>{{'studioUi.profileGuest' | translate}}</p><a class="btn btn-primary" routerLink="/accounts/sign-in">{{'account.signIn' | translate}}</a>}

@@ -1,0 +1,31 @@
+<section>
+  <h2>{{'featureAccess.title' | translate}}</h2>
+  <p>{{'featureAccess.description' | translate}}</p>
+  <p class="notice">{{'featureAccess.mergeHint' | translate}}</p>
+  <p class="notice">{{'featureAccess.limitHint' | translate}}</p>
+  @if (status) { <p role="alert">{{status | translate}}</p> }
+  <div class="actions">
+    <button class="btn btn-outline-primary" [disabled]="loading || saving" (click)="reload()">{{(dirty ? 'featureAccess.discardReload' : 'universal.reload') | translate}}</button>
+    <button class="btn btn-primary" [disabled]="!valid || !dirty || loading || saving || conflict" (click)="save()">{{(saving ? 'featureAccess.saving' : 'featureAccess.save') | translate}}</button>
+  </div>
+  @if (loading) { <p role="status">{{'featureAccess.loading' | translate}}</p> }
+  @if (document) {
+    <fieldset [disabled]="loading || saving">
+      @for (feature of document.features; track feature.key) {
+        <h3>{{feature.key}}</h3>
+        <div class="policy-table"><table>
+          <thead><tr><th>{{'account.roles' | translate}}</th><th>{{'featureAccess.enabled' | translate}}</th><th>{{'featureAccess.perMinute' | translate}}</th><th>{{'featureAccess.perDay' | translate}}</th><th>{{'featureAccess.concurrent' | translate}}</th></tr></thead>
+          <tbody>@for (role of roleNames; track role) {
+            <tr><th scope="row">{{role}}</th>
+              <td><input type="checkbox" [(ngModel)]="feature.roles[role].enabled" (ngModelChange)="changed()" [attr.aria-label]="role + ' ' + feature.key + ' ' + ('featureAccess.enabled' | translate)"></td>
+              <td><input type="number" min="1" max="2147483647" step="1" [(ngModel)]="feature.roles[role].requestsPerMinute" (ngModelChange)="changed()" [attr.aria-label]="role + ' ' + feature.key + ' ' + ('featureAccess.perMinute' | translate)"></td>
+              <td><input type="number" min="1" max="2147483647" step="1" [(ngModel)]="feature.roles[role].requestsPerDay" (ngModelChange)="changed()" [attr.aria-label]="role + ' ' + feature.key + ' ' + ('featureAccess.perDay' | translate)"></td>
+              <td><input type="number" min="1" max="2147483647" step="1" [(ngModel)]="feature.roles[role].maxConcurrent" (ngModelChange)="changed()" [attr.aria-label]="role + ' ' + feature.key + ' ' + ('featureAccess.concurrent' | translate)"></td>
+            </tr>
+          }</tbody>
+        </table></div>
+      }
+    </fieldset>
+    @if (!valid) { <p role="alert">{{'featureAccess.invalid' | translate}}</p> }
+  }
+</section>
