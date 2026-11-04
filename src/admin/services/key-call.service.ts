@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {map} from 'rxjs';
+import {map, shareReplay} from 'rxjs';
 import {Model, SupplierKey} from '../models/keys';
 import {ServiceProvider} from '../roots';
 import type {ModelResponse, PublicModelResponse, KeyResponse, ProviderTypeResponse, ModelStatusRequest, MessageResponse} from '../../contracts';
@@ -34,7 +34,9 @@ export class KeyCallService {
     const body = keyRequest(key, false);
     return this.http.put<void>(`${this.provider.apiUrl}api/key/${body.supplierKeyId}`, body);
   }
-  getKeyTypes() { return this.http.get<ProviderTypeResponse[]>(`${this.provider.apiUrl}api/key/types`); }
+  private providerTypes?: ReturnType<KeyCallService['loadProviderTypes']>;
+  private loadProviderTypes() { return this.http.get<ProviderTypeResponse[]>(`${this.provider.apiUrl}api/key/types`).pipe(shareReplay({bufferSize: 1, refCount: false})); }
+  getKeyTypes() { return this.providerTypes ??= this.loadProviderTypes(); }
   private setModelStatus(modelId: number, enable: boolean) {
     const body: ModelStatusRequest = {modelId: entityId(modelId), enable};
     return this.http.post<MessageResponse>(`${this.provider.apiUrl}api/model/changeModelStatus/${body.modelId}`, body);

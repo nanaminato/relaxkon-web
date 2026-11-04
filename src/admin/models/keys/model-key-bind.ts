@@ -7,7 +7,7 @@ export interface ModelKeyBind {
 
   modelId?: number;
   model?:Model;
-  fee: number;
+  fee: number; routingWeight?: number | null;
   providerModelValue?: string;
   priority?: number;
 }

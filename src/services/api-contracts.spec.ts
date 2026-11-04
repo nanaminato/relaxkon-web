@@ -78,23 +78,32 @@ describe('Backend HTTP contracts', () => {
 
   it('preserves aliases and priorities while excluding key relationship graphs and IDs', async () => {
     const key = {supplierKeyId: 7, baseUrl: 'https://provider.invalid/v1', apiKey: 'test-key', requestIdentifier: 0, enable: true,
-      modelKeyBinds: [{modelKeyBindId: 999, modelId: 3, supplierKeyId: 100, fee: 0, enable: true, providerModelValue: 'upstream-model', priority: -1,
+      modelKeyBinds: [{modelKeyBindId: 999, modelId: 3, supplierKeyId: 100, fee: 0, enable: true, providerModelValue: 'upstream-model', priority: -1, routingWeight: 2.5,
         model: {modelId: 3, name: 'logical', modelValue: 'logical', isChatModel: true, vision: true}}]};
     const result = firstValueFrom(TestBed.inject(KeyCallService).updateKey(key));
     const request = http.expectOne('/backend/api/key/7');
-    expect(request.request.body).toEqual({...key, modelKeyBinds: [{modelId: 3, fee: 0, enable: true, providerModelValue: 'upstream-model', priority: -1}]});
+    expect(request.request.body).toEqual({...key, modelKeyBinds: [{modelId: 3, fee: 0, enable: true, providerModelValue: 'upstream-model', priority: -1, routingWeight: 2.5}]});
     expect(key.modelKeyBinds[0].modelKeyBindId).toBe(999);
     request.flush(null); await result;
+  });
+
+  it('shares provider type lookups across route cards', async () => {
+    const api = TestBed.inject(KeyCallService);
+    const first = firstValueFrom(api.getKeyTypes()); const second = firstValueFrom(api.getKeyTypes());
+    http.expectOne('/backend/api/key/types').flush([{type: 'OpenAI', requestIdentifier: 0}]);
+    expect(await first).toEqual(await second);
+    expect(await firstValueFrom(api.getKeyTypes())).toEqual(await first);
+    http.expectNone('/backend/api/key/types');
   });
 
   it('normalizes nullable keys and keeps routing metadata for the next edit', async () => {
     const result = firstValueFrom(TestBed.inject(KeyCallService).getKeyById(7));
     const response: KeyResponse = {supplierKeyId: 7, baseUrl: null, apiKey: null, requestIdentifier: 0, enable: true,
-      modelKeyBinds: [{modelKeyBindId: 9, supplierKeyId: 7, modelId: 3, fee: 1, enable: true, providerModelValue: 'alias', priority: 4, model: null}]};
+      modelKeyBinds: [{modelKeyBindId: 9, supplierKeyId: 7, modelId: 3, fee: 1, enable: true, providerModelValue: 'alias', priority: 4, routingWeight: 0, model: null}]};
     http.expectOne('/backend/api/key/7').flush(response);
     const key = await result;
     expect(key.baseUrl).toBe(''); expect(key.modelKeyBinds![0].providerModelValue).toBe('alias');
-    expect(key.modelKeyBinds![0].priority).toBe(4); expect(key.modelKeyBinds![0].model).toBeUndefined();
+    expect(key.modelKeyBinds![0].routingWeight).toBe(0); expect(key.modelKeyBinds![0].priority).toBe(4); expect(key.modelKeyBinds![0].model).toBeUndefined();
   });
 
   it('uses zero IDs for creates and consistent positive IDs for updates', async () => {

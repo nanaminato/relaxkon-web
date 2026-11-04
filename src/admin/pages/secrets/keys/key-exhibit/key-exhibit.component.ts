@@ -28,6 +28,7 @@ export class KeyExhibitComponent {
   constructor(private call: KeyCallService,private message: NzMessageService) {
     this.fetchTypes();
   }
+  showSecret = false;
   types:KeyTypes[] | undefined;
   @Output()
   refresh = new EventEmitter<boolean>();

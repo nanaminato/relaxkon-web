@@ -10,7 +10,7 @@ export const modelView = (model: ModelResponse): Model => ({modelId: model.model
 export const keyView = (key: KeyResponse): SupplierKey => ({supplierKeyId: key.supplierKeyId, baseUrl: key.baseUrl ?? '',
   apiKey: key.apiKey ?? '', requestIdentifier: key.requestIdentifier, enable: key.enable,
   modelKeyBinds: key.modelKeyBinds.map(binding => ({modelKeyBindId: binding.modelKeyBindId, modelId: binding.modelId,
-    supplierKeyId: binding.supplierKeyId, enable: binding.enable, fee: binding.fee,
+    supplierKeyId: binding.supplierKeyId, enable: binding.enable, fee: binding.fee, routingWeight: binding.routingWeight,
     providerModelValue: binding.providerModelValue, priority: binding.priority,
     model: binding.model ? modelView(binding.model) : undefined}))});
 export function entityId(id: number | undefined): number {
@@ -29,5 +29,5 @@ export const keyRequest = (value: SupplierKey, create: boolean): KeyWriteRequest
   supplierKeyId: create ? 0 : entityId(value.supplierKeyId), baseUrl: value.baseUrl ?? '', apiKey: value.apiKey ?? '',
   requestIdentifier: value.requestIdentifier, enable: value.enable ?? false,
   modelKeyBinds: (value.modelKeyBinds ?? []).map(binding => ({modelId: entityId(binding.modelId),
-    enable: binding.enable ?? false, fee: binding.fee, providerModelValue: binding.providerModelValue ?? '', priority: binding.priority ?? 0}))
+    enable: binding.enable ?? false, fee: binding.fee, routingWeight: binding.routingWeight, providerModelValue: binding.providerModelValue ?? '', priority: binding.priority ?? 0}))
 });

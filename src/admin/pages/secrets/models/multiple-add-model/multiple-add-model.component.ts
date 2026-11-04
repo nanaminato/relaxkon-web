@@ -1,3 +1,4 @@
+import {firstValueFrom} from 'rxjs';
 import {TranslateService} from '@ngx-translate/core';
 import {TranslateModule} from '@ngx-translate/core';
 import {inject, Component, EventEmitter, Input, Output} from '@angular/core';
@@ -29,6 +30,7 @@ export class MultipleAddModelComponent {
     private call: KeyCallService) {
 
   }
+  saving = false;
   availableModels: Model[] = [];
   selects: boolean[] = []
   @Input()
@@ -48,35 +50,31 @@ export class MultipleAddModelComponent {
     if(!this.existModels){
       return false;
     }
-    let index = this.existModels.findIndex(m=>m.name === model.name&&m.modelValue===model.modelValue);
+    let index = this.existModels.findIndex(m=>m.modelValue===model.modelValue);
     return index >= 0;
   }
   selectAll(){
     for(let i=0; i<this.selects.length; i++){
-      this.selects[i] = true;
+      this.selects[i] = !this.alreadyExist(this.availableModels[i]);
     }
   }
-  addModels() {
-    for(let i=0; i<this.availableModels.length; i++){
-      if(this.selects[i]){
-        let model = this.availableModels[i];
-        if(!this.alreadyExist(model)){
-          this.call.addModel({
-            name: model.name!,
-            modelValue: model.modelValue ?? model.name,
-            isChatModel: model.isChatModel ?? false,
-            vision: model.vision ?? false,
-          }).subscribe({
-            next: () =>{
-              this.message.success(this.i18n.instant('management.addSuccess'));
-              this.close.next(true);
-            },
-            error: (err: any) => {
-              this.message.error(err.error);
-            }
-          })
-        }
+  async addModels() {
+    if (this.saving) return;
+    const pending = this.availableModels.filter((model, index) => this.selects[index] && !this.alreadyExist(model));
+    if (!pending.length) return;
+    this.saving = true;
+    let failed = false;
+    try {
+      for (const model of pending) {
+        try {
+          await firstValueFrom(this.call.addModel({name: model.name!, modelValue: model.modelValue ?? model.name,
+            isChatModel: model.isChatModel ?? false, vision: model.vision ?? false}));
+          this.existModels = [...(this.existModels ?? []), model];
+          this.selects[this.availableModels.indexOf(model)] = false;
+        } catch { failed = true; }
       }
-    }
+      if (failed) this.message.error(this.i18n.instant('management.batchPartialFailure'));
+      else { this.message.success(this.i18n.instant('management.addSuccess')); this.close.emit(true); }
+    } finally { this.saving = false; }
   }
 }

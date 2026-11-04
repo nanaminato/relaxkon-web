@@ -3,13 +3,13 @@ export interface ModelResponse { modelId: number; name: string | null; modelValu
 export interface PublicModelResponse extends ModelResponse { enable: boolean; }
 export interface ModelStatusRequest { modelId: number; enable: boolean; }
 export interface ModelBindingRequest {
-  modelKeyBindId?: number; modelId: number; enable?: boolean; fee?: number; providerModelValue?: string; priority?: number;
+  modelKeyBindId?: number; modelId: number; enable?: boolean; fee?: number; routingWeight?: number | null; providerModelValue?: string; priority?: number;
 }
 export interface KeyWriteRequest {
   supplierKeyId?: number; baseUrl: string; apiKey: string; requestIdentifier: number; enable?: boolean; modelKeyBinds?: ModelBindingRequest[];
 }
 export interface ModelBindingResponse {
-  modelKeyBindId: number; supplierKeyId: number; modelId: number; enable: boolean; fee: number;
+  modelKeyBindId: number; supplierKeyId: number; modelId: number; enable: boolean; fee: number; routingWeight?: number | null;
   providerModelValue: string; priority: number; model: ModelResponse | null;
 }
 export interface KeyResponse {
