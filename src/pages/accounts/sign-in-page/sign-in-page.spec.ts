@@ -42,6 +42,13 @@ describe('Sign in form', () => {
     expect(page.busy()).toBeFalse(); expect(verification.generateVerificationCode).toHaveBeenCalledTimes(2);
     expect(page.validateForm.controls.captcha.value).toBe('');
   });
+  it('allows existing long passwords while enforcing the login contract limit', () => {
+    const page = create(); fill(page);
+    page.validateForm.controls.password.setValue('x'.repeat(512));
+    expect(page.validateForm.valid).toBeTrue();
+    page.validateForm.controls.password.setValue('x'.repeat(513));
+    expect(page.validateForm.valid).toBeFalse();
+  });
   it('ignores stale captcha responses when refreshing', () => {
     const first = new Subject<any>(); const second = new Subject<any>();
     verification.generateVerificationCode.and.returnValues(first, second);

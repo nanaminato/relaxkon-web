@@ -1,52 +1,40 @@
-import {HttpClient} from "@angular/common/http";
-import {Injectable} from "@angular/core";
-import {Account, Role} from "../models/accounts";
-import {ServiceProvider} from "../roots";
-@Injectable(
-  {
-    providedIn: "root"
-  }
-)
-export class AccountCallService {
-  constructor(private http: HttpClient, private provider: ServiceProvider
-  ) {
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {map} from 'rxjs';
+import {ServiceProvider} from '../roots';
+import type {AccountResponse, AccountWriteRequest, LoginRequest, TokenResponse, RoleResponse, RoleWriteRequest, MessageResponse} from '../../contracts';
+import {accountView, accountRequest, roleView, entityId} from '../../services/api-mappers';
 
-  }
-  login(body: any){
-    return this.http.post<any>(`${this.provider.apiUrl}api/auth/login`, body);
-  }
-  getRolesWithUserId(userId?: number){
-    if(userId===undefined){
-      return this.http.get<Role[]>(`${this.provider.apiUrl}api/role`);
-    }
-    return this.http.get<Role[]>(`${this.provider.apiUrl}api/role?userId=${userId}`);
+@Injectable({providedIn: 'root'})
+export class AccountCallService {
+  constructor(private http: HttpClient, private provider: ServiceProvider) {}
+  login(body: LoginRequest) { return this.http.post<TokenResponse>(`${this.provider.apiUrl}api/auth/login`, body); }
+  getRolesWithUserId(userId?: number) {
+    return this.http.get<RoleResponse[]>(`${this.provider.apiUrl}api/role`, {params: userId === undefined ? {} : {userId}})
+      .pipe(map(roles => roles.map(roleView)));
   }
   getAccountsWithRole(roleId?: number) {
-    if(roleId===undefined){
-      return this.http.get<Account[]>(`${this.provider.apiUrl}api/account`);
-    }
-    return this.http.get<Account[]>(`${this.provider.apiUrl}api/account?roleId=${roleId}`);
+    return this.http.get<AccountResponse[]>(`${this.provider.apiUrl}api/account`, {params: roleId === undefined ? {} : {roleId}})
+      .pipe(map(accounts => accounts.map(accountView)));
   }
-  getAccountById(id: number){
-    return this.http.get<Account>(`${this.provider.apiUrl}api/account/${id}`);
+  getAccountById(id: number) {
+    return this.http.get<AccountResponse>(`${this.provider.apiUrl}api/account/${entityId(id)}`).pipe(map(accountView));
   }
-  deleteAccountById(id: number){
-    return this.http.delete<any>(`${this.provider.apiUrl}api/account/${id}`);
+  deleteAccountById(id: number) { return this.http.delete<void>(`${this.provider.apiUrl}api/account/${entityId(id)}`); }
+  addRole(name: string) {
+    const body: RoleWriteRequest = {name};
+    return this.http.post<MessageResponse>(`${this.provider.apiUrl}api/role`, body);
   }
-  addRole(name: string){
-    return this.http.post<any>(`${this.provider.apiUrl}api/role`, {name: name})
+  deleteRoleById(id: number) { return this.http.delete<MessageResponse>(`${this.provider.apiUrl}api/role/${entityId(id)}`); }
+  updateRole(role: RoleWriteRequest) {
+    const body: RoleWriteRequest = {roleId: entityId(role.roleId), name: role.name};
+    return this.http.put<MessageResponse>(`${this.provider.apiUrl}api/role/${body.roleId}`, body);
   }
-  deleteRoleById(id: number){
-    return this.http.delete(`${this.provider.apiUrl}api/role/${id}`);
+  addAccount(account: AccountWriteRequest) {
+    return this.http.post<void>(`${this.provider.apiUrl}api/account`, accountRequest(account, true));
   }
-  updateRole(role: Role){
-    return this.http.put(`${this.provider.apiUrl}api/role/${role.roleId}`,role);
-  }
-
-  addAccount(account: Account) {
-    return this.http.post<any>(`${this.provider.apiUrl}api/account`, account)
-  }
-  updateAccount(account: Account){
-    return this.http.put(`${this.provider.apiUrl}api/account/${account.accountId}`,account);
+  updateAccount(account: AccountWriteRequest) {
+    const body = accountRequest(account, false);
+    return this.http.put<void>(`${this.provider.apiUrl}api/account/${body.accountId}`, body);
   }
 }

@@ -1,66 +1,23 @@
-import {inject, Injectable} from "@angular/core";
-import {HttpClient} from "@angular/common/http";
-import {ServiceProvider} from "../roots";
-import {ChatHistory, ChatHistoryTitle, ChatInterface} from "../models";
-import {GenerateTask} from "../models/media";
+import {inject, Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {ServiceProvider} from '../roots';
+import {ChatHistoryTitle, ChatInterface} from '../models';
+import {GenerateTask} from '../models/media';
+import {historyRequest, messageRequest, taskRequest} from '../services/sync/legacy-requests';
 
-@Injectable({
-  providedIn: "root"
-})
+/** Compatibility endpoints; new durable writes use SendManagerService. */
+@Injectable({providedIn: 'root'})
 export class SendService {
-  http = inject(HttpClient);
-  provider = inject(ServiceProvider)
-  sendHistory(chatHistory: ChatHistoryTitle){
-    return this.http.post<any>(`${this.provider.apiUrl}api/receiver/history`,
-      {
-        dataId: chatHistory.dataId,
-        title: chatHistory.title
-      });
-  }
-  sendMessage(historyDataId: number,chatMessage: ChatInterface){
-    return this.http.post<any>(`${this.provider.apiUrl}api/receiver/message`,
-      {
-        historyDataId: historyDataId,
-        dataId: chatMessage.dataId,
-        role: chatMessage.role,
-        content: chatMessage.content,
-        fileList: chatMessage.fileList,
-        finish: chatMessage.finish,
-        model: chatMessage.model
-      });
-  }
-  sendTask(task: GenerateTask){
-    return this.http.post<any>(`${this.provider.apiUrl}api/receiver/task`,task);
-  }
-  updateHistory(chatHistory: ChatHistory){
-    return this.http.put<any>(`${this.provider.apiUrl}api/receiver/history`,
-      {
-        dataId: chatHistory.dataId,
-        title: chatHistory.title
-      });
-  }
-  updateMessage(historyDataId: number,chatMessage: ChatInterface){
-    return this.http.put<any>(`${this.provider.apiUrl}api/receiver/message`,
-      {
-        historyDataId: historyDataId,
-        dataId: chatMessage.dataId,
-        role: chatMessage.role,
-        content: chatMessage.content,
-        fileList: chatMessage.fileList,
-        finish: chatMessage.finish,
-        model: chatMessage.model
-      });
-  }
-  updateTask(task: GenerateTask){
-    return this.http.put<any>(`${this.provider.apiUrl}api/receiver/task`,task);
-  }
-  deleteHistory(historyDataId: number){
-    return this.http.delete<any>(`${this.provider.apiUrl}api/receiver/history/${historyDataId}`);
-  }
-  deleteMessage(historyDataId: number, messageDataId: number){
-    return this.http.delete<any>(`${this.provider.apiUrl}api/receiver/message/${historyDataId}/${messageDataId}`);
-  }
-  deleteTask(taskId: string){
-    return this.http.delete<any>(`${this.provider.apiUrl}api/receiver/task/${taskId}`);
-  }
+  private readonly http = inject(HttpClient);
+  private readonly provider = inject(ServiceProvider);
+  private get url() { return `${this.provider.apiUrl}api/receiver`; }
+  sendHistory(history: ChatHistoryTitle) { return this.http.post<void>(`${this.url}/history`, historyRequest(history)); }
+  updateHistory(history: ChatHistoryTitle) { return this.http.put<void>(`${this.url}/history`, historyRequest(history)); }
+  sendMessage(historyId: number, message: ChatInterface) { return this.http.post<void>(`${this.url}/message`, messageRequest(historyId, message)); }
+  updateMessage(historyId: number, message: ChatInterface) { return this.http.put<void>(`${this.url}/message`, messageRequest(historyId, message)); }
+  sendTask(task: GenerateTask) { return this.http.post<void>(`${this.url}/task`, taskRequest(task)); }
+  updateTask(task: GenerateTask) { return this.http.put<void>(`${this.url}/task`, taskRequest(task)); }
+  deleteHistory(id: number) { return this.http.delete<void>(`${this.url}/history/${id}`); }
+  deleteMessage(historyId: number, id: number) { return this.http.delete<void>(`${this.url}/message/${historyId}/${id}`); }
+  deleteTask(id: string) { return this.http.delete<void>(`${this.url}/task/${encodeURIComponent(id)}`); }
 }

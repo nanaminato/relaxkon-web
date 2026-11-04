@@ -28,8 +28,8 @@ export class SignInPage {
   readonly busy = signal(false);
   readonly captchaLoading = signal(false);
   readonly validateForm = this.fb.group({
-    username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
-    password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(20)]],
+    username: ['', [Validators.required, Validators.maxLength(20)]],
+    password: ['', [Validators.required, Validators.maxLength(512)]],
     remember: [true],
     captcha: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]]
   });

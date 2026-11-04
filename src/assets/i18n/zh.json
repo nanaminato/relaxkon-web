@@ -145,6 +145,7 @@
     "delete": "删除"
   },
   "account": {
+    "loginPasswordTip": "请输入现有密码，最长 512 个字符。",
     "copyrightStatement": "版权声明",
     "signIn": "登录",
     "signOut": "登出",
@@ -165,8 +166,8 @@
     "pleasePassword": "请输入密码",
     "pleaseConfirmPassword": "请再一次输入你的密码",
     "validating": "验证中",
-    "userTip": "用户名在3-20位之间",
-    "passwordTip": "密码在6-20位之间",
+    "userTip": "用户名为 1–20 个字符。",
+    "passwordTip": "密码长度为 6–128 个字符。",
     "notWith": "两次密码不一致",
     "nickname": "昵称",
     "roles": "角色",
@@ -393,6 +394,8 @@
   "admin": { "controlCenter": "管理后台" },
   "help": "你需要什么帮助？",
   "management": {
+    "passwordUpdateLength": "新密码长度为 6–128 个字符。",
+    "passwordOptional": "留空表示保留现有密码。",
     "syncRetryPending": "数据已保存在本机，同步暂未完成。",
     "retrySync": "重试同步",
     "syncQueued": "已保存，等待同步",
@@ -464,8 +467,8 @@
     "server": "当前连接的服务器是",
     "nickname": "昵称",
     "none": "无",
-    "usernameLength": "用户名在3-20位之间",
-    "passwordLength": "密码在6-20位之间",
+    "usernameLength": "用户名为 1–20 个字符。",
+    "passwordLength": "密码长度为 6–128 个字符。",
     "modelLength": "请输入 2–200 个字符",
     "roleLength": "角色名须为 2–15 个字符",
     "emailPlaceholder": "请输入你的邮箱",

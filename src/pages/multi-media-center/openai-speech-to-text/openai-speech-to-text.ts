@@ -1,3 +1,5 @@
+import type {AudioTextResponse, AudioTranslationFormat} from '../../../contracts/media';
+import {apiErrorMessage} from '../../../contracts/common';
 import {Component, inject} from '@angular/core';
 import {MenuAbleService} from "../../../services/normal-services/menu-able.service";
 import {NzIconDirective} from "ng-zorro-antd/icon";
@@ -56,8 +58,8 @@ export class OpenaiSpeechToText {
     'whisper-1'
   ]
   temperature: number = 0;//0-1
-  response_format: string = "json";
-  response_formats: string[] = [
+  response_format: AudioTranslationFormat = "json";
+  response_formats: AudioTranslationFormat[] = [
     "json",
     "text",
     "srt",
@@ -154,16 +156,16 @@ export class OpenaiSpeechToText {
         model: this.model,
         response_format: this.response_format,
         temperature: this.temperature,
-        suffix: file!.file!.name.split('.')[1],
+        suffix: file.file!.name.split('.').pop() || 'mp3',
         prompt: this.prompt
       });
       this.tackleResult(result);
     }catch (e:any){
-      this.notification.error(e.error,'')
+      this.notification.error(apiErrorMessage(e, this.localization.text('notifications.networkError')), '')
     }
     this.loading = false;
   }
-  result: any;
+  result?: AudioTextResponse;
   viewSourceVisible: boolean = false;
   get suggestion() {
     return this.localization.text('mediaStudio.generationFailureSuggestion');
@@ -182,24 +184,18 @@ export class OpenaiSpeechToText {
         model: this.model,
         response_format: this.response_format,
         temperature: this.temperature,
-        suffix: file!.file!.name.split('.')[1],
+        suffix: file.file!.name.split('.').pop() || 'mp3',
         language: this.language,
         prompt: this.prompt
       });
       this.tackleResult(result);
     }catch (e:any){
-      this.notification.error(e.error,'')
+      this.notification.error(apiErrorMessage(e, this.localization.text('notifications.networkError')), '')
     }
     this.loading = false;
   }
-  tackleResult(result: any){
-    // console.log(text)
-    if(result.error!==undefined && result.error!=null ){
-      this.outputText = this.suggestion;
-      this.notification.error(result.error.code,''+result.error.type)
-    }else{
-      this.outputText = result.text;
-    }
+  tackleResult(result: AudioTextResponse) {
+    this.outputText = result.text;
     this.result = result;
   }
 

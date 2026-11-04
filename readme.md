@@ -8,6 +8,7 @@ Turbo AI 用户端是一个 Angular 单页应用，用于访问 Turbo AI Server 
 | --- | --- |
 | 使用聊天、图像或音频工具 | [用户指南](docs/user-guide.md) |
 | 查看架构与实施记录 | [前端架构](docs/architecture.md) · [架构审查](docs/architecture-review.md) |
+| 对照后端接口与类型 | [API 契约](docs/api-contracts.md) |
 | 在本机运行或参与开发 | [开发指南](docs/development.md) |
 | 配置后端、账户、模型与密钥 | [Turbo AI Server 文档](https://github.com/nanaminato/turbo-ai-server/tree/master/docs) |
 

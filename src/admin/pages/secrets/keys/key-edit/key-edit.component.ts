@@ -1,3 +1,4 @@
+import {apiErrorMessage} from '../../../../../contracts/common';
 import {TranslateService} from '@ngx-translate/core';
 import {TranslateModule} from '@ngx-translate/core';
 import { Component, inject } from '@angular/core';
@@ -121,7 +122,6 @@ export class KeyEditComponent {
   submitForm() {
     if (this.validateForm.valid) {
       const value = this.validateForm.value;
-      console.log(value)
       this.call.updateKey(
         {
           supplierKeyId: value.supplierKeyId!,
@@ -137,7 +137,7 @@ export class KeyEditComponent {
             this.router.navigate(admin_routes.keys);
           },
           error: (err: any) => {
-            this.message.error(err.error);
+            this.message.error(apiErrorMessage(err, this.i18n.instant('management.networkError')));
           }
         })
     } else {

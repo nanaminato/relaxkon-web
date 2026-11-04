@@ -43,8 +43,8 @@ export class SignInPageComponent {
     password: FormControl<string>;
     remember: FormControl<boolean>;
   }> = this.fb.group({
-    username: ['', [Validators.required,Validators.minLength(3), Validators.maxLength(20)]],
-    password: ['', [Validators.required,Validators.minLength(6), Validators.maxLength(20)]],
+    username: ['', [Validators.required,Validators.maxLength(20)]],
+    password: ['', [Validators.required,Validators.maxLength(512)]],
     remember: [true]
   });
   constructor(private authService: AuthService, private router: Router,
@@ -96,7 +96,7 @@ export class SignInPageComponent {
     this.verificationService.generateVerificationCode()
       .subscribe(
         {
-          next: (value:any) => {
+          next: value => {
             this.code = value.code;
             this.codeUrl = `data:${value.contentType === 'image/svg+xml' ? 'image/svg+xml' : 'image/jpeg'};base64,${value.img}`;
           }

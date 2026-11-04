@@ -22,7 +22,7 @@ describe('Multilingual chat streaming', () => {
         verbosity: 'high', thinking_budget: 512, historySessionLength: 1, detail: 'high'}
     } as any;
     const send = spyOn(service, 'fetchChatBase').and.returnValue(of(''));
-    const messages = [{role: 'user', content: 'hello'}];
+    const messages = [{role: 'user' as const, content: 'hello'}];
     service.fetchChat({messages} as any);
     expect(send).toHaveBeenCalledWith('/api/ai/chat', {
       messages, model: 'gpt-5', vision: true, stream: true
@@ -42,7 +42,7 @@ describe('Multilingual chat streaming', () => {
       controller.close();
     }});
     const fetchSpy = spyOn(window, 'fetch').and.resolveTo(new Response(stream, {headers: {'Content-Type': 'text/event-stream'}}));
-    const chunks = await firstValueFrom(TestBed.inject(TurboService).fetchChatBase('/api/ai/chat', {}).pipe(toArray()));
+    const chunks = await firstValueFrom(TestBed.inject(TurboService).fetchChatBase('/api/ai/chat', {model: 'test', messages: [{role: 'user', content: 'hello'}]}).pipe(toArray()));
     expect(chunks.join('')).toBe(text);
     expect((fetchSpy.calls.mostRecent().args[1]?.headers as Record<string, string>)['Accept-Language']).toBe('ja');
   });  it('does not restart a cancelled chat after token refresh completes', async () => {
@@ -55,7 +55,7 @@ describe('Multilingual chat streaming', () => {
       {provide: LocalizationService, useValue: {requestLanguage: 'en'}}
     ]});
     const fetchSpy = spyOn(window, 'fetch').and.resolveTo(new Response('', {status: 401}));
-    const subscription = TestBed.inject(TurboService).fetchChatBase('/api/ai/chat', {}).subscribe();
+    const subscription = TestBed.inject(TurboService).fetchChatBase('/api/ai/chat', {model: 'test', messages: [{role: 'user', content: 'hello'}]}).subscribe();
     await new Promise(resolve => setTimeout(resolve, 0));
     expect(auth.refreshAccessToken).toHaveBeenCalled();
     subscription.unsubscribe();

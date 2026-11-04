@@ -10,7 +10,7 @@ describe('Chat context defaults', () => {
     chats[2].fileList = [{fileName: 'image.png', fileType: 'image/png', fileContent: 'data:image/png;base64,aA=='}];
     const messages = new ChatContextHandler().handler(2, configuration, chats, 3) as VisionMessage[];
     expect(messages.length).toBe(2);
-    expect(messages.map(message => message.content[0].text)).toEqual(['2', '3']);
-    expect(messages[1].content[1].image_url).toEqual({url: 'data:image/png;base64,aA=='});
+    expect(messages.map(message => message.content.find(part => part.type === 'text')?.text)).toEqual(['2', '3']);
+    expect(messages[1].content.find(part => part.type === 'image_url')?.image_url).toEqual({url: 'data:image/png;base64,aA=='});
   });
 });

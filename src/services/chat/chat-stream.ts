@@ -1,3 +1,4 @@
+import {isChatStreamEvent} from '../../contracts/chat';
 export async function* readChatStream(body: ReadableStream<Uint8Array>): AsyncGenerator<string> {
   const reader = body.getReader();
   const decoder = new TextDecoder();
@@ -14,11 +15,9 @@ export async function* readChatStream(body: ReadableStream<Uint8Array>): AsyncGe
           .map(line => line.slice(5).trimStart()).join('\n');
         if (!data) continue;
         const event: unknown = JSON.parse(data);
-        if (!event || typeof event !== 'object' || !('type' in event)) throw new Error('Invalid chat event');
+        if (!isChatStreamEvent(event)) throw new Error('Invalid chat event');
         if (event.type === 'completed') return;
         if (event.type === 'error') throw new Error('Chat stream failed');
-        if (event.type !== 'delta' || !('text' in event) || typeof event.text !== 'string')
-          throw new Error('Invalid chat event');
         yield event.text;
       }
       if (pending.length > 1024 * 1024) throw new Error('Chat event exceeds size limit');

@@ -1,3 +1,4 @@
+import {apiErrorMessage} from '../../../contracts/common';
 import {Component, inject,  signal} from '@angular/core';
 import {Gallery} from "../gallery/gallery";
 import {TranslateModule} from "@ngx-translate/core";
@@ -176,10 +177,10 @@ export class APIMartImage{
       }
     }catch (e:any) {
       this.loading = false;
-      this.notification.error(this.localization.text('notifications.generationFailed'), e.error)
+      this.notification.error(this.localization.text('notifications.generationFailed'), apiErrorMessage(e, this.localization.text('notifications.networkError')))
       return;
     }
-    if (asyncTask === undefined || asyncTask.code!==200) {
+    if (asyncTask === undefined || asyncTask.code!==200 || !asyncTask.data?.[0]?.task_id) {
       this.loading = false;
       this.notification.error(this.localization.text('notifications.imageGenerationFailed'), '');
       return;
@@ -213,9 +214,8 @@ export class APIMartImage{
       first = false;
       try{
         taskResult = await this.apimartService.getApiMartTask(task_id);
-        if(taskResult.code===200){
-          console.log("progress...",taskResult.data?.progress);
-        }
+        if (taskResult.code !== 200 || !taskResult.data || ['failed', 'cancelled'].includes(taskResult.data.status))
+          throw new Error('Image task is unavailable');
       }catch (error: any){
         this.imageTaskService.unregisterTask(task_id);
         this.loading = false;
@@ -225,7 +225,7 @@ export class APIMartImage{
     }
     const resultData = taskResult?.data?.result?.images?.[0];
     const imageUrls: string[] = resultData?.url || [];
-    const expiresAt = resultData?.expiresAt ?? '';
+    const expiresAt = resultData?.expires_at ?? '';
 
     generateTask.images = imageUrls;
     this.universalService.addOrUpdateGenerateTask(generateTask).then(() => {

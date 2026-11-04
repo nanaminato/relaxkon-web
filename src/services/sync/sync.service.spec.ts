@@ -47,6 +47,7 @@ describe('Durable synchronization', () => {
     expect((await local.pendingSync(3))[0].mutation.operationId).toBe(operationId);
     const retry = service.synchronize();
     const sent = await request('POST');
+    expect(sent.request.body).toEqual(failed.request.body);
     expect(sent.request.body.operationId).toBe(operationId);
     sent.flush({version: 1});
     (await request('GET')).flush({cursor: 1, reset: true, hasMore: false, changes: [
@@ -55,6 +56,30 @@ describe('Durable synchronization', () => {
     await retry;
     expect(await local.pendingSync(3)).toEqual([]);
     expect(await local.syncCursor(3)).toBe(1);
+  });
+
+  it('keeps an operation queued when a success response has no valid committed version', async () => {
+    const mutation = {operationId: crypto.randomUUID(), kind: 'history' as const, action: 'upsert' as const,
+      entityId: '1', payload: {dataId: 1, title: 'offline', userId: 3, legacyLocalKey: 'preserve-on-retry'}};
+    await local.enqueueSync(3, mutation);
+    const run = service.synchronize();
+    const write = await request('POST');
+    expect(write.request.body).toEqual(mutation);
+    write.flush({});
+    await expectAsync(run).toBeRejectedWithError('Invalid sync acknowledgement');
+    expect((await local.pendingSync(3))[0].mutation).toEqual(mutation);
+    expect(await local.syncCursor(3)).toBe(0);
+  });
+
+  it('normalizes null history IDs from the HTTP contract before storing local records', async () => {
+    const run = service.synchronize();
+    const read = await request('GET');
+    read.flush({cursor: 1, reset: true, hasMore: false, changes: [
+      {version: 1, kind: 'history', action: 'upsert', entityId: '1', historyId: null, payload: {dataId: 1, title: 'remote', userId: 3}}
+    ]});
+    await run;
+    expect((await local.syncEntities(3))[0].historyId).toBeUndefined();
+    expect((await database.getHistory(1, 3))?.title).toBe('remote');
   });
 
   it('applies deletions and keeps identical client IDs isolated across accounts', async () => {

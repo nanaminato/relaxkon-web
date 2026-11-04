@@ -1,3 +1,6 @@
+import type {ImageGenerationRequest, ImageResultResponse, ImageQuality} from '../../../contracts/media';
+import {imageSource} from '../../../services/media-results';
+import {apiErrorMessage} from '../../../contracts/common';
 import {Component, inject} from '@angular/core';
 import {Gallery} from "../gallery/gallery";
 import {TranslateModule} from "@ngx-translate/core";
@@ -58,12 +61,12 @@ export class GptImageCreate{
   prompt: string = "";
   // n: number = 1; image_num
   size: string = "1024x1024";
-  quality: string = "standard";
-  style: string = "vivid";
-  response_format: string = "url";
-  background: string = "auto";
-  moderation: string = "auto";
-  output_format: string = "png";
+  quality: ImageQuality = "standard";
+  style: NonNullable<ImageGenerationRequest['style']> = "vivid";
+  response_format: NonNullable<ImageGenerationRequest['response_format']> = "url";
+  background: NonNullable<ImageGenerationRequest['background']> = "auto";
+  moderation: NonNullable<ImageGenerationRequest['moderation']> = "auto";
+  output_format: NonNullable<ImageGenerationRequest['output_format']> = "png";
 
   //gpt-image only
   backgrounds: string[] = [
@@ -80,7 +83,7 @@ export class GptImageCreate{
     "png","jpeg","webp"
   ]
   //dall3
-  qualities: string[] = [
+  qualities: ImageQuality[] = [
     "hd","standard"
   ];
   image_response_formats: string[] = [
@@ -109,6 +112,7 @@ export class GptImageCreate{
         size: this.size,
         quality: this.quality,
         moderation: this.moderation,
+        background: this.background,
         output_format: this.output_format,
         response_format: this.response_format,
         style: this.style
@@ -119,9 +123,9 @@ export class GptImageCreate{
         result = await this.openaiService.gptImageCreate(createRequest);
       }
 
-    }catch (e:any){
+    }catch (e: unknown){
       this.loading = false;
-      this.notification.error(this.localization.text('notifications.generationFailed'), e.error)
+      this.notification.error(this.localization.text('notifications.generationFailed'), apiErrorMessage(e, this.localization.text('notifications.networkError')))
       return;
     }
     if(result===null||result.data===null ||result.data.length===0){
@@ -130,19 +134,17 @@ export class GptImageCreate{
       return;
     }
     this.loading = false;
-    this.images!.length = 0;
-    result.data.forEach(image=>{
-      this.images?.push({
-        image_url: this.getImageUrl(image),
-        image_url_ttl: "3600",
-        image_type: "any"
-      })
-    });
+    const imageUrls = result.data.map(image => this.getImageUrl(image, result.output_format)).filter(Boolean);
+    if (!imageUrls.length) {
+      this.notification.error(this.localization.text('notifications.generationFailed'), '');
+      return;
+    }
+    this.images = imageUrls.map(url => ({image_url: url, image_url_ttl: '3600', image_type: 'any'}));
     let task: GenerateTask = {
       task_id: Date.now()+'',
       account_id: this.authService.user!.id!,
       task_type: "any => image",
-      images: result.data.map(f=> this.getImageUrl(f)),
+      images: imageUrls,
       date: new Date(),
     };
     await this.universalService.addOrUpdateGenerateTask(task);
@@ -157,17 +159,8 @@ export class GptImageCreate{
   toggleMenu() {
     this.sizeReportService.toggleMenu()
   }
-  getImageUrl(image: any): string {
-    if (image.url && image.url.length > 0) {
-      return image.url;
-    }
-    if (image.b64Json) {
-      if (image.b64Json.startsWith('data:image/')) {
-        return image.b64Json;
-      }
-      return `data:image/png;base64,${image.b64Json}`;
-    }
-    return '';
+  getImageUrl(image: ImageResultResponse, format?: string | null): string {
+    return imageSource(image, format ?? this.output_format);
   }
   //妯″瀷鍒囨崲
   protected modelChange(event: string) {

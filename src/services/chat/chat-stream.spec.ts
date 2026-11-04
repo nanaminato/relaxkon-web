@@ -15,6 +15,13 @@ describe('Chat event protocol', () => {
     expect(await collect('data: {"type":"delta","text":"你好\\n🙂"}\r\n\r\ndata: {"type":"completed"}\r\n\r\n'))
       .toEqual(['你好\n🙂']);
   });
+  it('accepts the nullable text/code fields emitted by the backend response DTO', async () => {
+    expect(await collect('data: {"type":"delta","text":"reply","code":null}\n\ndata: {"type":"completed","text":null,"code":null}\n\n')).toEqual(['reply']);
+  });
+  it('rejects malformed discriminated event fields', async () => {
+    await expectAsync(collect('data: {"type":"delta","text":null,"code":null}\n\n')).toBeRejected();
+    await expectAsync(collect('data: {"type":"completed","text":"unexpected","code":null}\n\n')).toBeRejected();
+  });
   it('rejects unexpected EOF after a partial answer', async () => {
     await expectAsync(collect('data: {"type":"delta","text":"partial"}\n\n')).toBeRejected();
   });

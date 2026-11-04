@@ -1,3 +1,4 @@
+import type {SyncVersionResponse, SyncBatchResponse} from '../../contracts/sync';
 import {DestroyRef, inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, firstValueFrom, Subject} from 'rxjs';
@@ -61,14 +62,17 @@ export class SyncService {
       const pending = await this.database.pendingSync(accountId);
       for (const item of pending) {
         assertAccount();
-        await firstValueFrom(this.http.post(url, item.mutation, options));
+        const acknowledgement = await firstValueFrom(this.http.post<SyncVersionResponse>(url, item.mutation, options));
+        if (!acknowledgement || !Number.isSafeInteger(acknowledgement.version) || acknowledgement.version < 1)
+          throw new Error('Invalid sync acknowledgement');
         // A lost acknowledgement leaves the same operation ID queued for safe retry.
         await this.database.acknowledgeSync(item.order!);
       }
       assertAccount();
       const cursor = await this.database.syncCursor(accountId);
-      const batch = await firstValueFrom(this.http.get<SyncBatch>(`${url}?cursor=${cursor}`, options));
+      const response = await firstValueFrom(this.http.get<SyncBatchResponse>(`${url}?cursor=${cursor}`, options));
       assertAccount();
+      const batch: SyncBatch = {...response, changes: response.changes.map(change => ({...change, historyId: change.historyId ?? undefined}))};
       if (await this.database.prepareBootstrap(accountId, batch)) continue;
       if (!await this.database.applySyncBatch(accountId, batch, cursor)) continue;
       changed ||= batch.reset || batch.changes.length > 0;

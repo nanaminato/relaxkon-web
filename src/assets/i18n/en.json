@@ -146,6 +146,7 @@
     "delete": "Delete"
   },
   "account": {
+    "loginPasswordTip": "Enter your current password, up to 512 characters.",
     "rememberMe": "Remember me",
     "forgotPassword": "Forgot password",
     "registerNow": "Register now",
@@ -160,8 +161,8 @@
     "pleasePassword": "Enter your password",
     "pleaseConfirmPassword": "Enter your password again",
     "validating": "Verifying…",
-    "userTip": "Username must contain 3–20 characters",
-    "passwordTip": "Password must contain 6–20 characters",
+    "userTip": "Username must contain 1–20 characters.",
+    "passwordTip": "Password must contain 6–128 characters.",
     "notWith": "Passwords do not match",
     "copyrightStatement": "Copyright",
     "signIn": "Sign in",
@@ -394,6 +395,8 @@
   "admin": { "controlCenter": "Admin console" },
   "help": "How can I help you today?",
   "management": {
+    "passwordUpdateLength": "New passwords must contain 6–128 characters.",
+    "passwordOptional": "Leave blank to keep the current password.",
     "syncRetryPending": "Saved on this device. Sync has not completed.",
     "retrySync": "Retry sync",
     "syncQueued": "Saved; sync queued",
@@ -465,8 +468,8 @@
     "server": "Connected server",
     "nickname": "Nickname",
     "none": "None",
-    "usernameLength": "Username must contain 3–20 characters",
-    "passwordLength": "Password must contain 6–20 characters",
+    "usernameLength": "Username must contain 1–20 characters.",
+    "passwordLength": "Password must contain 6–128 characters.",
     "modelLength": "Use 2–200 characters",
     "roleLength": "Role name must contain 2–15 characters",
     "emailPlaceholder": "Enter your email",

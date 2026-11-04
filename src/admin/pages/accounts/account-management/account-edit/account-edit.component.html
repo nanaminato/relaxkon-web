@@ -18,10 +18,11 @@
     </div>
     <div class="form-group">
       <label>{{'management.password' | translate}}</label>
-      <input class="form-control" name="password" formControlName="password">
+      <input class="form-control" type="password" autocomplete="new-password" name="password" formControlName="password">
+      <small>{{'management.passwordOptional' | translate}}</small>
       @if (validateForm.controls['password'].invalid && validateForm.controls['password'].dirty) {
         <li>
-          {{'management.passwordLength' | translate}}
+          {{'management.passwordUpdateLength' | translate}}
         </li>
       }
     </div>

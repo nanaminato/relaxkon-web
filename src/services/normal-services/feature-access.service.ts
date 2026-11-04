@@ -2,15 +2,9 @@ import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {ServiceProvider} from '../../roots';
 
-export interface FeatureGrant {
-  enabled: boolean;
-  requestsPerMinute: number | null;
-  requestsPerDay: number | null;
-  maxConcurrent: number | null;
-}
-export interface FeaturePolicy { key: string; roles: Record<string, FeatureGrant>; }
-export interface FeaturePolicies { revision: number; features: FeaturePolicy[]; }
-export interface FeatureAccess { canManagePolicies: boolean; features: (FeatureGrant & {key: string})[]; }
+import type {FeatureGrant, FeaturePolicyDocument as FeaturePolicies} from '../../contracts/feature-access';
+export type {FeatureGrant, FeaturePolicy, FeaturePolicyDocument as FeaturePolicies, FeatureAccessResponse as FeatureAccess} from '../../contracts/feature-access';
+import type {FeatureAccessResponse as FeatureAccess} from '../../contracts/feature-access';
 
 export function validFeatureGrant(grant: FeatureGrant): boolean {
   return [grant.requestsPerMinute, grant.requestsPerDay, grant.maxConcurrent]

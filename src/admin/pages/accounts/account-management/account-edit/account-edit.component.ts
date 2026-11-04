@@ -1,3 +1,4 @@
+import {apiErrorMessage} from '../../../../../contracts/common';
 import {TranslateService} from '@ngx-translate/core';
 import {TranslateModule} from '@ngx-translate/core';
 import { Component, inject } from '@angular/core';
@@ -44,7 +45,7 @@ export class AccountEditComponent {
           this.validateForm.setValue({
             accountId: account.accountId,
             username: account.username,
-            password: account.password,
+            password: '',
             email: account.email===undefined?'':account.email,
           });
           this.roles.length = 0;
@@ -74,9 +75,9 @@ export class AccountEditComponent {
     email:FormControl<string>,
   }> = this.fb.group({
     accountId: [0, [Validators.required]],
-    username: ['', [Validators.required,Validators.minLength(2), Validators.maxLength(15)]],
-    password: ['', [Validators.required,Validators.minLength(6), Validators.maxLength(15)]],
-    email: ['', [Validators.required,Validators.email]],
+    username: ['', [Validators.required,Validators.maxLength(20)]],
+    password: ['', [Validators.minLength(6), Validators.maxLength(128)]],
+    email: ['', [Validators.required,Validators.email, Validators.maxLength(50)]],
   });
   roles: Role[] = [];
   allRoles: Role[] | undefined;
@@ -116,7 +117,7 @@ export class AccountEditComponent {
             this.router.navigate(admin_routes.management);
           },
           error: (err: any) => {
-            this.message.error(err.error);
+            this.message.error(apiErrorMessage(err, this.i18n.instant('management.networkError')));
           }
         })
     } else {

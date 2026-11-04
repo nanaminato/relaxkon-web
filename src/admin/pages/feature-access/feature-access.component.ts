@@ -33,7 +33,7 @@ export class FeatureAccessComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: ({document, roles}) => {
           this.document = document;
-          this.roleNames = [...new Set(roles.map(role => role.name))];
+          this.roleNames = [...new Set(roles.map(role => role.name).filter(Boolean))];
           for (const feature of document.features) feature.roles = Object.assign(Object.create(null), feature.roles);
           // Remove grants for deleted/renamed roles; never transfer them to a new role.
           for (const feature of document.features) for (const role of Object.keys(feature.roles)) {

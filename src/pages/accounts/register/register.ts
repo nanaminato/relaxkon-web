@@ -1,5 +1,6 @@
 import {Component, ElementRef, inject, ViewChild} from '@angular/core';
 import {
+  AbstractControl, ValidationErrors,
   FormControl,
   FormGroup,
   NonNullableFormBuilder, ReactiveFormsModule,
@@ -31,10 +32,10 @@ export class Register {
     password: FormControl<string>;
     confirm: FormControl<string>;
   }> = this.fb.group({
-    username: ['', [Validators.required, Validators.maxLength(20), Validators.minLength(3)]],
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required,Validators.minLength(6), Validators.maxLength(20)]],
-    confirm: ['', [Validators.required,Validators.minLength(6), Validators.maxLength(20)]]
+    username: ['', [Validators.required, Validators.maxLength(20)]],
+    email: ['', [Validators.required, Validators.email, Validators.maxLength(50)]],
+    password: ['', [Validators.required,Validators.minLength(6), Validators.maxLength(128)]],
+    confirm: ['', [Validators.required,Validators.minLength(6), Validators.maxLength(128)]]
   });
   code: string | undefined;
   codeUrl: string | undefined;
@@ -42,7 +43,7 @@ export class Register {
     this.verificationService.generateVerificationCode()
       .subscribe(
         {
-          next: (value:any) => {
+          next: value => {
             this.code = value.code;
             this.codeUrl = `data:${value.contentType === 'image/svg+xml' ? 'image/svg+xml' : 'image/jpeg'};base64,${value.img}`;
           }
@@ -59,9 +60,10 @@ export class Register {
         return;
       }
       this.registerService.register({
-        username: this.validateForm.value.username,
-        password: this.validateForm.value.password,
-        email: this.validateForm.value.email
+        username: this.validateForm.getRawValue().username,
+        password: this.validateForm.getRawValue().password,
+        confirm: this.validateForm.getRawValue().confirm,
+        email: this.validateForm.getRawValue().email
       }).subscribe({
         next: (data: any)=>{
           this.message.success(this.localization.text('notifications.registrationSuccess'))
@@ -87,15 +89,12 @@ export class Register {
   router: Router = inject(Router);
   constructor(
               ) {
-    // @ts-ignore
     this.validateForm.setValidators(this.passwordMatchValidator);
     this.generateVerificationCode();
   }
-  private passwordMatchValidator(group: FormGroup) {
-    // @ts-ignore
-    const password = group.get('password').value;
-    // @ts-ignore
-    const confirm = group.get('confirm').value;
+  private passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
+    const password = group.get('password')?.value;
+    const confirm = group.get('confirm')?.value;
     return password === confirm ? null : { passwordMatch: true };
   }
 }

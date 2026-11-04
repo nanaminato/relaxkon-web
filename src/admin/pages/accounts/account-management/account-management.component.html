@@ -12,7 +12,6 @@
     <th scope="col">{{'management.accountId' | translate}}</th>
     <th scope="col">{{'management.username' | translate}}</th>
     <th scope="col">{{'management.email' | translate}}</th>
-    <th scope="col">{{'management.password' | translate}}</th>
     <th scope="col">{{'management.roles' | translate}}</th>
     <th>{{'management.actions' | translate}}</th>
     </thead>
@@ -26,7 +25,6 @@
             <td>{{account.accountId}}</td>
             <td>{{account.username}}</td>
             <td>{{account.email}}</td>
-            <td>{{account.password}}</td>
             <td>
               @if(account.userRoles!==undefined){
                 @for(role of account.userRoles; track role.roleId){

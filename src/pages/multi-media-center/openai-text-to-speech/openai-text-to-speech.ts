@@ -1,3 +1,4 @@
+import type {SpeechFormat} from '../../../contracts/media';
 import {Component, ElementRef, inject, OnInit, ViewChild} from '@angular/core';
 import {MenuAbleService} from "../../../services/normal-services/menu-able.service";
 import {NzCardComponent} from "ng-zorro-antd/card";
@@ -62,10 +63,10 @@ export class OpenaiTextToSpeech {
   woman_voices: string[] = [
     "nova", "shimmer"
   ];
-  speech_response_formats: string[] = [
+  speech_response_formats: SpeechFormat[] = [
     "mp3", "opus", "aac", "flac"
   ]
-  response_format: string = "mp3";
+  response_format: SpeechFormat = "mp3";
   model: string = "tts-1";
   speed: number = 1; // 0.25 - 4.0
   models: string[] = [
@@ -200,6 +201,7 @@ export class OpenaiTextToSpeech {
     } catch (e) {
       this.loading = false;
       this.stopTimer();
+      return;
     }
     this.stopTimer();
     this.loading = false;

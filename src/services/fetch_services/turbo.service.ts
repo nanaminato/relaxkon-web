@@ -1,3 +1,5 @@
+import {chatRole, type ChatCompletionRequest} from '../../contracts/chat';
+import {throwError} from 'rxjs';
 import {readChatStream} from '../chat/chat-stream';
 import {LocalizationService} from '../normal-services/localization.service';
 import {inject, Injectable} from "@angular/core";
@@ -30,16 +32,18 @@ export class TurboService {
     const messages: Message[] | VisionMessage[] = mp.messages;
     let config = this.config!;
     let url = this.baseUrl + "/chat";
-    let requestBody: any = {
-      messages: messages,
-      model: model === undefined ? config?.model.modelValue : model,
+    const modelValue = model ?? config?.model.modelValue;
+    if (!modelValue) return throwError(() => new Error('A chat model is required'));
+    const requestBody: ChatCompletionRequest = {
+      messages: messages.map(message => ({role: chatRole(message.role), content: message.content})),
+      model: modelValue,
       vision: config?.model.vision,
       stream: true
     };
     return this.fetchChatBase(url, requestBody);
   }
 
-  fetchChatBase(url: string, requestBody: any): Observable<string> {
+  fetchChatBase(url: string, requestBody: ChatCompletionRequest): Observable<string> {
     return new Observable<string>(observer => {
       const abortController = new AbortController();
       const execute = async () => {

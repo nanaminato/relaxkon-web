@@ -13,7 +13,7 @@
         <input id="login-password" class="form-control" [type]="passwordVisible ? 'text' : 'password'" formControlName="password" autocomplete="current-password" [placeholder]="'account.pleasePassword' | translate" [attr.aria-invalid]="validateForm.controls.password.invalid && validateForm.controls.password.touched" aria-describedby="password-error">
         <button type="button" class="password-visibility-toggle" (click)="togglePasswordVisibility()" [attr.aria-label]="(passwordVisible ? 'account.hidePassword' : 'account.showPassword') | translate" [attr.aria-pressed]="passwordVisible"><span nz-icon [nzType]="passwordVisible ? 'eye-invisible' : 'eye'" aria-hidden="true"></span></button>
       </div>
-      @if (validateForm.controls.password.invalid && validateForm.controls.password.touched) { <p id="password-error" class="field-error" role="alert">{{'account.passwordTip' | translate}}</p> }
+      @if (validateForm.controls.password.invalid && validateForm.controls.password.touched) { <p id="password-error" class="field-error" role="alert">{{'account.loginPasswordTip' | translate}}</p> }
     </div>
     <div class="login-options">
       <label class="remember"><input type="checkbox" formControlName="remember">{{'account.rememberMe' | translate}}</label>

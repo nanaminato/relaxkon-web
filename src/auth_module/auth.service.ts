@@ -7,13 +7,8 @@ import {User} from "../models/accounts";
 import {AuthCallService} from "./auth-call.service";
 import {Store} from "@ngrx/store";
 
-export interface AuthTokenResponse {
-  token: string;
-  accessToken?: string;
-  refreshToken: string;
-  id: number;
-  sessionId: string;
-}
+import type {TokenResponse} from '../contracts/auth';
+export type AuthTokenResponse = TokenResponse;
 
 @Injectable({ providedIn: "root" })
 export class AuthService {
