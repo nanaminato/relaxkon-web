@@ -13,5 +13,4 @@ export interface ContentClip{
 }
 export interface VisionImage{
   url: string;
-  detail?: string;
 }

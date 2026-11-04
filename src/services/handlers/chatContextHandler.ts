@@ -11,13 +11,11 @@ export class ChatContextHandler{
           configuration: Configuration,
           chatModels: ChatModel[],
           endPointer: number | undefined): Message[]|VisionMessage[]{
-    let sessionLength = configuration?.chatConfiguration.historySessionLength!;
     let messages: Message[] | VisionMessage[] = [];
     const originalArray = [...chatModels]; // 创建 chatModels 的副本
     const reversedArray = originalArray.reverse();
     let vision = configuration.model.vision;
     for (let chatModel of reversedArray) {
-      if (messages.length >= sessionLength) break;
       if(endPointer!==undefined && chatModel.dataId!>endPointer!){
         // 如果传递了 结束指针，就跳过结束指针之后的聊天模型对象
         continue;
@@ -45,8 +43,7 @@ export class ChatContextHandler{
               complexContent.push({
                 type: "image_url",
                 image_url: {
-                  url: img.fileContent!,
-                  detail: configuration.chatConfiguration.detail
+                  url: img.fileContent!
                 }
               })
             }

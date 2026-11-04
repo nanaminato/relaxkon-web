@@ -13,7 +13,6 @@ import {NzInputModule} from "ng-zorro-antd/input";
 import {RouterLink} from "@angular/router";
 import {NgStyle} from "@angular/common";
 import {NzSelectModule} from "ng-zorro-antd/select";
-import {NzSwitchModule} from "ng-zorro-antd/switch";
 import {NzSkeletonModule} from "ng-zorro-antd/skeleton";
 import {ConfigExport} from "./config-export/config-export";
 import {ConfigImport} from "./config-import/config-import";
@@ -23,7 +22,7 @@ import {DynamicConfigService, LocalizationService, SizeReportService, ThemeSwitc
 import {Configuration, DynamicConfig} from "../../models";
 import {ConfigurationService, DbService} from "../../services/db-services";
 import {ModelCenter} from "./model-center/model-center";
-import {details, providerCatalog, ProviderDefinition, reasoningEfforts, thinkingBudgetPresets, verbosityLevels} from "../../models/enumerates/enum.type";
+import {providerCatalog, ProviderDefinition} from "../../models/enumerates/enum.type";
 import {ServiceProvider} from "../../roots";
 import {themeOptions} from '../../themes/theme'
 import {selectConfig} from "../../systems/store/configuration/configuration.selectors";
@@ -39,7 +38,7 @@ import {NzMessageService} from "ng-zorro-antd/message";
     NzButtonModule, NzIconModule, NzPopoverModule,
     NzInputNumberModule, NzSliderModule, FormsModule,
     NzInputModule, RouterLink, NgStyle,
-    NzSelectModule, NzSwitchModule, NzSkeletonModule,
+    NzSelectModule, NzSkeletonModule,
     ConfigExport, ConfigImport,
     NzTooltipModule, TranslateModule, ModelCenter,
   ],
@@ -156,7 +155,7 @@ export class Settings {
     this.languageChange(this.dynamicConfig.language===undefined?'':this.dynamicConfig.language);
   }
 
-  protected readonly details = details;
+
 
   menuVisible() {
     return this.sizeReportService.menuVisible;
@@ -190,101 +189,5 @@ export class Settings {
     this.message.success(this.localization.text('notifications.databaseResetSuccess'));
   }
 
-  // —— 新版 OpenAI / 多供应商对话参数 ——
-  // 这些选项在 Settings 中以可选形式存在；存到 IndexedDB 后由 TurboService.fetchChat 透传。
-  // 后端的 OpenAiChatHandler 与 GoogleChatHandler 已兼容：
-  //  - reasoning_effort：OpenAI 推理模型 (o 系列、gpt-5 系列)
-  //  - verbosity：GPT-5 系列
-  //  - thinking_budget：Gemini 2.5 系列
-  // 当目标模型不支持时，后端会忽略对应字段而不会报错。
-  protected readonly reasoningEfforts = reasoningEfforts;
-  protected readonly verbosityLevels = verbosityLevels;
-  protected readonly thinkingBudgetPresets = thinkingBudgetPresets;
   protected readonly providerCatalog: ReadonlyArray<ProviderDefinition> = providerCatalog;
-
-  protected updateReasoningEffort(value: string | null): void {
-    if (!this.config) return;
-    this.config.chatConfiguration.reasoning_effort = value ?? undefined;
-  }
-
-  protected updateVerbosity(value: string | null): void {
-    if (!this.config) return;
-    this.config.chatConfiguration.verbosity = value ?? undefined;
-  }
-
-  protected thinkingBudgetModel(): number | null {
-    const value = this.config?.chatConfiguration.thinking_budget;
-    if (value === undefined || value === null) return null;
-    return value;
-  }
-
-  protected updateThinkingBudget(value: number | null): void {
-    if (!this.config) return;
-    this.config.chatConfiguration.thinking_budget = value === null ? undefined : value;
-  }
-
-  protected thinkingBudgetLabel(preset: number): string {
-    if (preset === -1) return '-1 (dynamic)';
-    if (preset === 0) return '0 (off)';
-    return String(preset);
-  }
-
-  /**
-   * 单次回复限制 (max_completion_tokens) 的「无限制」开关。
-   *
-   * 之所以要这个开关：某些模型对 max_completion_tokens 有更严格的上限
-   * （例如某些模型只支持 5000 以下），如果用户在配置中写了一个超过
-   * 上限的值（例如 10000），请求就会失败。开启「无限制」之后，
-   * 该字段根本不会发送给后端，由后端使用模型自身的默认值。
-   *
-   * 同时兼容历史配置（曾以 0 表示「不限制」）。
-   */
-  private static readonly DEFAULT_MAX_TOKENS = 4000;
-  private previousMaxTokensValue: number | undefined;
-
-  protected isMaxTokensUnlimited(): boolean {
-    const value = this.config?.chatConfiguration.max_completion_tokens;
-    return value === undefined || value === null || value <= 0;
-  }
-
-  protected setMaxTokensUnlimited(unlimited: boolean): void {
-    if (!this.config) return;
-    if (unlimited) {
-      // 记录当前值，以便用户切回「限制」时恢复；并清空当前值，使其不再发送给后端。
-      const current = this.config.chatConfiguration.max_completion_tokens;
-      if (current !== undefined && current !== null && current > 0) {
-        this.previousMaxTokensValue = current;
-      }
-      this.config.chatConfiguration.max_completion_tokens = undefined;
-    } else {
-      // 恢复先前保存的值；若没有历史值，回落到默认 4000。
-      const restored = this.previousMaxTokensValue
-        ?? this.config.chatConfiguration.max_completion_tokens
-        ?? Settings.DEFAULT_MAX_TOKENS;
-      const safe = restored > 0 ? restored : Settings.DEFAULT_MAX_TOKENS;
-      this.config.chatConfiguration.max_completion_tokens = safe;
-      this.previousMaxTokensValue = safe;
-    }
-  }
-
-  protected maxTokensSliderValue(): number {
-    const value = this.config?.chatConfiguration.max_completion_tokens;
-    return value !== undefined && value !== null && value > 0
-      ? value
-      : Settings.DEFAULT_MAX_TOKENS;
-  }
-
-  protected updateMaxTokensSlider(value: number | null | undefined): void {
-    if (!this.config) return;
-    if (value === undefined || value === null || !Number.isFinite(value) || value <= 0) {
-      // 用户把值拖到 0 或更小的极端情况：回退到上一次保留的值或默认值，
-      // 同时把这些情况视作「无限制」，避免错误地把 0 送给后端。
-      this.config.chatConfiguration.max_completion_tokens =
-        this.previousMaxTokensValue ?? Settings.DEFAULT_MAX_TOKENS;
-      this.previousMaxTokensValue = this.config.chatConfiguration.max_completion_tokens;
-      return;
-    }
-    this.config.chatConfiguration.max_completion_tokens = value;
-    this.previousMaxTokensValue = value;
-  }
 }
