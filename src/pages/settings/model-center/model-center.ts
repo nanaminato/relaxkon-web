@@ -1,3 +1,4 @@
+import {NgTemplateOutlet} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Component, EventEmitter, inject, OnInit, Output} from '@angular/core';
 import {Configuration, DisplayModel, displayModels} from "../../../models";
@@ -7,8 +8,6 @@ import {NzModalContentDirective, NzModalModule} from "ng-zorro-antd/modal";
 import {ModelCustomAdd} from "./model-custom-add/model-custom-add";
 import {UniversalService} from "../../../services/db-services/universal.service";
 import {TranslateModule} from "@ngx-translate/core";
-import {NzIconDirective} from "ng-zorro-antd/icon";
-import {NzPopoverDirective} from "ng-zorro-antd/popover";
 import {Store} from "@ngrx/store";
 import {selectConfig} from "../../../systems/store/configuration/configuration.selectors";
 import {configurationActions} from "../../../systems/store/configuration/configuration.actions";
@@ -19,13 +18,12 @@ import {configurationActions} from "../../../systems/store/configuration/configu
   styleUrls: ['./model-center.scss'],
   standalone: true,
   imports: [
+    NgTemplateOutlet,
     NzButtonComponent,
     NzModalModule,
     NzModalContentDirective,
     ModelCustomAdd,
     TranslateModule,
-    NzIconDirective,
-    NzPopoverDirective,
   ]
 })
 export class ModelCenter implements OnInit {

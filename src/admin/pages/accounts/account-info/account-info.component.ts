@@ -57,10 +57,8 @@ export class AccountInfoComponent {
         throw err;
       })
     ).subscribe({
-      next: value => {
-        this.message.success(this.i18n.instant('management.verified'));
-        // console.log("ok")
-      }
+      // Background session validation is silent; only failures need attention.
+      error: () => undefined
     });
     if (this.authService.user!.roles === undefined) {
       this.call.getRolesWithUserId(this.authService.user!.id)

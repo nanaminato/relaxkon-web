@@ -37,6 +37,7 @@ export class TurboService {
     const requestBody: ChatCompletionRequest = {
       messages: messages.map(message => ({role: chatRole(message.role), content: message.content})),
       model: modelValue,
+      ...(mp.conversationId ? {conversationId: mp.conversationId} : {}),
       vision: config?.model.vision,
       stream: true
     };
@@ -61,11 +62,16 @@ export class TurboService {
           if (abortController.signal.aborted) return;
           response = await request();
         }
-        if (!response.ok) throw {
+        if (!response.ok) {
+          // Admission errors arrive as JSON before the event stream starts.
+          const problem = await response.json().catch(() => null);
+          throw {
           type: response.status === 401 || response.status === 403 ? ErrorType.NotAuthorize
             : response.status === 429 ? ErrorType.Busy : ErrorType.Other,
-          status: response.status
+          status: response.status,
+          code: typeof problem?.code === 'string' ? problem.code : undefined
         } satisfies ResponseError;
+        }
         if (!response.body) throw {type: ErrorType.NoContent};
         if (!response.headers.get('Content-Type')?.startsWith('text/event-stream'))
           throw {type: ErrorType.Other, error: 'Unsupported chat stream protocol'};

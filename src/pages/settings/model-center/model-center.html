@@ -1,46 +1,48 @@
-<div class="d-flex flex-row-reverse">
-  <nz-modal [(nzVisible)]="customAddVisible"
-            [nzTitle]="'settings.addOptionalModel' | translate"
-            [nzFooter]="[]"
-            (nzOnOk)="customAddVisible=false"
-            (nzOnCancel)="customAddVisible=false"
-  >
-    <ng-container *nzModalContent>
-      <app-model-custom-add
-        (displayModel)="newDisplayModelAction($event)"></app-model-custom-add>
-    </ng-container>
-  </nz-modal>
-  <button nz-button (click)="customAddVisible = true">{{ 'settings.addOptionalModel' | translate }}</button>
+<nz-modal [(nzVisible)]="customAddVisible"
+          [nzTitle]="'settings.addOptionalModel' | translate"
+          [nzFooter]="null" (nzOnCancel)="customAddVisible=false">
+  <ng-container *nzModalContent>
+    @if (customAddVisible) {
+      <app-model-custom-add (displayModel)="newDisplayModelAction($event)"></app-model-custom-add>
+    }
+  </ng-container>
+</nz-modal>
+<div class="model-toolbar">
+  <p>{{ 'settings.modelSelectionHint' | translate }}</p>
+  <button nz-button (click)="customAddVisible = true">+ {{ 'settings.addOptionalModel' | translate }}</button>
 </div>
-@for (selected of selectedModels; track selected.modelName){
-  <button class="bg-info mx-2 my-1  p-1 rounded-2"
-          nz-popover [nzPopoverTitle]="selected.modelValue"  nzPopoverPlacement="bottom"
-    (click)="addOrRemove(selected)">
-    {{selected.modelName}}
-    @if(selected.internet===true){
-      <span nz-icon nzType="ant-cloud" nzTheme="outline"></span>
+<section class="model-section">
+  <h3>{{ 'settings.selectedModels' | translate }} <span>{{selectedModels.length}}</span></h3>
+  <div class="model-grid">
+    @for (model of selectedModels; track model.modelName) {
+      <ng-container *ngTemplateOutlet="modelCard; context: {$implicit: model, active: true}"></ng-container>
+    } @empty {
+      <p class="model-empty">{{ 'settings.noSelectedModels' | translate }}</p>
     }
-    @if(selected.vision===true){
-      <span nz-icon nzType="eye" nzTheme="outline"></span>
+  </div>
+</section>
+<section class="model-section">
+  <h3>{{ 'settings.availableModels' | translate }}</h3>
+  <div class="model-grid">
+    @for (model of selectableModels; track model.modelName) {
+      @if (notSelected(model.modelName)) {
+        <ng-container *ngTemplateOutlet="modelCard; context: {$implicit: model, active: false}"></ng-container>
+      }
     }
+  </div>
+</section>
+<ng-template #modelCard let-model let-active="active">
+  <button type="button" class="model-card" [class.is-selected]="active"
+          [attr.aria-pressed]="active" [title]="model.modelValue" (click)="addOrRemove(model)">
+    <span class="model-card-top"><strong>{{model.modelName}}</strong><span class="selection-mark" aria-hidden="true">{{active ? '✓' : '+'}}</span></span>
+    <span class="model-value">{{model.modelValue}}</span>
+    <span class="model-capabilities">
+      @if(model.internet) { <span>{{ 'settings.cloudModel' | translate }}</span> }
+      @if(model.vision) { <span>{{ 'settings.visionSupport' | translate }}</span> }
+    </span>
   </button>
-}
-@for (selectable of selectableModels; track selectable.modelName){
-  @if (notSelected(selectable.modelName)){
-    <button class="c-dark mx-2 my-1  p-1 rounded-2" nz-popover [nzPopoverTitle]="selectable.modelValue" nzPopoverPlacement="bottom"
-            (click)="addOrRemove(selectable)">
-      {{selectable.modelName}}
-      @if(selectable.internet===true){
-        <span nz-icon nzType="ant-cloud" nzTheme="outline"></span>
-      }
-      @if(selectable.vision===true){
-        <span nz-icon nzType="eye" nzTheme="outline"></span>
-      }
-    </button>
-  }@else{
-
-  }
-}
-<div class="d-flex flex-row-reverse">
-  <button nz-button class="rounded-2" (click)="save()">{{'universal.save'|translate}}</button>
+</ng-template>
+<div class="model-actions">
+  <button nz-button (click)="closeAction.emit(false)">{{ 'universal.cancel' | translate }}</button>
+  <button nz-button nzType="primary" (click)="save()">{{ 'universal.save' | translate }}</button>
 </div>

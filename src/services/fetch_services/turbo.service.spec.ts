@@ -5,8 +5,40 @@ import {AuthService} from '../../auth_module';
 import {ServiceProvider} from '../../roots';
 import {LocalizationService} from '../normal-services/localization.service';
 import {TurboService} from './turbo.service';
+import {ChatHistoryModel, ChatPacket} from '../../models';
 
 describe('Multilingual chat streaming', () => {
+  it('keeps the persisted conversation identifier across turns and model changes', () => {
+    TestBed.configureTestingModule({providers: [
+      {provide: Store, useValue: {select: () => of(null)}},
+      {provide: ServiceProvider, useValue: {apiUrl: '/'}},
+      {provide: AuthService, useValue: {token: 'test'}},
+      {provide: LocalizationService, useValue: {requestLanguage: 'en'}}
+    ]});
+    const service = TestBed.inject(TurboService);
+    const history = new ChatHistoryModel();
+    const restored = Object.assign(new ChatHistoryModel(), structuredClone(history));
+    const send = spyOn(service, 'fetchChatBase').and.returnValue(of(''));
+    service.fetchChat(new ChatPacket([{role: 'user', content: 'hello'}], history.dataId!.toString()), 'first-model');
+    service.fetchChat(new ChatPacket([{role: 'user', content: 'next turn'}], restored.dataId!.toString()), 'second-model');
+    expect(send.calls.allArgs().map(args => args[1].conversationId)).toEqual([
+      history.dataId!.toString(), history.dataId!.toString()
+    ]);
+    expect(send.calls.mostRecent().args[1].model).toBe('second-model');
+  });
+  for (const [status, code] of [[403, 'feature_disabled'], [429, 'feature_limit_exceeded'], [503, 'feature_access_unavailable']] as const) {
+    it(`preserves admission error ${code}`, async () => {
+      TestBed.configureTestingModule({providers: [
+        {provide: Store, useValue: {select: () => of(null)}},
+        {provide: ServiceProvider, useValue: {apiUrl: '/'}},
+        {provide: AuthService, useValue: {token: 'test'}},
+        {provide: LocalizationService, useValue: {requestLanguage: 'zh'}}
+      ]});
+      spyOn(window, 'fetch').and.resolveTo(new Response(JSON.stringify({code}), {status}));
+      await expectAsync(firstValueFrom(TestBed.inject(TurboService).fetchChatBase('/api/ai/chat',
+        {model: 'test', messages: []}))).toBeRejectedWith(jasmine.objectContaining({status, code}));
+    });
+  }
   it('omits generation settings even when legacy stored configuration contains them', () => {
     TestBed.configureTestingModule({providers: [
       {provide: Store, useValue: {select: () => of(null)}},

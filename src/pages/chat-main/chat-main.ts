@@ -466,7 +466,8 @@ export class ChatMainComponent implements OnDestroy{
       this.chatModels,
       messages
     );
-    return new ChatPacket(messages);
+    // The persisted history ID survives reloads, retries, and regenerations.
+    return new ChatPacket(messages, this.chatHistoryModel?.dataId?.toString());
   }
 
   scrollToBottom(): void {

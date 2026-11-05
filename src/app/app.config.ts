@@ -30,7 +30,7 @@ import {chatHistoryReducer} from "../systems/store/chat-history/chat-history.red
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    {provide: NZ_CONFIG, useValue: {message: {nzDuration: 4500, nzMaxStack: 3, nzPauseOnHover: true, nzTop: 24}}},
+    {provide: NZ_CONFIG, useValue: {message: {nzDuration: 2400, nzMaxStack: 1, nzPauseOnHover: false, nzTop: 24}, notification: {nzDuration: 3200, nzMaxStack: 1, nzPauseOnHover: true, nzPlacement: 'topRight'}}},
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes, withPreloading(PreloadAllModules)),

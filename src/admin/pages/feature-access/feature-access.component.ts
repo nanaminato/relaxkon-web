@@ -12,7 +12,7 @@ import {AccountCallService} from '../../services/account-call.service';
   selector: 'app-feature-access', standalone: true,
   imports: [FormsModule, TranslatePipe, RouterLink],
   templateUrl: './feature-access.component.html',
-  styles: [`:host{display:block} .policy-table{overflow:auto} table{width:100%;border-collapse:collapse} th,td{padding:.65rem;border-bottom:1px solid var(--app-border);text-align:left} input[type=number]{width:8rem;background:var(--app-surface);color:var(--app-text);border:1px solid var(--app-border);padding:.35rem} .actions{display:flex;gap:.75rem;margin:1rem 0} .preview{margin:1.5rem 0;padding:1rem;border:1px solid var(--app-border);border-radius:.75rem}.preview select{max-width:32rem;margin:.5rem 0}.preview{margin:1.5rem 0;padding:1rem;border:1px solid var(--app-border);border-radius:.75rem}.preview select{max-width:32rem;margin:.5rem 0}.notice{color:var(--app-text-muted)} [role=alert]{color:var(--app-text)}`]
+  styleUrl: './feature-access.component.css'
 })
 export class FeatureAccessComponent implements OnInit {
   private readonly access = inject(FeatureAccessService);
@@ -24,6 +24,23 @@ export class FeatureAccessComponent implements OnInit {
   roles: Role[] = [];
   selectedCodes: string[] = [];
   readonly unavailable = '\u2014';
+  activeKey = 'chat';
+  readonly limits = [
+    {key: 'requestsPerMinute', label: 'featureAccess.perMinute'},
+    {key: 'requestsPerDay', label: 'featureAccess.perDay'},
+    {key: 'maxConcurrent', label: 'featureAccess.concurrent'}
+  ] as const;
+  validLimit(value: number | null) { return value === null || Number.isInteger(value) && value > 0 && value <= 2147483647; }
+  get activeFeature() { return this.document?.features.find(feature => feature.key === this.activeKey) ?? this.document?.features[0]; }
+  enabledCount(feature: import('../../../contracts/feature-access').FeaturePolicy) {
+    return this.roleNames.filter(role => feature.roles[role]?.enabled).length;
+  }
+  togglePreview(code: string) {
+    this.selectedCodes = this.selectedCodes.includes(code)
+      ? this.selectedCodes.filter(selected => selected !== code) : [...this.selectedCodes, code];
+  }
+  memberCount(code: string) { return this.roles.find(role => (role.code ?? role.name) === code)?.memberCount ?? 0; }
+
   loading = false;
   saving = false;
   dirty = false;

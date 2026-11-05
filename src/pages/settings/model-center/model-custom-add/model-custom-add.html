@@ -1,14 +1,14 @@
 <div class="form-group">
-  <label>{{ 'settings.modelName' | translate }}</label>
-  <input class="form-control" [(ngModel)]="modelName">
+  <label for="custom-model-name">{{ 'settings.modelName' | translate }}</label>
+  <input id="custom-model-name" class="form-control" [(ngModel)]="modelName">
 </div>
 <div class="form-group">
-  <label>{{ 'settings.modelValue' | translate }}</label>
-  <input class="form-control" [(ngModel)]="modelValue">
+  <label for="custom-model-value">{{ 'settings.modelValue' | translate }}</label>
+  <input id="custom-model-value" class="form-control" [(ngModel)]="modelValue">
 </div>
 <div class="form-group">
-  <label>{{ 'settings.visionSupport' | translate }}</label>
-  <input type="checkbox" [(ngModel)]="vision">
+  <label for="custom-model-vision">{{ 'settings.visionSupport' | translate }}</label>
+  <input id="custom-model-vision" type="checkbox" [(ngModel)]="vision">
 </div>
 <div class="d-flex mt-2 flex-row-reverse">
   <button class="btn btn-primary" (click)="outerTransfer()">{{'universal.add'| translate}}</button>

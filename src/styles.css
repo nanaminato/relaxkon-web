@@ -129,12 +129,12 @@ button, [role="button"] {
 .ant-message { padding: 0 16px; }
 .ant-message-notice-content {
   max-width: min(520px, calc(100vw - 32px));
-  padding: 12px 18px;
-  border: 1px solid var(--border-color, #e2e8f0);
-  border-radius: 14px;
-  background: var(--background-color, #fff);
-  color: var(--text-color, #172033);
-  box-shadow: 0 8px 32px rgba(15, 23, 42, .14);
+  padding: 10px 14px;
+  border: 1px solid var(--app-border, #e2e8f0);
+  border-radius: 12px;
+  background: var(--app-surface, #fff);
+  color: var(--app-text, #172033);
+  box-shadow: 0 6px 24px rgba(15, 23, 42, .10);
   text-align: left;
   overflow-wrap: anywhere;
   line-height: 1.6;
@@ -144,3 +144,37 @@ button, [role="button"] {
 @media (prefers-reduced-motion: reduce) {
   .ant-message-notice { animation: none !important; transition: none !important; }
 }
+
+/* Overlay content lives outside page components, so share the app theme here. */
+.ant-modal-mask { background: rgba(15, 23, 42, .38); backdrop-filter: blur(3px); }
+.ant-modal-content { border:1px solid var(--app-border, #e2e8f0); border-radius:18px; background:var(--app-surface, #fff); color:var(--app-text, #172033); box-shadow:0 24px 80px #0f172a29; }
+.ant-modal-header { padding:22px 24px 18px; border-radius:18px 18px 0 0; border-bottom:1px solid var(--app-border, #e2e8f0); background:transparent; }
+.ant-modal-title { padding-right:28px; font-size:17px; font-weight:650; color:var(--app-text, #172033); }
+.ant-modal-close { top:12px; right:12px; color:var(--app-text-muted, #64748b); border-radius:9px; }
+.ant-modal-close-x { width:36px; height:36px; line-height:36px; font-size:14px; }
+.ant-modal-close:hover { color:var(--app-text, #172033); background:var(--app-hover, #f1f5f9); }
+.ant-modal-body { padding:24px; max-height:calc(100dvh - 240px); overflow-y:auto; overscroll-behavior:contain; }
+.ant-modal-footer { padding:16px 24px; border-top:1px solid var(--app-border, #e2e8f0); }
+.ant-modal .ant-btn, .ant-modal .btn { min-height:36px; height:auto; padding:7px 16px; border-radius:9px; box-shadow:none; font-size:13px; }
+.ant-modal .ant-btn-default { border-color:var(--app-border, #e2e8f0); background:var(--app-surface, #fff); color:var(--app-text, #172033); }
+.ant-modal .ant-btn-primary, .ant-modal .btn-primary { background:#2463cf; border-color:#2463cf; color:#fff; }
+.ant-modal .ant-btn-primary:hover, .ant-modal .btn-primary:hover { background:#1c52b0; border-color:#1c52b0; }
+.ant-modal .form-group { margin-bottom:18px; }
+.ant-modal label { display:inline-block; margin-bottom:8px; font-size:13px; color:var(--app-text, #172033); }
+.ant-modal .form-control, .ant-modal .ant-input { min-height:40px; border-radius:9px; border-color:var(--app-border, #e2e8f0); background:var(--app-surface, #fff); color:var(--app-text, #172033); }
+.ant-modal .form-control:focus { border-color:var(--app-accent, #2463cf); box-shadow:0 0 0 3px var(--app-selection, #eef4ff); }
+.ant-modal-confirm-title, .ant-modal-confirm-content { color:var(--app-text, #172033) !important; }
+.ant-message-notice { padding:6px 0; }
+.ant-message-custom-content { font-size:13px; }
+@media(max-width:600px) {
+  .ant-modal-header { padding:20px; }
+  .ant-modal-body { padding:20px; max-height:calc(100dvh - 180px); }
+  .ant-modal-footer { padding:14px 20px; }
+}
+@media(prefers-reduced-motion:reduce) { .ant-modal-mask { backdrop-filter:none; } }
+
+.ant-notification-notice { border:1px solid var(--app-border, #e2e8f0); border-radius:12px; background:var(--app-surface, #fff); color:var(--app-text, #172033); box-shadow:0 8px 28px #0f172a1a; padding:16px 20px; }
+.ant-notification-notice-message { font-size:14px; font-weight:600; color:var(--app-text, #172033); padding-right:16px; }
+.ant-notification-notice-description { font-size:13px; line-height:1.65; color:var(--app-text-muted, #64748b); overflow-wrap:anywhere; white-space:pre-line; max-height:40dvh; overflow-y:auto; }
+.ant-notification-notice-close { color:var(--app-text-muted, #64748b); }
+@media(max-width:600px) { .ant-notification { max-width:calc(100vw - 24px); margin-right:12px; margin-left:12px; } }

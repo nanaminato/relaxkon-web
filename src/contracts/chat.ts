@@ -1,7 +1,7 @@
 export type ChatRole = 'system' | 'developer' | 'user' | 'assistant';
 export type ChatContentPart = {type: 'text'; text: string} | {type: 'image_url'; image_url: {url: string}};
 export interface ChatMessageRequest { role: ChatRole; content: string | ChatContentPart[]; }
-export interface ChatCompletionRequest { model: string; messages: ChatMessageRequest[]; stream?: boolean; vision?: boolean; }
+export interface ChatCompletionRequest { model: string; messages: ChatMessageRequest[]; stream?: boolean; vision?: boolean; conversationId?: string; }
 export interface ChatModelResponse { modelName: string | null; modelValue: string | null; vision: boolean; }
 export type ChatStreamEventResponse = {type: 'delta'; text: string; code?: null}
   | {type: 'completed'; text?: null; code?: null} | {type: 'error'; text?: null; code: string};
