@@ -41,7 +41,7 @@
                         nz-popconfirm
                         [nzPopconfirmTitle]="'management.confirmAccountDelete' | translate"
                         nzPopconfirmPlacement="bottom"
-                        (nzOnConfirm)="delete(account.accountId)">
+                        [disabled]="deleting.has(account.accountId)" (nzOnConfirm)="delete(account.accountId)">
                   {{'management.delete' | translate}}
                 </button>
               </div>

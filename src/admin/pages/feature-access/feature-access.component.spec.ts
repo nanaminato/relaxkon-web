@@ -1,3 +1,4 @@
+import {provideRouter} from '@angular/router';
 import {TestBed} from '@angular/core/testing';
 import {of, Subject} from 'rxjs';
 import {FeatureAccessComponent} from './feature-access.component';
@@ -12,13 +13,25 @@ describe('Feature policy editor', () => {
   beforeEach(() => {
     result = new Subject();
     api = {policies: jasmine.createSpy().and.callFake(() => of(policy())), save: jasmine.createSpy().and.returnValue(result)};
-    TestBed.configureTestingModule({providers: [{provide: FeatureAccessService, useValue: api}, {provide: AccountCallService, useValue: {getRolesWithUserId: () => of([{roleId: 1, name: 'vip'}, {roleId: 2, name: 'user'}])}}]});
+    TestBed.configureTestingModule({providers: [provideRouter([]), {provide: FeatureAccessService, useValue: api}, {provide: AccountCallService, useValue: {getRolesWithUserId: () => of([{roleId: 1, code: 'vip', name: 'Premium'}, {roleId: 2, code: 'user', name: 'Standard'}])}}]});
     component = TestBed.runInInjectionContext(() => new FeatureAccessComponent());
     component.ngOnInit();
   });
   it('starts newly discovered roles denied and preserves server values', () => {
     expect(component.document!.features[0].roles['user'].enabled).toBeFalse();
     expect(component.document!.features[0].roles['vip'].requestsPerMinute).toBe(5);
+  });
+  it('keeps grants under stable codes after display-name changes and previews the broadest enabled limits', () => {
+    expect(component.roleNames).toEqual(['vip', 'user']);
+    expect(component.roleLabel('vip')).toBe('Premium');
+    component.selectedCodes = ['vip', 'user'];
+    const feature = component.document!.features[0];
+    feature.roles['user'] = {enabled: true, requestsPerMinute: 10, requestsPerDay: 20, maxConcurrent: null};
+    expect(component.effective(feature)).toEqual({enabled: true, requestsPerMinute: 10, requestsPerDay: null, maxConcurrent: null});
+    feature.roles['user'].enabled = false;
+    expect(component.effective(feature).requestsPerMinute).toBe(5);
+    component.selectedCodes = [];
+    expect(component.effective(feature).enabled).toBeFalse();
   });
   it('prevents duplicate saves and preserves edits after failure', () => {
     component.changed(); component.save(); component.save();

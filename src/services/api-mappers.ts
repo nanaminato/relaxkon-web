@@ -2,7 +2,7 @@ import type {Account, Role} from '../admin/models/accounts';
 import type {Model, SupplierKey} from '../admin/models/keys';
 import type {AccountResponse, AccountWriteRequest, RoleResponse, ModelResponse, ModelWriteRequest, KeyResponse, KeyWriteRequest} from '../contracts';
 
-export const roleView = (role: RoleResponse): Role => ({roleId: role.roleId, name: role.name ?? ''});
+export const roleView = (role: RoleResponse): Role => ({roleId: role.roleId, name: role.name ?? '', code: role.code ?? role.name ?? '', description: role.description, isSystem: role.isSystem, memberCount: role.memberCount});
 export const accountView = (account: AccountResponse): Account => ({accountId: account.accountId,
   username: account.username ?? '', email: account.email ?? '', userRoles: account.userRoles.map(roleView)});
 export const modelView = (model: ModelResponse): Model => ({modelId: model.modelId, name: model.name ?? '',

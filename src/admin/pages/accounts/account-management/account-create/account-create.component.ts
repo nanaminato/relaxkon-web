@@ -1,4 +1,5 @@
-import {apiErrorMessage} from '../../../../../contracts/common';
+import {roleErrorKey} from '../../../../services/role-errors';
+import {finalize} from 'rxjs';
 import {TranslateService} from '@ngx-translate/core';
 import {TranslateModule} from '@ngx-translate/core';
 import { Component, inject } from '@angular/core';
@@ -79,8 +80,11 @@ export class AccountCreateComponent {
       }
     })
   }
+  saving = false;
   submitForm() {
+    if (this.saving) return;
     if (this.validateForm.valid) {
+      this.saving = true;
       const value = this.validateForm.value;
       this.call.addAccount(
         {
@@ -88,15 +92,15 @@ export class AccountCreateComponent {
           username: value.username!,
           password: value.password!,
           email: value.email!,
-          userRoles: this.roles
+          userRoles: this.roles.map(role => ({roleId: role.roleId}))
         })
-        .subscribe({
+        .pipe(finalize(() => this.saving = false)).subscribe({
           next: () =>{
             this.message.success(this.i18n.instant('management.accountCreated'));
             this.router.navigate(admin_routes.management);
           },
           error: (err: any) => {
-            this.message.error(apiErrorMessage(err, this.i18n.instant('management.networkError')));
+            this.message.error(this.i18n.instant(roleErrorKey(err, 'management.networkError')));
           }
         })
     } else {
@@ -110,6 +114,7 @@ export class AccountCreateComponent {
   }
 
   action(role: Role) {
+    if (this.saving) return;
     if(this.active(role.roleId)){
       this.roles = this.roles.filter(r=>r.roleId!=role.roleId);
     }else{

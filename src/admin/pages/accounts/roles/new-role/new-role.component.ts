@@ -1,61 +1,39 @@
-import {TranslateService} from '@ngx-translate/core';
-import {Component, inject, EventEmitter, Output} from '@angular/core';
-import {
-  FormControl,
-  FormGroup,
-  FormsModule,
-  NonNullableFormBuilder,
-  ReactiveFormsModule,
-  Validators
-} from "@angular/forms";
-import {TranslateModule} from "@ngx-translate/core";
-import {NzMessageService} from "ng-zorro-antd/message";
-import {AccountCallService} from "../../../../services";
-
+import {roleErrorKey} from '../../../../services/role-errors';
+import {Component, DestroyRef, EventEmitter, inject, Output} from '@angular/core';
+import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import {NzMessageService} from 'ng-zorro-antd/message';
+import {finalize} from 'rxjs';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {AccountCallService} from '../../../../services';
 @Component({
-  selector: 'app-new-role',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    TranslateModule,
-    FormsModule
-  ],
-  templateUrl: './new-role.component.html',
-  styleUrl: './new-role.component.css'
+  selector: 'app-new-role', standalone: true,
+  imports: [ReactiveFormsModule, TranslateModule],
+  templateUrl: './new-role.component.html', styleUrl: './new-role.component.css'
 })
 export class NewRoleComponent {
   readonly i18n = inject(TranslateService);
   private readonly fb = inject(NonNullableFormBuilder);
-  validateForm: FormGroup<{
-    name: FormControl<string>;
-  }> = this.fb.group({
-    name: ['', [Validators.required,Validators.minLength(2), Validators.maxLength(15)]],
+  private readonly call = inject(AccountCallService);
+  private readonly message = inject(NzMessageService);
+  private readonly destroyRef = inject(DestroyRef);
+  saving = false;
+  readonly validateForm = this.fb.group({
+    code: ['', [Validators.required, Validators.pattern(/^[a-z][a-z0-9_-]{1,63}$/)]],
+    name: ['', [Validators.required, Validators.maxLength(64)]],
+    description: ['', [Validators.maxLength(256)]]
   });
-  constructor(
-    private message: NzMessageService,
-    private call: AccountCallService) {
-
-  }
-  @Output()
-  close = new EventEmitter<boolean>();
+  @Output() close = new EventEmitter<boolean>();
   submitForm() {
-    if (this.validateForm.valid) {
-      this.call.addRole(this.validateForm.value.name!).subscribe({
-        next: () =>{
-          this.message.success(this.i18n.instant('management.addSuccess'));
-          this.close.next(true);
-        },
-        error: (err: any) => {
-          this.message.error(err.error);
-        }
-      })
-    } else {
-      Object.values(this.validateForm.controls).forEach(control => {
-        if (control.invalid) {
-          control.markAsDirty();
-          control.updateValueAndValidity({ onlySelf: true });
-        }
-      });
-    }
+    if (this.saving) return;
+    const value = this.validateForm.getRawValue();
+    this.validateForm.patchValue({name: value.name.trim(), description: value.description.trim()});
+    if (this.validateForm.invalid) { this.validateForm.markAllAsTouched(); return; }
+    this.saving = true;
+    const body = {...this.validateForm.getRawValue()};
+    this.call.addRole(body).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.saving = false)).subscribe({
+      next: () => { this.message.success(this.i18n.instant('management.addSuccess')); this.close.emit(true); },
+      error: error => this.message.error(this.i18n.instant(roleErrorKey(error)))
+    });
   }
 }

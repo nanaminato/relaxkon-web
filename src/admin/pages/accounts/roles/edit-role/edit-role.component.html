@@ -1,18 +1,20 @@
-<form novalidate [formGroup]="validateForm" (ngSubmit)="submitForm()">
-  <div class="form-group">
-    <label>{{'management.roleId' | translate}}</label>
-    <input readonly class="form-control" name="roleId" formControlName="roleId">
-  </div>
-  <div class="form-group mb-1">
-    <label>{{'management.roleName' | translate}}</label>
-    <input class="form-control" name="name" formControlName="name">
-    @if (validateForm.controls['name'].invalid && validateForm.controls['name'].dirty) {
-      <li>
-        {{'management.roleLength' | translate}}
-      </li>
-    }
-  </div>
-  <div class="d-flex flex-row-reverse">
-    <button class="btn btn-primary" type="submit">{{'management.change' | translate}}</button>
-  </div>
+<form [formGroup]="validateForm" (ngSubmit)="submitForm()">
+  <fieldset [disabled]="saving">
+    <div class="mb-3">
+      <label for="edit-role-code">{{'roleManager.code' | translate}}</label>
+      <input id="edit-role-code" class="form-control" formControlName="code" readonly autocomplete="off">
+      <small>{{'roleManager.codeHint' | translate}}</small>
+    </div>
+    <div class="mb-3">
+      <label for="edit-role-name">{{'roleManager.displayName' | translate}}</label>
+      <input id="edit-role-name" class="form-control" formControlName="name" maxlength="64">
+    </div>
+    <div class="mb-3">
+      <label for="edit-role-description">{{'roleManager.description' | translate}}</label>
+      <textarea id="edit-role-description" class="form-control" formControlName="description" maxlength="256" rows="3"></textarea>
+    </div>
+    @if (validateForm.invalid && validateForm.touched) { <p role="alert">{{'roleManager.invalid' | translate}}</p> }
+    <p>{{'roleManager.editImpact' | translate: {count: _role?.memberCount ?? 0} }}</p>
+    <button class="btn btn-primary" type="submit" [disabled]="saving">{{(saving ? 'featureAccess.saving' : 'featureAccess.save') | translate}}</button>
+  </fieldset>
 </form>

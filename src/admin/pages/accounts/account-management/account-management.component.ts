@@ -1,3 +1,5 @@
+import {roleErrorKey} from '../../../services/role-errors';
+import {finalize} from 'rxjs';
 import {TranslateService} from '@ngx-translate/core';
 import {TranslateModule} from '@ngx-translate/core';
 import {inject, Component, OnInit} from '@angular/core';
@@ -43,15 +45,18 @@ export class AccountManagementComponent implements OnInit{
     refresh(){
       this.fetchAccounts(true,this.roleId)
     }
+    deleting = new Set<number>();
     delete(id: number){
+      if (this.deleting.has(id)) return;
+      this.deleting.add(id);
       this.call.deleteAccountById(id)
-        .subscribe({
+        .pipe(finalize(() => this.deleting.delete(id))).subscribe({
           next: msg=>{
             this.message.success(this.i18n.instant('management.deleteSuccess'))
             this.refresh();
           },
           error: err=>{
-            this.message.error(err.error)
+            this.message.error(this.i18n.instant(roleErrorKey(err, 'management.deleteFailed')))
           }
         })
     }

@@ -1,77 +1,45 @@
-import {TranslateService} from '@ngx-translate/core';
-import {TranslateModule} from '@ngx-translate/core';
-import {Component, inject, EventEmitter, Input, Output} from '@angular/core';
-import {
-  FormControl,
-  FormGroup,
-  FormsModule,
-  NonNullableFormBuilder,
-  ReactiveFormsModule,
-  Validators
-} from "@angular/forms";
-import {NzMessageService} from "ng-zorro-antd/message";
-import {AccountCallService} from "../../../../services";
-import {Role} from "../../../../models/accounts";
-
+import {roleErrorKey} from '../../../../services/role-errors';
+import {Component, DestroyRef, EventEmitter, inject, Input, Output} from '@angular/core';
+import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import {NzMessageService} from 'ng-zorro-antd/message';
+import {finalize} from 'rxjs';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {AccountCallService} from '../../../../services';
+import {Role} from '../../../../models/accounts';
 @Component({
-  selector: 'app-edit-role',
-  standalone: true,
-  imports: [
-    TranslateModule,
-    ReactiveFormsModule,
-    FormsModule
-  ],
-  templateUrl: './edit-role.component.html',
-  styleUrl: './edit-role.component.css'
+  selector: 'app-edit-role', standalone: true,
+  imports: [ReactiveFormsModule, TranslateModule],
+  templateUrl: './edit-role.component.html', styleUrl: './edit-role.component.css'
 })
 export class EditRoleComponent {
   readonly i18n = inject(TranslateService);
   private readonly fb = inject(NonNullableFormBuilder);
-  validateForm: FormGroup<{
-    roleId: FormControl<number>;
-    name: FormControl<string>;
-  }> = this.fb.group({
-    roleId: [0, [Validators.required]],
-    name: ['', [Validators.required,Validators.minLength(2), Validators.maxLength(15)]],
+  private readonly call = inject(AccountCallService);
+  private readonly message = inject(NzMessageService);
+  private readonly destroyRef = inject(DestroyRef);
+  saving = false;
+  readonly validateForm = this.fb.group({
+    code: ['', [Validators.required]],
+    name: ['', [Validators.required, Validators.maxLength(64)]],
+    description: ['', [Validators.maxLength(256)]]
   });
-  constructor(
-    private message: NzMessageService,
-    private call: AccountCallService) {
+  _role?: Role;
+  @Input() set role(value: Role) {
+    this._role = value;
+    this.validateForm.setValue({code: value.code ?? value.name, name: value.name, description: value.description ?? ''});
   }
-  _role: Role | undefined;
-  @Input()
-  set role(role: Role){
-    this._role = role;
-    this.validateForm.setValue({
-      roleId: this._role!.roleId,
-      name: this._role!.name
-    });
-  }
-  @Output()
-  close = new EventEmitter<boolean>();
+  @Output() close = new EventEmitter<boolean>();
   submitForm() {
-    if (this.validateForm.valid) {
-      this.call.updateRole(
-        {
-          roleId: this._role!.roleId,
-          name: this.validateForm.value.name!
-        })
-        .subscribe({
-        next: () =>{
-          this.message.success(this.i18n.instant('management.roleUpdated'));
-          this.close.next(true);
-        },
-        error: (err: any) => {
-          this.message.error(err.error);
-        }
-      })
-    } else {
-      Object.values(this.validateForm.controls).forEach(control => {
-        if (control.invalid) {
-          control.markAsDirty();
-          control.updateValueAndValidity({ onlySelf: true });
-        }
-      });
-    }
+    if (this.saving) return;
+    const value = this.validateForm.getRawValue();
+    this.validateForm.patchValue({name: value.name.trim(), description: value.description.trim()});
+    if (this.validateForm.invalid) { this.validateForm.markAllAsTouched(); return; }
+    this.saving = true;
+    const body = {...this.validateForm.getRawValue(), roleId: this._role!.roleId};
+    this.call.updateRole(body).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.saving = false)).subscribe({
+      next: () => { this.message.success(this.i18n.instant('management.roleUpdated')); this.close.emit(true); },
+      error: error => this.message.error(this.i18n.instant(roleErrorKey(error)))
+    });
   }
 }

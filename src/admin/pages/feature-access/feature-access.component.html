@@ -1,6 +1,7 @@
 <section>
   <h2>{{'featureAccess.title' | translate}}</h2>
   <p>{{'featureAccess.description' | translate}}</p>
+  <a routerLink="/admin/accounts/roles">{{'management.roles' | translate}}</a>
   <p class="notice">{{'featureAccess.mergeHint' | translate}}</p>
   <p class="notice">{{'featureAccess.limitHint' | translate}}</p>
   @if (status) { <p role="alert">{{status | translate}}</p> }
@@ -10,13 +11,28 @@
   </div>
   @if (loading) { <p role="status">{{'featureAccess.loading' | translate}}</p> }
   @if (document) {
+    <aside class="preview">
+      <h3>{{'roleManager.preview' | translate}}</h3>
+      <label for="preview-roles">{{'roleManager.previewSelect' | translate}}</label>
+      <select id="preview-roles" class="form-select" multiple [(ngModel)]="selectedCodes">
+        @for (role of roles; track role.roleId) { <option [value]="role.code ?? role.name">{{role.name}} ({{role.code ?? role.name}})</option> }
+      </select>
+      <p>{{'roleManager.previewHint' | translate}}</p>
+      @if (selectedCodes.length) {
+        <div class="policy-table"><table><thead><tr><th>{{'roleManager.feature' | translate}}</th><th>{{'featureAccess.enabled' | translate}}</th><th>{{'featureAccess.perMinute' | translate}}</th><th>{{'featureAccess.perDay' | translate}}</th><th>{{'featureAccess.concurrent' | translate}}</th></tr></thead>
+          <tbody>@for (feature of document.features; track feature.key) { @let grant = effective(feature);
+            <tr><th>{{feature.key}}</th><td>{{(grant.enabled ? 'roleManager.allowed' : 'roleManager.denied') | translate}}</td><td>{{grant.enabled ? (grant.requestsPerMinute ?? ('roleManager.unlimited' | translate))  : unavailable}}</td><td>{{grant.enabled ? (grant.requestsPerDay ?? ('roleManager.unlimited' | translate))  : unavailable}}</td><td>{{grant.enabled ? (grant.maxConcurrent ?? ('roleManager.unlimited' | translate))  : unavailable}}</td></tr>
+          }</tbody>
+        </table></div>
+      }
+    </aside>
     <fieldset [disabled]="loading || saving">
       @for (feature of document.features; track feature.key) {
         <h3>{{feature.key}}</h3>
         <div class="policy-table"><table>
           <thead><tr><th>{{'account.roles' | translate}}</th><th>{{'featureAccess.enabled' | translate}}</th><th>{{'featureAccess.perMinute' | translate}}</th><th>{{'featureAccess.perDay' | translate}}</th><th>{{'featureAccess.concurrent' | translate}}</th></tr></thead>
           <tbody>@for (role of roleNames; track role) {
-            <tr><th scope="row">{{role}}</th>
+            <tr><th scope="row">{{roleLabel(role)}} <small>({{role}})</small><br><small>{{'roleManager.editImpact' | translate: {count: roles[$index]?.memberCount ?? 0} }}</small></th>
               <td><input type="checkbox" [(ngModel)]="feature.roles[role].enabled" (ngModelChange)="changed()" [attr.aria-label]="role + ' ' + feature.key + ' ' + ('featureAccess.enabled' | translate)"></td>
               <td><input type="number" min="1" max="2147483647" step="1" [(ngModel)]="feature.roles[role].requestsPerMinute" (ngModelChange)="changed()" [attr.aria-label]="role + ' ' + feature.key + ' ' + ('featureAccess.perMinute' | translate)"></td>
               <td><input type="number" min="1" max="2147483647" step="1" [(ngModel)]="feature.roles[role].requestsPerDay" (ngModelChange)="changed()" [attr.aria-label]="role + ' ' + feature.key + ' ' + ('featureAccess.perDay' | translate)"></td>

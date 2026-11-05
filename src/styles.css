@@ -124,3 +124,23 @@ button, [role="button"] {
     top: 0;
   }
 }
+
+/* Shared toast surface for both customer and administration pages. */
+.ant-message { padding: 0 16px; }
+.ant-message-notice-content {
+  max-width: min(520px, calc(100vw - 32px));
+  padding: 12px 18px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 14px;
+  background: var(--background-color, #fff);
+  color: var(--text-color, #172033);
+  box-shadow: 0 8px 32px rgba(15, 23, 42, .14);
+  text-align: left;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+}
+.ant-message-custom-content { display: flex; align-items: baseline; gap: 10px; }
+.ant-message-custom-content > .anticon { margin-right: 0; flex-shrink: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .ant-message-notice { animation: none !important; transition: none !important; }
+}

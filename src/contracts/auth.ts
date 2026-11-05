@@ -13,8 +13,8 @@ export interface SessionResponse {
   createdAt: string; lastUsedAt: string; expiresAt: string;
 }
 export interface CaptchaResponse { img: string; code: string; contentType: string; }
-export interface RoleResponse { roleId: number; name: string | null; }
-export interface RoleWriteRequest { roleId?: number; name: string; }
+export interface RoleResponse { roleId: number; name: string | null; code?: string; description?: string | null; isSystem?: boolean; memberCount?: number; }
+export interface RoleWriteRequest { roleId?: number; name: string; code?: string; description?: string | null; }
 export interface RoleReferenceRequest { roleId: number; name?: string | null; }
 export interface AccountResponse { accountId: number; username: string | null; email: string | null; userRoles: RoleResponse[]; }
 export interface AccountWriteRequest {

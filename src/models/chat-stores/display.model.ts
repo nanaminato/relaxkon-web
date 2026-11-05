@@ -23,6 +23,10 @@ export class DisplayModelGenerator{
 export const generator = new DisplayModelGenerator();
 // Offline examples only. Configured models are loaded from the server.
 export const displayModels = [
+  generator.generate('gpt-6.1-sol', true),
+  generator.generate('gpt-6.1-terra', true),
+  generator.generate('gpt-6-astra', true),
+  generator.generate('gpt-6-sol', true),
   generator.generate('gpt-6-luna', true),
   generator.generate('claude-sonnet-5-5', true),
   generator.generate('claude-haiku-5-5', true),

@@ -21,13 +21,12 @@ export class AccountCallService {
     return this.http.get<AccountResponse>(`${this.provider.apiUrl}api/account/${entityId(id)}`).pipe(map(accountView));
   }
   deleteAccountById(id: number) { return this.http.delete<void>(`${this.provider.apiUrl}api/account/${entityId(id)}`); }
-  addRole(name: string) {
-    const body: RoleWriteRequest = {name};
+  addRole(body: RoleWriteRequest) {
     return this.http.post<MessageResponse>(`${this.provider.apiUrl}api/role`, body);
   }
   deleteRoleById(id: number) { return this.http.delete<MessageResponse>(`${this.provider.apiUrl}api/role/${entityId(id)}`); }
   updateRole(role: RoleWriteRequest) {
-    const body: RoleWriteRequest = {roleId: entityId(role.roleId), name: role.name};
+    const body: RoleWriteRequest = {roleId: entityId(role.roleId), name: role.name, code: role.code, description: role.description};
     return this.http.put<MessageResponse>(`${this.provider.apiUrl}api/role/${body.roleId}`, body);
   }
   addAccount(account: AccountWriteRequest) {

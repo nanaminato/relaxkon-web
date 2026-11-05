@@ -63,7 +63,7 @@ describe('Backend HTTP contracts', () => {
     const result = firstValueFrom(TestBed.inject(AccountCallService).getAccountById(2));
     const response: AccountResponse = {accountId: 2, username: null, email: null, userRoles: [{roleId: 1, name: null}]};
     http.expectOne('/backend/api/account/2').flush(response);
-    expect(await result).toEqual({accountId: 2, username: '', email: '', userRoles: [{roleId: 1, name: ''}]});
+    expect(await result).toEqual({accountId: 2, username: '', email: '', userRoles: [{roleId: 1, name: '', code: '', description: undefined, isSystem: undefined, memberCount: undefined}]});
     expect('password' in await result).toBeFalse();
   });
 

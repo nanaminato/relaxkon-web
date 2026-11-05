@@ -1,3 +1,4 @@
+import {NZ_CONFIG} from 'ng-zorro-antd/core/config';
 import {SyncEffects} from '../services/sync/sync.effects';
 import {provideAppTranslations} from './app-translations';
 import {localizationInterceptor} from '../systems/interceptors/localization.interceptor';
@@ -29,6 +30,7 @@ import {chatHistoryReducer} from "../systems/store/chat-history/chat-history.red
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    {provide: NZ_CONFIG, useValue: {message: {nzDuration: 4500, nzMaxStack: 3, nzPauseOnHover: true, nzTop: 24}}},
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes, withPreloading(PreloadAllModules)),
