@@ -1,201 +1,131 @@
-import type {ImageGenerationRequest, ImageResultResponse, ImageQuality} from '../../../contracts/media';
+import type {ImageGenerationRequest, ImageResultResponse, ImageOutputFormat, ImageQuality} from '../../../contracts/media';
 import {imageSource} from '../../../services/media-results';
 import {apiErrorMessage} from '../../../contracts/common';
 import {Component, inject} from '@angular/core';
-import {Gallery} from "../gallery/gallery";
-import {TranslateModule} from "@ngx-translate/core";
-import {GptImageCreateRequest, GptImageResponse, TaskImage, UrlImage} from "../../../models/images";
-import {NzButtonComponent} from "ng-zorro-antd/button";
-import {NzIconDirective} from "ng-zorro-antd/icon";
-import {MenuAbleService} from "../../../services/normal-services/menu-able.service";
-import {NzNotificationService} from "ng-zorro-antd/notification";
-import {UniversalService} from "../../../services/db-services/universal.service";
-import {AuthService, SendManagerService} from "../../../auth_module";
-import {FormsModule} from "@angular/forms";
-import {NzInputNumberComponent} from "ng-zorro-antd/input-number";
-import {NzSliderComponent} from "ng-zorro-antd/slider";
-import {NzInputDirective} from "ng-zorro-antd/input";
-import {OpenaiService} from "../../../services/fetch_services";
-import {NzOptionComponent, NzSelectComponent} from "ng-zorro-antd/select";
-import {LocalizationService, SizeReportService} from "../../../services/normal-services";
-import {NzWaveDirective} from "ng-zorro-antd/core/wave";
-import {CdkTextareaAutosize} from "@angular/cdk/text-field";
-import {GenerateTask} from "../../../models/media";
+import {RouterLink} from '@angular/router';
+import {FormsModule} from '@angular/forms';
+import {TranslateModule} from '@ngx-translate/core';
+import {Gallery} from '../gallery/gallery';
+import {UrlImage} from '../../../models/images';
+import {MenuAbleService} from '../../../services/normal-services/menu-able.service';
+import {UniversalService} from '../../../services/db-services/universal.service';
+import {AuthService, SendManagerService} from '../../../auth_module';
+import {OpenaiService} from '../../../services/fetch_services';
+import {LocalizationService, SizeReportService} from '../../../services/normal-services';
+import {GenerateTask} from '../../../models/media';
+import {imageCapabilities, imageModels, normalizeImageRequest} from './image-capabilities';
 
 @Component({
-  selector: 'app-dalle',
-  templateUrl: './gpt-image-create.component.html',
-  styleUrls: ['./gpt-image-create.component.scss'],
-  standalone: true,
-  imports: [
-    Gallery,
-    TranslateModule,
-    NzButtonComponent,
-    NzIconDirective,
-    FormsModule,
-    NzInputNumberComponent,
-    NzSliderComponent,
-    NzInputDirective,
-    NzSelectComponent,
-    NzOptionComponent,
-    NzWaveDirective,
-    CdkTextareaAutosize
-  ]
+  selector: 'app-dalle', standalone: true, imports: [Gallery, TranslateModule, FormsModule, RouterLink],
+  templateUrl: './gpt-image-create.component.html', styleUrls: ['./gpt-image-create.component.scss']
 })
-export class GptImageCreate{
-
-  constructor(private menuAbleService: MenuAbleService,
-              private notification: NzNotificationService,
-              private universalService: UniversalService,
-              private openaiService: OpenaiService,
-              private authService: AuthService,
-              private sendService: SendManagerService) {
-    this.menuAbleService.enableImage();
-
+export class GptImageCreate {
+  private readonly menuAbleService = inject(MenuAbleService);
+  private readonly universalService = inject(UniversalService);
+  private readonly openaiService = inject(OpenaiService);
+  private readonly authService = inject(AuthService);
+  private readonly sendService = inject(SendManagerService);
+  readonly sizeReportService = inject(SizeReportService);
+  private readonly localization = inject(LocalizationService);
+  constructor() { this.menuAbleService.enableImage(); }
+  readonly models = imageModels;
+  images: UrlImage[] = [];
+  loading = false;
+  savingHistory = false;
+  error = '';
+  historyWarning = '';
+  private retryRequest?: ImageGenerationRequest;
+  private pendingTask?: GenerateTask;
+  private localHistorySaved = false;
+  lastResult?: {model: string; count: number; size: string; format: string};
+  model = 'gpt-image-2.6-flare';
+  prompt = '';
+  image_num = 1;
+  size = 'auto';
+  quality: ImageQuality = 'auto';
+  background: NonNullable<ImageGenerationRequest['background']> = 'auto';
+  moderation: NonNullable<ImageGenerationRequest['moderation']> = 'auto';
+  output_format: ImageOutputFormat = 'png';
+  complexity: NonNullable<ImageGenerationRequest['complexity']> = 'medium';
+  output_compression = 100;
+  frame_count = 8;
+  frame_duration_ms = 100;
+  readonly backgrounds = ['auto', 'opaque', 'transparent'];
+  readonly moderations = ['auto', 'low'];
+  readonly complexities = ['low', 'medium', 'high'];
+  get caps() { return imageCapabilities(this.model); }
+  get sizes() { return this.output_format === 'gif' ? ['auto'] : this.caps.sizes; }
+  get qualities() { return this.caps.qualities; }
+  get output_formats() { return this.caps.formats; }
+  get image_num_max() { return this.output_format === 'svg' ? 1 : this.caps.maxCount; }
+  get busy() { return this.loading || this.savingHistory; }
+  get canGenerate() { return !this.busy && !!this.prompt.trim() && this.prompt.trim().length <= this.caps.promptLimit; }
+  get canRetryGeneration() { return !!this.retryRequest && !this.busy; }
+  modelChange() {
+    this.size = this.sizes.includes(this.size) ? this.size : this.sizes[0];
+    this.quality = this.qualities.includes(this.quality) ? this.quality : this.qualities[0];
+    this.output_format = this.output_formats.includes(this.output_format) ? this.output_format : 'png';
+    this.formatChange();
+    this.error = ''; this.retryRequest = undefined;
   }
-  images: UrlImage[] | undefined = [];
-  loading: boolean = false;
-  image_num: number = 1;
-  image_num_max: number = 1;
-  model: string = "dall-e-3";
-  prompt: string = "";
-  // n: number = 1; image_num
-  size: string = "1024x1024";
-  quality: ImageQuality = "standard";
-  style: NonNullable<ImageGenerationRequest['style']> = "vivid";
-  response_format: NonNullable<ImageGenerationRequest['response_format']> = "url";
-  background: NonNullable<ImageGenerationRequest['background']> = "auto";
-  moderation: NonNullable<ImageGenerationRequest['moderation']> = "auto";
-  output_format: NonNullable<ImageGenerationRequest['output_format']> = "png";
-
-  //gpt-image only
-  backgrounds: string[] = [
-    "transparent",
-    "opaque",
-    "auto"
-  ]
-  //gpt-image only
-  moderations: string[] = [
-    "low",
-    "auto"
-  ]
-  output_formats: string[] = [
-    "png","jpeg","webp"
-  ]
-  //dall3
-  qualities: ImageQuality[] = [
-    "hd","standard"
-  ];
-  image_response_formats: string[] = [
-    "url",
-    "b64_json"
-  ];
-  //dalle3
-  sizes: string[] = [
-    "1024x1024",
-    "1024x1792",
-    "1792x1024"
-  ];
-  //dall3
-  styles: string[] = [
-    "vivid","natural"
-  ];
-
+  formatChange() {
+    this.image_num = Math.min(this.image_num_max, Math.max(1, Math.round(Number.isFinite(this.image_num) ? this.image_num : 1)));
+    if (this.output_format === 'gif') this.size = 'auto';
+    if (!['png', 'webp'].includes(this.output_format) && this.background === 'transparent') this.background = 'auto';
+  }
+  useExample(key: string) { if (!this.busy) this.prompt = this.localization.text(key); }
   async generateImages() {
-    this.loading = true;
-    let result :GptImageResponse | undefined;
-    try{
-      let createRequest: GptImageCreateRequest = {
-        model: this.model,
-        prompt: this.prompt,
-        n: this.image_num,
-        size: this.size,
-        quality: this.quality,
-        moderation: this.moderation,
-        background: this.background,
-        output_format: this.output_format,
-        response_format: this.response_format,
-        style: this.style
-      };
-      if(createRequest.model!.startsWith("dall")){
-        result = await this.openaiService.dallImageCreate(createRequest);
-      }else{
-        result = await this.openaiService.gptImageCreate(createRequest);
+    if (!this.canGenerate) return;
+    const request = normalizeImageRequest({
+      model: this.model, prompt: this.prompt, n: this.image_num, size: this.size, quality: this.quality,
+      background: this.background,
+      moderation: this.moderation, output_format: this.output_format, complexity: this.complexity,
+      output_compression: this.output_compression, frame_count: this.frame_count, frame_duration_ms: this.frame_duration_ms
+    });
+    await this.generate(request);
+  }
+  async retryGeneration() { if (this.canRetryGeneration) await this.generate(this.retryRequest!); }
+  private async generate(request: ImageGenerationRequest) {
+    if (this.busy) return;
+    this.loading = true; this.error = ''; this.historyWarning = ''; this.retryRequest = undefined;
+    this.pendingTask = undefined; this.localHistorySaved = false;
+    const accountId = this.authService.user?.id;
+    try {
+      const result = await this.openaiService.gptImageCreate(request);
+      const format = result?.output_format ?? request.output_format ?? 'png';
+      const urls = (result?.data ?? []).map(image => imageSource(image, format)).filter(Boolean);
+      if (!urls.length) throw new Error(this.localization.text('imageWorkspace.noImages'));
+      this.images = urls.map(url => ({image_url: url, image_type: format}));
+      this.lastResult = {model: request.model!, count: urls.length, size: result?.size ?? request.size ?? 'auto', format};
+      if (accountId == null) { this.historyWarning = this.localization.text('imageWorkspace.historyUnavailable'); return; }
+      this.pendingTask = {task_id: crypto.randomUUID(), account_id: accountId, task_type: 'any => image', images: urls, date: new Date()};
+    } catch (error: unknown) {
+      const code = (error as {error?: {code?: string}})?.error?.code;
+      const keys: Record<string, string> = {invalid_image_option: 'imageWorkspace.invalidOptions', image_provider_busy: 'imageWorkspace.providerBusy', image_provider_rejected: 'imageWorkspace.providerRejected', image_provider_error: 'imageWorkspace.providerError'};
+      this.error = code && keys[code] ? this.localization.text(keys[code]) : error instanceof Error && error.message === this.localization.text('imageWorkspace.noImages') ? error.message : apiErrorMessage(error, this.localization.text('notifications.networkError'));
+      this.retryRequest = structuredClone(request);
+    } finally { this.loading = false; }
+    if (this.pendingTask) await this.retryHistory();
+  }
+  async retryHistory() {
+    if (!this.pendingTask || this.busy) return;
+    if (this.pendingTask.account_id !== this.authService.user?.id) {
+      this.historyWarning = this.localization.text('imageWorkspace.historyUnavailable'); return;
+    }
+    this.savingHistory = true;
+    try {
+      if (!this.localHistorySaved) {
+        await this.universalService.addOrUpdateGenerateTask(this.pendingTask);
+        this.localHistorySaved = true;
       }
-
-    }catch (e: unknown){
-      this.loading = false;
-      this.notification.error(this.localization.text('notifications.generationFailed'), apiErrorMessage(e, this.localization.text('notifications.networkError')))
-      return;
-    }
-    if(result===null||result.data===null ||result.data.length===0){
-      this.loading = false;
-      this.notification.error(this.localization.text('notifications.generationFailed'), '')
-      return;
-    }
-    this.loading = false;
-    const imageUrls = result.data.map(image => this.getImageUrl(image, result.output_format)).filter(Boolean);
-    if (!imageUrls.length) {
-      this.notification.error(this.localization.text('notifications.generationFailed'), '');
-      return;
-    }
-    this.images = imageUrls.map(url => ({image_url: url, image_url_ttl: '3600', image_type: 'any'}));
-    let task: GenerateTask = {
-      task_id: Date.now()+'',
-      account_id: this.authService.user!.id!,
-      task_type: "any => image",
-      images: imageUrls,
-      date: new Date(),
-    };
-    await this.universalService.addOrUpdateGenerateTask(task);
-    await this.sendService.sendTask(task)
+      await this.sendService.sendTask(this.pendingTask);
+      this.pendingTask = undefined; this.historyWarning = '';
+    } catch {
+      this.historyWarning = this.localization.text(this.localHistorySaved ? 'imageWorkspace.syncWarning' : 'imageWorkspace.saveWarning');
+    } finally { this.savingHistory = false; }
   }
-  sizeReportService: SizeReportService = inject(SizeReportService);
-  private localization = inject(LocalizationService);
-  menuVisible() {
-    return this.sizeReportService.menuVisible;
-  }
-
-  toggleMenu() {
-    this.sizeReportService.toggleMenu()
-  }
-  getImageUrl(image: ImageResultResponse, format?: string | null): string {
-    return imageSource(image, format ?? this.output_format);
-  }
-  //妯″瀷鍒囨崲
-  protected modelChange(event: string) {
-    if(this.model.startsWith("dall")){
-      if(this.model==="dall-e-3"){
-        this.sizes = [
-          "1024x1024",
-          "1024x1792",
-          "1792x1024"
-        ];
-        this.qualities = ["auto","hd","standard"];
-      }else if(this.model==="dall-e-2"){
-        this.sizes = [
-          "256x256",
-          "512x512",
-          "1024x1024"
-        ];
-        this.qualities = ["auto","standard"];
-      }
-    }else{
-      this.sizes = [
-        "1024x1024",
-        "1024x1536",
-        "1536x1024",
-        "auto"
-      ];
-      this.qualities = ["auto","high","medium","low"];
-    }
-    this.size = this.sizes[0];
-    this.quality = this.qualities[0];
-    if(this.model==="dall-e-3"){
-      this.image_num_max = 1;
-      this.image_num = 1;
-    }else{
-      this.image_num_max = 10;
-    }
-  }
+  get canRetryHistory() { return !!this.pendingTask && !this.busy; }
+  menuVisible() { return this.sizeReportService.menuVisible; }
+  toggleMenu() { this.sizeReportService.toggleMenu(); }
+  getImageUrl(image: ImageResultResponse, format?: string | null) { return imageSource(image, format ?? this.output_format); }
 }

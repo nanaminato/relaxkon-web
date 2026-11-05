@@ -1,17 +1,23 @@
-<div class="image-gallery w-100 h-100 overflow-auto">
-  @if(loading){
-    <div class="rounded-3 m-2 d-flex flex-row border-1 p-2">
-      {{'image.running' | translate}}
-      <nz-spin nzSimple></nz-spin>
-    </div>
+<div class="image-gallery" [attr.aria-busy]="loading">
+  @if (!images?.length) {
+    @if (loading) {
+      <div class="loading-art" aria-hidden="true"><div class="skeleton-frame"><span>✦</span></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+    } @else {
+      <div class="gallery-empty"><div class="empty-composition" aria-hidden="true"><span class="art-back"></span><span class="art-front"><svg viewBox="0 0 64 64" fill="none"><rect x="11" y="13" width="42" height="38" rx="6" stroke="currentColor" stroke-width="2"/><circle cx="24" cy="25" r="4" stroke="currentColor" stroke-width="2"/><path d="m13 43 13-12 9 8 7-6 10 10" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></span><span class="art-spark">✧</span></div><h3>{{'imageWorkspace.emptyTitle' | translate}}</h3><p>{{'imageWorkspace.emptyHint' | translate}}</p><div class="empty-formats"><span>PNG</span><span>WEBP</span><span>GIF</span><span>SVG</span></div></div>
+    }
   }
-  @if(!loading && !images?.length){<div class="studio-empty"><span class="empty-art" aria-hidden="true">✧</span><h3>{{ 'studioUi.imageEmpty' | translate }}</h3><p>{{ 'studioUi.imageEmptyHint' | translate }}</p></div>}
-  <div class="w-100 d-flex flex-wrap flex-row justify-content-evenly">
-    @for(image of images;track image){
-      <app-landscape class="image-wrapper"
-                     [ngClass]="{'full-width': images!.length === 1}"
-                     [loading]="loading" [src]="image.image_url" ></app-landscape>
+  @if (downloadError) { <p class="download-error" role="alert">{{'imageWorkspace.downloadError' | translate}}</p> }
+  <div class="result-grid" [class.single-result]="images?.length === 1">
+    @for (image of images; track image; let index = $index) {
+      <figure class="result-card">
+        @if (failed.has(image) || !source(image)) { <div class="failed-preview" role="status">{{'imageWorkspace.previewError' | translate}}</div> }
+        @else { <button class="preview-button" type="button" (click)="open(image, index)" [attr.aria-label]="'imageWorkspace.openImage' | translate: {number: index + 1}"><img [src]="source(image)" [alt]="'imageWorkspace.generatedImage' | translate: {number: index + 1}" loading="lazy" decoding="async" (error)="failed.add(image)"><span class="preview-affordance" aria-hidden="true">⤢</span></button> }
+        <figcaption><span><strong>{{'imageWorkspace.imageNumber' | translate: {number: index + 1} }}</strong><small>{{format(image)}}</small></span><button type="button" [disabled]="downloading.has(image) || !source(image)" (click)="download(image, index)" [attr.aria-label]="'imageWorkspace.downloadImage' | translate: {number: index + 1}">↓ <span>{{'imageWorkspace.download' | translate}}</span></button></figcaption>
+      </figure>
     }
   </div>
-
 </div>
+<dialog #viewer class="image-viewer" (close)="selected = undefined" [attr.aria-label]="'imageWorkspace.imagePreview' | translate">
+  <div class="viewer-toolbar"><strong>{{'imageWorkspace.imagePreview' | translate}}</strong><button type="button" (click)="close()" [attr.aria-label]="'imageWorkspace.close' | translate">×</button></div>
+  @if (selected) { <img [src]="source(selected)" [alt]="'imageWorkspace.generatedImage' | translate: {number: selectedIndex + 1}"><button class="viewer-download" type="button" [disabled]="downloading.has(selected)" (click)="download(selected, selectedIndex)">{{'imageWorkspace.download' | translate}}</button> }
+</dialog>

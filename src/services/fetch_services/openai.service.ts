@@ -19,9 +19,6 @@ export class OpenaiService {
   transcription(request: AudioTranscriptionRequest): Promise<AudioTextResponse> {
     return firstValueFrom(this.http.post<AudioTextResponse>(`${this.url}/whisper-transcription`, request));
   }
-  dallImageCreate(request: ImageGenerationRequest): Promise<ImageGenerationResponse> {
-    return firstValueFrom(this.http.post<ImageGenerationResponse>(`${this.url}/dall-e`, request));
-  }
   gptImageCreate(request: ImageGenerationRequest): Promise<ImageGenerationResponse> {
     return firstValueFrom(this.http.post<ImageGenerationResponse>(`${this.url}/gpt-image`, request));
   }

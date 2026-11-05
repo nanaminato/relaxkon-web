@@ -8,5 +8,4 @@ export type {DirectImage,UrlImage,ExtraImage} from "./direct-image";
 export type {NovitaTask} from "./novita-task";
 export type {TaskResult, TaskInfo,TaskVideo,TaskExtra,TaskImage} from "./task-result";
 export type {GptImageCreateRequest,GptImageResponse,ImageDataResult} from "./gpt-image"
-export type {APIMartImageItem, APIMartGPTImage2Data, APIMartGPTImage2Response, APIMartTaskError, APIMartGPTImage2Request, APIMartGPTImage2OfficialRequest} from './api-mart-gpt-image';
 export type {APIMartTaskResult, APIMartTaskResponse, APIMartTaskData} from './api-mart-task';

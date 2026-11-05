@@ -1,1 +1,0 @@
-export type {APIMartGPTImage2OfficialRequest, APIMartGPTImage2Request, APIMartTaskData as APIMartGPTImage2Data, APIMartTaskError, APIMartGenerationResponse as APIMartGPTImage2Response, APIMartImageItem} from '../../contracts/media';

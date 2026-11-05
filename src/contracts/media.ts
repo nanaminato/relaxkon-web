@@ -19,12 +19,14 @@ export interface AudioTextResponse {
   text: string; language: string | null; duration: number | null;
   segments: AudioSegmentResponse[] | null; words: AudioWordResponse[] | null;
 }
-export type ImageQuality = 'standard' | 'hd' | 'low' | 'medium' | 'high' | 'auto';
-export type ImageOutputFormat = 'png' | 'jpeg' | 'webp';
+export type ImageQuality = 'low' | 'medium' | 'high' | 'auto' | 'xhigh' | 'max';
+export type ImageOutputFormat = 'png' | 'jpeg' | 'webp' | 'gif' | 'svg';
 export interface ImageGenerationRequest {
   model?: string; prompt: string; n?: number; size?: string; quality?: ImageQuality | null;
   background?: 'transparent' | 'opaque' | 'auto' | null; moderation?: 'low' | 'auto' | null;
-  output_format?: ImageOutputFormat | null; response_format?: 'url' | 'b64_json'; style?: 'vivid' | 'natural' | null;
+  complexity?: 'low' | 'medium' | 'high' | null; output_compression?: number | null;
+  frame_count?: number | null; frame_duration_ms?: number | null;
+  output_format?: ImageOutputFormat | null;
 }
 export interface ImageResultResponse { url: string | null; b64_json: string | null; revised_prompt: string | null; }
 export interface ImageUsageResponse { input_tokens: number; output_tokens: number; total_tokens: number; }
@@ -32,17 +34,6 @@ export interface ImageGenerationResponse {
   created: number; data: ImageResultResponse[]; background: string | null;
   output_format: string | null; quality: string | null; size: string | null; usage: ImageUsageResponse | null;
 }
-export interface APIMartGPTImage2Request {
-  model?: string; prompt: string; n?: number; size?: string | null; resolution?: string | null;
-  image_urls?: string[] | null; official_fallback?: boolean;
-}
-export interface APIMartGPTImage2OfficialRequest extends Omit<APIMartGPTImage2Request, 'official_fallback'> {
-  quality?: string | null; background?: string | null; moderation?: string | null;
-  output_format?: string | null; mask_url?: string | null;
-}
-export interface APIMartTaskError { code: string; message: string; type: string; }
-export interface APIMartTaskData { status: string; task_id: string; }
-export interface APIMartGenerationResponse { code: number | null; data: APIMartTaskData[] | null; error: APIMartTaskError | null; }
 export interface APIMartImageItem { url: string[]; expires_at: number; }
 export interface APIMartTaskResult { images: APIMartImageItem[]; }
 export interface APIMartTaskDetail {

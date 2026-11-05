@@ -32,7 +32,7 @@ describe('Generated image contract', () => {
     ]});
   });
   it('displays and persists b64_json using output_format and sends the selected background', async () => {
-    const page = TestBed.inject(GptImageCreate); page.model = 'gpt-image-test'; page.prompt = 'image'; page.background = 'transparent';
+    const page = TestBed.inject(GptImageCreate); page.model = 'gpt-image-2.5-flare'; page.prompt = 'image'; page.background = 'transparent';
     await page.generateImages();
     expect(generate.calls.mostRecent().args[0].background).toBe('transparent');
     expect(page.images?.[0].image_url).toBe('data:image/jpeg;base64,AQID');
@@ -41,9 +41,39 @@ describe('Generated image contract', () => {
   });
   it('rejects nullable image results with neither a URL nor base64 instead of saving empty images', async () => {
     response.data = [{url: null, b64_json: null, revised_prompt: null}];
-    const page = TestBed.inject(GptImageCreate); page.model = 'gpt-image-test';
+    const page = TestBed.inject(GptImageCreate); page.model = 'gpt-image-2.5-flare'; page.prompt = 'image';
     await page.generateImages();
-    expect(save).not.toHaveBeenCalled(); expect(send).not.toHaveBeenCalled(); expect(error).toHaveBeenCalled();
+    expect(save).not.toHaveBeenCalled(); expect(send).not.toHaveBeenCalled(); expect(page.error).toBeTruthy();
+    expect(page.loading).toBeFalse();
+  });
+
+  it('keeps generated images when local history fails and retries saving without another generation', async () => {
+    const page = TestBed.inject(GptImageCreate); page.prompt = 'image';
+    save.and.rejectWith(new Error('quota'));
+    await page.generateImages();
+    expect(page.images.length).toBe(1); expect(page.error).toBe(''); expect(page.historyWarning).toBeTruthy();
+    expect(generate).toHaveBeenCalledTimes(1); expect(send).not.toHaveBeenCalled();
+    save.and.resolveTo();
+    await page.retryHistory();
+    expect(generate).toHaveBeenCalledTimes(1); expect(send).toHaveBeenCalledTimes(1); expect(page.historyWarning).toBe('');
+  });
+  it('retains saved local history on sync failure and retries without rewriting it', async () => {
+    const page = TestBed.inject(GptImageCreate); page.prompt = 'image';
+    send.and.rejectWith(new Error('offline'));
+    await page.generateImages();
+    expect(page.images.length).toBe(1); expect(page.historyWarning).toBeTruthy();
+    send.and.resolveTo();
+    await page.retryHistory();
+    expect(save).toHaveBeenCalledTimes(1); expect(generate).toHaveBeenCalledTimes(1); expect(send).toHaveBeenCalledTimes(2);
+  });
+  it('rejects empty prompts and prevents duplicate in-flight generation', async () => {
+    const page = TestBed.inject(GptImageCreate);
+    await page.generateImages(); expect(generate).not.toHaveBeenCalled();
+    let finish!: (value: ImageGenerationResponse) => void;
+    generate.and.returnValue(new Promise(resolve => finish = resolve));
+    page.prompt = 'image'; const running = page.generateImages(); await page.generateImages();
+    expect(generate).toHaveBeenCalledTimes(1);
+    finish(response); await running;
     expect(page.loading).toBeFalse();
   });
 });

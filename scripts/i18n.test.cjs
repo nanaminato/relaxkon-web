@@ -55,7 +55,7 @@ test('English translations contain no untranslated Chinese or Japanese text', ()
 test('image parameter option values have translated labels in every language', () => {
   const ts = require('typescript');
   const options = new Set(['backgrounds', 'moderations', 'qualities', 'styles', 'image_response_formats']);
-  for (const relative of ['gpt-image/gpt-image-create.component.ts', 'apimart-image/apimart-image.component.ts']) {
+  for (const relative of ['gpt-image/gpt-image-create.component.ts']) {
     const file = path.join(__dirname, '../src/pages/imageStudio', relative);
     const source = ts.createSourceFile(file, fs.readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true);
     function visit(node) {
