@@ -1,4 +1,23 @@
 {
+  "library": {
+    "eyebrow": "CREATIVE ARCHIVE",
+    "create": "Create artwork",
+    "total": "works",
+    "images": "images",
+    "collectionHint": "A home for every idea you bring to life",
+    "tools": "Library tools",
+    "search": "Search task ID or type",
+    "sort": "Sort order",
+    "newest": "Newest first",
+    "oldest": "Oldest first",
+    "noMatches": "No matching works",
+    "searchHint": "Try another keyword or clear the search to see all works.",
+    "emptyHint": "Your generated images and task records will appear here.",
+    "clearSearch": "Clear search",
+    "loadError": "Could not load your works. Please retry.",
+    "noPreview": "No image preview",
+    "imageCount": "{{count}} images"
+},
   "registrationEmail": {
     "label": "Email verification code",
     "placeholder": "Enter the 6-digit email code",

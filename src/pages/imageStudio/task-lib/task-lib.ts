@@ -1,14 +1,13 @@
+import {RouterLink} from '@angular/router';
 import {Component, inject, OnInit} from '@angular/core';
 import {GenerateTask} from "../../../models/media";
 import {UniversalService} from "../../../services/db-services/universal.service";
 import {AuthService, RequestManagerService, SendManagerService} from "../../../auth_module";
-import {NzCardComponent} from "ng-zorro-antd/card";
 import {TaskItem} from "./task-item/task-item";
 import {NzButtonComponent} from "ng-zorro-antd/button";
 import {NzNotificationService} from "ng-zorro-antd/notification";
 import {TranslateModule} from "@ngx-translate/core";
 import {NzIconDirective} from "ng-zorro-antd/icon";
-import {NzWaveDirective} from "ng-zorro-antd/core/wave";
 import {LocalizationService, SizeReportService} from "../../../services/normal-services";
 import {ImageTaskService} from "../../../services/fetch_services";
 import {NzSwitchComponent} from "ng-zorro-antd/switch";
@@ -26,12 +25,11 @@ import {NzColDirective} from "ng-zorro-antd/grid";
   styleUrls: ['./task-lib.scss'],
   standalone: true,
   imports: [
-    NzCardComponent,
+    RouterLink,
     TaskItem,
     NzButtonComponent,
     TranslateModule,
     NzIconDirective,
-    NzWaveDirective,
     NzSwitchComponent,
     FormsModule,
     NzTooltipDirective,
@@ -44,6 +42,17 @@ import {NzColDirective} from "ng-zorro-antd/grid";
 })
 export class TaskLib implements OnInit {
   generateTasks: GenerateTask[] = [];
+  search = '';
+  sortOrder = 'newest';
+  loading = false;
+  loadError = false;
+  get imageCount() { return this.generateTasks.reduce((count, task) => count + (task.images?.length ?? 0), 0); }
+  get visibleTasks() {
+    const query = this.search.trim().toLowerCase();
+    const timestamp = (task: GenerateTask) => { const value = task.date ? new Date(task.date).getTime() : 0; return Number.isFinite(value) ? value : 0; };
+    return this.generateTasks.filter(task => !query || `${task.task_id ?? ''} ${task.task_type ?? ''}`.toLowerCase().includes(query))
+      .sort((a, b) => this.sortOrder === 'oldest' ? timestamp(a) - timestamp(b) : timestamp(b) - timestamp(a));
+  }
   private sizeReportService = inject(SizeReportService);
   private universalService: UniversalService = inject(UniversalService);
   private authService: AuthService = inject(AuthService);
@@ -54,10 +63,14 @@ export class TaskLib implements OnInit {
   private localization = inject(LocalizationService);
 
   loadGenerateTasks(){
+    if (this.loading) return;
+    if (!this.authService.user) { this.loadError = true; return; }
+    this.loading = true;
+    this.loadError = false;
     this.universalService.getAllGenerateTaskOfUser(this.authService.user!.id).then(tasks=>{
       this.generateTasks.length = 0;
-      this.generateTasks.push(...(tasks as GenerateTask[]));
-      this.notification.success(this.localization.text('notifications.loadSuccess'), '');
+      this.generateTasks.push(...((tasks ?? []) as GenerateTask[]));
+
       let taskIds = [];
       if(tasks){
         for(let i = 0; i < tasks.length; i++){
@@ -68,7 +81,7 @@ export class TaskLib implements OnInit {
           }
         }
       }
-      this.requestService.fetchTasks(taskIds).then(tasks => {
+      return this.requestService.fetchTasks(taskIds).then(tasks => {
         if(tasks && tasks.length > 0){
           tasks.forEach(task => {
             this.universalService.addOrUpdateGenerateTask(task);
@@ -82,15 +95,15 @@ export class TaskLib implements OnInit {
           });
         }
       });
-    })
+    }).catch(() => { this.loadError = true; }).finally(() => { this.loading = false; });
   }
   ngOnInit() {
     this.loadGenerateTasks();
     this.loadProxySettings();
   }
 
-  awareDeleteItem($event: number) {
-    this.generateTasks.splice($event,1);
+  awareDeleteItem(taskId: string) {
+    this.generateTasks = this.generateTasks.filter(task => task.task_id !== taskId);
   }
 
   menuVisible() {

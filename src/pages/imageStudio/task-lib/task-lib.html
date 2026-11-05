@@ -1,32 +1,28 @@
-<div class="bg-theme text-theme w-100 h-100 d-flex flex-column">
-  <header class="studio-heading"><button nz-button type="button" (click)="toggleMenu()" [attr.aria-label]="'studioUi.menu' | translate" [attr.aria-expanded]="menuVisible()"><nz-icon nzType="menu-unfold" nzTheme="outline" /></button><div><h1>{{ 'universal.storeHouse' | translate }}</h1><p>{{ 'studioUi.libraryIntro' | translate }}</p></div></header>
-  <div class="studio-actions">
-    <button nz-button class="m-3 rounded-3" (click)="loadGenerateTasks()" >
-      {{'universal.reload'|translate}}
-    </button>
-    <button nz-button class="m-3 rounded-3" (click)="stopAllTask()" >
-      {{'image.stopAllTasks'|translate}}
-    </button>
-    <!-- 批量删除按钮 -->
-    <button nz-button class="m-3 rounded-3" nzDanger
-            (click)="openBatchDelete()"
-            [disabled]="generateTasks.length === 0">
-      <span nz-icon nzType="delete" nzTheme="outline"></span>
-      {{'image.batchDelete'|translate}}
-    </button>
-    <div class="m-3 rounded-3">
-      <label class="me-1" [nz-tooltip]="'image.proxyTip' | translate">{{ 'image.proxy' | translate }}</label>
-      <nz-switch  [(ngModel)]="useProxy" (ngModelChange)="changeProxySetting()"></nz-switch>
-    </div>
-  </div>
-  <nz-card class="rounded-3 tasks m-2 overflow-auto">
-    @if(generateTasks.length === 0){<div class="studio-empty">{{ 'studioUi.libraryEmpty' | translate }}</div>}
-    @for(task of generateTasks; track task){
-      <nz-card class="my-1">
-        <app-task-item [task]="task" [useProxy]="useProxy" [index]="$index" (delete)="awareDeleteItem($event)"></app-task-item>
-      </nz-card>
+<div class="library-page">
+  <header class="library-heading">
+    <div class="heading-main"><button nz-button class="menu-toggle" type="button" (click)="toggleMenu()" [attr.aria-label]="'studioUi.menu' | translate" [attr.aria-expanded]="menuVisible()"><nz-icon nzType="menu-unfold" nzTheme="outline" /></button><div><span class="eyebrow">{{'library.eyebrow' | translate}}</span><h1>{{'universal.storeHouse' | translate}}</h1><p>{{'studioUi.libraryIntro' | translate}}</p></div></div>
+    <a class="create-link" routerLink="/image-studio/APIMart-image">+ {{'library.create' | translate}}</a>
+  </header>
+  <div class="library-stats"><span><strong>{{generateTasks.length}}</strong> {{'library.total' | translate}}</span><span><strong>{{imageCount}}</strong> {{'library.images' | translate}}</span><span class="stats-note">{{'library.collectionHint' | translate}}</span></div>
+  <section class="library-toolbar" [attr.aria-label]="'library.tools' | translate">
+    <div class="search-control"><span aria-hidden="true">⌕</span><input type="search" [(ngModel)]="search" [placeholder]="'library.search' | translate" [attr.aria-label]="'library.search' | translate"></div>
+    <select [(ngModel)]="sortOrder" [attr.aria-label]="'library.sort' | translate"><option value="newest">{{'library.newest' | translate}}</option><option value="oldest">{{'library.oldest' | translate}}</option></select>
+    <div class="toolbar-actions"><button nz-button [disabled]="loading" (click)="loadGenerateTasks()">{{(loading ? 'featureAccess.loading' : 'universal.reload') | translate}}</button><button nz-button (click)="stopAllTask()">{{'image.stopAllTasks' | translate}}</button><button nz-button nzDanger (click)="openBatchDelete()" [disabled]="!generateTasks.length || loading">{{'image.batchDelete' | translate}}</button></div>
+    <label class="proxy-control"><span [nz-tooltip]="'image.proxyTip' | translate">{{'image.proxy' | translate}}</span><nz-switch [(ngModel)]="useProxy" (ngModelChange)="changeProxySetting()"></nz-switch></label>
+  </section>
+  @if (loadError) { <div class="load-error" role="alert">{{'library.loadError' | translate}} <button nz-button (click)="loadGenerateTasks()">{{'universal.reload' | translate}}</button></div> }
+  <section class="library-content" [attr.aria-busy]="loading">
+    @if (loading && !generateTasks.length) { <div class="library-empty" role="status"><span class="empty-art" aria-hidden="true">▧</span><p>{{'featureAccess.loading' | translate}}</p></div> }
+    @else {
+      @let tasks = visibleTasks;
+      @if (!tasks.length) { <div class="library-empty"><span class="empty-art" aria-hidden="true">▧</span><h2>{{(search.trim() ? 'library.noMatches' : 'studioUi.libraryEmpty') | translate}}</h2><p>{{(search.trim() ? 'library.searchHint' : 'library.emptyHint') | translate}}</p>@if(search.trim()){<button nz-button (click)="search = ''">{{'library.clearSearch' | translate}}</button>}@else{<a class="create-link" routerLink="/image-studio/APIMart-image">{{'library.create' | translate}} ↗</a>}</div> }
+      <div class="works-grid">
+        @for(task of tasks; track task.task_id) {
+          <app-task-item [task]="task" [useProxy]="useProxy" (delete)="awareDeleteItem($event)"></app-task-item>
+        }
+      </div>
     }
-  </nz-card>
+  </section>
 
   <!-- 批量删除对话框：列出所有任务，可多选 -->
   <nz-modal [(nzVisible)]="batchDeleteVisible"

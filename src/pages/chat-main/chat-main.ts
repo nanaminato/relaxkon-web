@@ -107,68 +107,61 @@ export class ChatMainComponent implements OnDestroy{
     }
   }
   async askGPT() {
-    if (this.answering || (this.inputText.trim() === '' && this.fileList.length === 0)) {
+    if (this.answering || (!this.inputText.trim() && !this.fileList.length)) return;
+    const selectedModel = this.config?.model?.modelValue;
+    if (!selectedModel) {
+      this.notification.warning(this.localization.text('workspace.selectModel'), '');
       return;
     }
-    if (this.chatHistoryModel === undefined) {
-      this.chatHistoryModel = new ChatHistoryModel();
-    }
+    if (!this.chatHistoryModel) this.chatHistoryModel = new ChatHistoryModel();
     this.answering = true;
-
     const version = this.draftVersion;
-    //构建请求文件列表
-    try { await this.buildFileList(); }
-    catch {
+    const prompt = this.inputText;
+    const uploads = [...this.fileList];
+    try {
+      const files = await Promise.all(uploads.map(file => this.readFile(file)));
+      if (version !== this.draftVersion) return;
+      const userModel = new ChatModel(UserRole, prompt, files, undefined, true, selectedModel);
+      if (!await this.parseAllFile(userModel)) {
+        if (version === this.draftVersion) {
+          this.answering = false;
+          this.notification.error(this.localization.text('notifications.fileParseFailed'), '');
+        }
+        return;
+      }
+      if (version !== this.draftVersion) return;
+      this.chatModels.push(userModel);
+      if (this.chatContext.pointer === undefined) {
+        this.chatContext.pointer = userModel.dataId;
+        this.awareContextChange();
+      }
+      const packet = this.resolveContext(this.chatContext.pointer);
+      const assistant = new ChatModel(AssistantRole, '', undefined, undefined, false, selectedModel);
+      assistant.reRandom();
+      this.chatModels.push(assistant);
+      this.followOutput = true;
+      this.scrollSubject = new Subject<boolean>();
+      this.scrollSubscribe();
+      this.nextSubscribe(true);
+      this.handleTitleWhenNewResponse(userModel);
+      // Consume only the submitted draft, preserving anything typed during preparation.
+      if (this.inputText === prompt) this.inputText = '';
+      this.fileList = this.fileList.filter(file => !uploads.includes(file));
+      this.chatFileList = [];
+      this.animalModel = assistant;
+      this.responseSubscription = this.subscriptionResponse(
+        this.modelFetchService.getFetchResponse(packet, selectedModel), assistant);
+    } catch {
       if (version !== this.draftVersion) return;
       this.answering = false;
-      this.notification.error(this.localization.text('management.saveFailed'), '');
-      return;
+      this.finalizeResponse();
+      this.notification.error(this.localization.text('chat-main.responseInterrupted'), '');
     }
-    if (version !== this.draftVersion) return;
-
-    // 添加用户请求
-
-    const randomId = Date.now()*1000 + Math.floor(Math.random() * 500) + 1;
-    const userModel = new ChatModel("user", this.inputText,
-      this.chatFileList, randomId,true,this.config!.model.modelValue);
-    this.chatModels.push(userModel);
-    let parseStatus = await this.parseAllFile(userModel);//!!!!!
-
-    if (version !== this.draftVersion) return;
-    if(!parseStatus){
-      this.answering = false;
-      return;
-    }
-    // 如果当前的上下文指针为空，就设置上一条为当前上下文的指针，该指针指示最后一条将要包含到上下文中的对话的id
-    if (this.chatContext.pointer === undefined) {
-      this.chatContext.pointer = userModel.dataId;
-      this.awareContextChange();
-    }
-    let fetchParam: ChatPacket
-      = this.resolveContext(this.chatContext.pointer,undefined);
-    // 添加返回的 聊天信息模型
-    const assistantModel = new ChatModel(AssistantRole);
-    assistantModel.finish = false;
-    assistantModel.reRandom();
-    assistantModel.model = this.config!.model.modelValue;
-    this.chatModels.push(assistantModel);
-    //  构建新的滚动 订阅
-    this.scrollSubject = new Subject<boolean>();
-    this.scrollSubscribe();
-    this.nextSubscribe(true);
-    // 如果当前的聊天历史模型的标题为空，说明使用的是刚创建的，还没有消息，存储到数据库，
-    // 设置nextSubjection为true表示将会推送一个新的历史记录
-    this.handleTitleWhenNewResponse(userModel);
-    this.inputText = '';// 清空输入框
-    let response: Observable<string> = this.modelFetchService.getFetchResponse(fetchParam);
-    // 订阅返回的数据
-    this.animalModel = assistantModel;
-    this.responseSubscription = this.subscriptionResponse(response,assistantModel);
   }
   handleTitleWhenNewResponse(model: ChatModel) {
     const history = this.chatHistoryModel!;
     if (!history.title) {
-      history.title = this.inputText.substring(0, 25) || this.chatFileList[0]?.fileName.substring(0, 25)
+      history.title = model.content.substring(0, 25) || model.fileList?.[0]?.fileName.substring(0, 25)
         || this.localization.text('chat-main.untitledConversation');
       const title = {dataId: history.dataId!, title: history.title, userId: history.userId};
       this.store.dispatch(historyTitleActions.newHistoryTitle({title}));
@@ -188,14 +181,6 @@ export class ChatMainComponent implements OnDestroy{
   // 一个相应的生命周期的结束，清空 文件列表，结束滚动订阅
   //
   finalizeResponse() {
-    this.fileList = []
-    this.chatFileList = []
-    for(let model of this.chatModels){
-      if(model.content===undefined||model.content.length===0){
-        model.content = this.localization.text('chat-main.responseStopped');
-      }
-      model.finish = true;
-    }
     this.scrollSubject?.complete();
     for (const subscription of this.responseHolder) subscription.unsubscribe();
     this.responseHolder = [];
@@ -226,6 +211,7 @@ export class ChatMainComponent implements OnDestroy{
   }
 
   ngOnDestroy(): void {
+    if (this.scrollTimer) clearTimeout(this.scrollTimer);
     this.draftVersion++;
     this.finalizeResponse();
     if (this.responseSubscription) {
@@ -249,7 +235,7 @@ export class ChatMainComponent implements OnDestroy{
   handlePromptKeydown(event: KeyboardEvent) {
     // Keep Enter available for multi-line prompts. Ctrl/Cmd + Enter works on
     // Windows, Linux, macOS and hardware keyboards connected to mobile.
-    if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+    if (!event.isComposing && event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
       event.preventDefault();
       this.typeControlGPT();
     }
@@ -257,6 +243,7 @@ export class ChatMainComponent implements OnDestroy{
 
   async buttonControlGPT() {
     if (this.answering) {
+      this.draftVersion++;
       this.answering = false;
       this.finalizeResponse();
     } else {
@@ -282,7 +269,7 @@ export class ChatMainComponent implements OnDestroy{
 
   set chatHistoryModel(value: ChatHistoryModel | undefined) {
     this._chatHistoryModel = value;
-    this.chatModels = this._chatHistoryModel?.chatList?.chatModel!;
+    this.chatModels = this._chatHistoryModel?.chatList?.chatModel ?? [];
   }
   chatModels: ChatModel[] = [];
   answering: boolean = false;
@@ -305,9 +292,8 @@ export class ChatMainComponent implements OnDestroy{
     let index = this.chatModels.findIndex(m=>m.dataId === id);
     for(let i = index+1;i<this.chatModels.length;i++){
       let model = this.chatModels[i];
-      if(model.role===AssistantRole){
-        return model;
-      }
+      if(model.role===UserRole || model.role===SystemRole) return undefined;
+      if(model.role===AssistantRole) return model;
     }
     return undefined;
   }
@@ -325,10 +311,18 @@ export class ChatMainComponent implements OnDestroy{
       this.notification.error(this.localization.text('notifications.operationNotAllowed'), this.localization.text('notifications.systemPromptCannotRegenerate'));
       return;
     }
-    let parseStatus = await this.parseAllFile(reModel);
+    const endPointerModel = this.findLatestTrueRequest($event);
+    if (!endPointerModel) {
+      this.notification.error(this.localization.text('notifications.contextMessageNotFound'), '');
+      return;
+    }
+    this.answering = true;
+    let parseStatus = await this.parseAllFile(endPointerModel);
     if (version !== this.draftVersion) return;
 
     if(!parseStatus){
+      this.answering = false;
+      this.notification.error(this.localization.text('notifications.fileParseFailed'), '');
       return;
     }
     let generateModel: ChatModel | undefined;
@@ -346,12 +340,6 @@ export class ChatMainComponent implements OnDestroy{
         this.chatModels.splice(index+1,0,generateModel);
       }
     }
-    // 向上查找 用户model，作为 聊天的完成对象
-    let endPointerModel = this.findLatestTrueRequest($event);
-    if(endPointerModel===undefined){
-      this.notification.error(this.localization.text('notifications.contextMessageNotFound'), '');
-      return;
-    }
     // 添加用户请求
     let back: number | undefined;
     // back 指针，是为了进行细粒度控制上下文引入的指针，
@@ -368,16 +356,24 @@ export class ChatMainComponent implements OnDestroy{
     generateModel!.finish = false;
     generateModel!.markAsChanged = true;
 
-    let response: Observable<string> = this.modelFetchService.getFetchResponse(
-      fetchParam,generateModel!.model);
-    // 订阅返回的数据
-    this.answering = true;
-    let animalSubscription = this.subscriptionResponse(response,generateModel!);
-    this.responseHolder.push(animalSubscription);
+    try {
+      const response = this.modelFetchService.getFetchResponse(fetchParam, generateModel!.model);
+      this.animalModel = generateModel;
+      this.followOutput = true;
+      this.scrollSubject = new Subject<boolean>();
+      this.scrollSubscribe();
+      this.responseSubscription = this.subscriptionResponse(response, generateModel!);
+    } catch {
+      generateModel!.finish = true;
+      this.answering = false;
+      this.finalizeResponse();
+      this.notification.error(this.localization.text('chat-main.responseInterrupted'), '');
+    }
   }
   @ViewChild('chatPanel') private chatPanel: ElementRef | undefined;
 
   clearContext() {
+    if (this.answering) return;
     this.chatContext.pointer = undefined;
     this.notification.success(this.localization.text('chat-main.clearContext'), this.localization.text('notifications.contextCleared'));
     this.awareContextChange();
@@ -441,6 +437,7 @@ export class ChatMainComponent implements OnDestroy{
       this.draftVersion++;
       this.answering = false;
       this.finalizeResponse();
+      if (this.isVisible) this.handleCancel();
       for (const subscription of this.responseHolder) subscription.unsubscribe();
       this.responseHolder = [];
       this.chatHistoryModel = this.session.draft(chatHistory);
@@ -470,16 +467,19 @@ export class ChatMainComponent implements OnDestroy{
     return new ChatPacket(messages, this.chatHistoryModel?.dataId?.toString());
   }
 
+  private followOutput = true;
+  private scrollTimer?: ReturnType<typeof setTimeout>;
+  onPanelScroll() {
+    const panel = this.chatPanel?.nativeElement;
+    if (panel) this.followOutput = panel.scrollHeight - panel.scrollTop - panel.clientHeight < 100;
+  }
   scrollToBottom(): void {
-    if (!this.chatPanel) return;
-    try {
-      setTimeout(()=>{
-        this.render.setProperty(this.chatPanel!.nativeElement, 'scrollTop', this.chatPanel!.nativeElement.scrollHeight);
-      },
-        200);
-    } catch (err) {
-      console.error(err);
-    }
+    if (!this.chatPanel || !this.followOutput || this.scrollTimer) return;
+    this.scrollTimer = setTimeout(() => {
+      this.scrollTimer = undefined;
+      const panel = this.chatPanel?.nativeElement;
+      if (panel && this.followOutput) this.render.setProperty(panel, 'scrollTop', panel.scrollHeight);
+    }, 16);
   }
   editModel: ChatModel | undefined;
   editBeforeModel: ChatModel | undefined;
@@ -491,12 +491,13 @@ export class ChatMainComponent implements OnDestroy{
     return new ChatModel(model2?.role,model2?.content,model2?.fileList,model2?.dataId,model2?.finish,model2?.model);
   }
   handleUserTask($event: UserTask) {
+    if (this.answering) return;
     switch ($event.task){
       case TaskType.edit:
         const i = this.chatHistoryModel?.chatList?.chatModel!.findIndex(item => item.dataId === $event.id);
-        if (i !== undefined) {
-          this.editModel = this.chatHistoryModel?.chatList?.chatModel![i];
-          this.editBeforeModel = this.cloneChatModel(this.editModel);
+        if (i !== undefined && i >= 0) {
+          this.editBeforeModel = this.chatHistoryModel?.chatList?.chatModel![i];
+          this.editModel = Object.assign(new ChatModel(), structuredClone(this.editBeforeModel));
           this.showModal();
         }
         break;
@@ -506,7 +507,7 @@ export class ChatMainComponent implements OnDestroy{
         break;
       case TaskType.delete:
         const index = this.chatHistoryModel?.chatList?.chatModel!.findIndex(item => item.dataId === $event.id);
-        if (index !== undefined) {
+        if (index !== undefined && index >= 0) {
           let model = this.chatHistoryModel?.chatList?.chatModel![index]!;
           if(model.role===SystemRole){
             this.chatContext.systems = this.chatContext.systems?.filter(si=>si.id!==model.dataId);
@@ -532,8 +533,8 @@ export class ChatMainComponent implements OnDestroy{
     if(this.editModel===undefined || this.editBeforeModel===undefined) return;
     if(this.editBeforeModel?.content!==this.editModel?.content){
       this.editModel!.markAsChanged = true;
-      console.log(this.notifyChatHistoryIdentifier)
-      this.sendManagerService.updateMessage(this.chatHistoryModel!.dataId!,this.editModel! as ChatInterface);
+      Object.assign(this.editBeforeModel, this.editModel);
+      this.sendManagerService.updateMessage(this.chatHistoryModel!.dataId!,this.editBeforeModel! as ChatInterface);
       this.syncHistorySession()
     }
     this.handleFinalization();

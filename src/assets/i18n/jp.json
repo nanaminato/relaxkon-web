@@ -1,4 +1,23 @@
 {
+  "library": {
+    "eyebrow": "制作アーカイブ",
+    "create": "制作を始める",
+    "total": "件の作品",
+    "images": "枚の画像",
+    "collectionHint": "ひらめきを形にした作品をまとめて保存",
+    "tools": "作品管理ツール",
+    "search": "タスク ID・種類で検索",
+    "sort": "並び順",
+    "newest": "新しい順",
+    "oldest": "古い順",
+    "noMatches": "一致する作品がありません",
+    "searchHint": "キーワードを変えるか、検索を解除してください。",
+    "emptyHint": "生成した画像やタスクの記録がここに表示されます。",
+    "clearSearch": "検索を解除",
+    "loadError": "作品を読み込めませんでした。再試行してください。",
+    "noPreview": "プレビュー画像がありません",
+    "imageCount": "{{count}} 枚の画像"
+},
   "registrationEmail": {
     "label": "メール確認コード",
     "placeholder": "6桁のメール確認コードを入力",

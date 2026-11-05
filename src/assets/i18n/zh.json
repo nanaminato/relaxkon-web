@@ -1,4 +1,23 @@
 {
+  "library": {
+    "eyebrow": "创作档案",
+    "create": "开始创作",
+    "total": "个作品",
+    "images": "张图像",
+    "collectionHint": "收藏每一次灵感的落地",
+    "tools": "作品管理工具",
+    "search": "搜索任务编号或类型",
+    "sort": "排序方式",
+    "newest": "最新优先",
+    "oldest": "最早优先",
+    "noMatches": "没有找到匹配的作品",
+    "searchHint": "试试其他关键词，或清除搜索查看全部作品。",
+    "emptyHint": "生成的图像与任务记录会汇集在这里。",
+    "clearSearch": "清除搜索",
+    "loadError": "作品加载失败，请重试。",
+    "noPreview": "暂无可预览图像",
+    "imageCount": "{{count}} 张图像"
+},
   "registrationEmail": {
     "label": "邮箱验证码",
     "placeholder": "请输入 6 位邮箱验证码",

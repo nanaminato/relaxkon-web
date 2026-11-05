@@ -2,12 +2,12 @@
 <div class="d-flex flex-row">
   <nz-select nzId="chat-model-select" class="select"
              [nzPlaceHolder]="(chatStreamChildren.length ? 'workspace.selectModel' : 'workspace.noModels') | translate"
-             [nzDisabled]="!chatStreamChildren.length"
+             [nzDisabled]="disabled || !chatStreamChildren.length"
              [attr.aria-label]="'workspace.selectModel' | translate"
-             [(ngModel)]="model" nzMode="default"
+             [(ngModel)]="model" [compareWith]="compareModels" nzMode="default"
              (ngModelChange)="onSelectChange()">
     <nz-option-group [nzLabel]="'workspace.chatModels' | translate">
-      @for (chat of chatStreamChildren; track chat) {
+      @for (chat of chatStreamChildren; track chat.modelName) {
         <nz-option [nzLabel]="chat.modelName" [nzValue]="chat" >
         </nz-option>
       }

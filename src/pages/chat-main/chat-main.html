@@ -34,7 +34,7 @@
     <div class="chat-title"><strong>{{'universal.aiChat' | translate}}</strong><span>{{'workspace.chatSubtitle' | translate}}</span></div>
     <app-language-switcher></app-language-switcher>
   </div>
-  <div class="messages" #chatPanel>
+  <div class="messages" #chatPanel (scroll)="onPanelScroll()">
     @if (showLogo()) {
       <ng-container *ngTemplateOutlet="logo"></ng-container>
     } @else {
@@ -55,7 +55,7 @@
         <!-- 模型选择：移到选择文件的左边 -->
         <div class="model-row align-self-start">
           @defer (on immediate) {
-            <app-model-selector></app-model-selector>
+            <app-model-selector [disabled]="answering"></app-model-selector>
           } @placeholder (minimum 100ms){
             <select></select>
           }
@@ -63,6 +63,7 @@
         <div class="select-box rounded-4">
           <nz-upload class="flex-grow-0 rounded-2"
                      [nzMultiple]="true"
+                     [nzDisabled]="answering"
                      [(nzFileList)]="fileList"
                      [nzBeforeUpload]="beforeUpload">
             <button nz-button class="bg-theme2 text-theme2">
@@ -73,7 +74,7 @@
         </div>
         <div class="tools align-items-start">
           <button type="button" class="text-theme2 border-1 border-theme2 bg-theme2 rounded-2"
-                  (click)="clearContext()"
+                  (click)="clearContext()" [disabled]="answering"
                   nz-tooltip [nzTooltipTitle]="'chat-main.clearContext' | translate" [attr.aria-label]="'chat-main.clearContext' | translate">
             <img src="assets/svgs/clear.svg" width="30" height="20" [alt]="'chat-main.clear' | translate ">
           </button>

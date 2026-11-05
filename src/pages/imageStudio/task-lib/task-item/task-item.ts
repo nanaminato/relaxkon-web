@@ -1,7 +1,7 @@
+import {DatePipe} from '@angular/common';
 import {AuthenticatedImage} from '../../../../shared/authenticated-image';
 import {Component, EventEmitter, inject, input, Input, Output} from '@angular/core';
 import {GenerateTask} from "../../../../models/media";
-import {NzColDirective} from "ng-zorro-antd/grid";
 import {NzButtonComponent} from "ng-zorro-antd/button";
 import {NzPopconfirmDirective} from "ng-zorro-antd/popconfirm";
 import {UniversalService} from "../../../../services/db-services/universal.service";
@@ -18,7 +18,7 @@ import {LocalizationService} from '../../../../services/normal-services';
   standalone: true,
   imports: [
     AuthenticatedImage,
-    NzColDirective,
+    DatePipe,
     NzButtonComponent,
     NzPopconfirmDirective,
     TranslateModule
@@ -30,10 +30,8 @@ export class TaskItem {
   private apiMartService: ApimartService = inject(ApimartService)
   private sendService: SendManagerService = inject(SendManagerService)
   private localization = inject(LocalizationService)
-  @Input()
-  index: number | undefined;
   @Output()
-  delete = new EventEmitter<number>();
+  delete = new EventEmitter<string>();
   useProxy = input(false);
   @Input() task: GenerateTask | undefined;
   recheck_task_status(task: GenerateTask) {
@@ -68,7 +66,7 @@ export class TaskItem {
       this.universalService.deleteGenerateTask(task).then(c=>{
         this.notification.success(msg,"")
       });
-      this.delete.emit(this.index);
+      this.delete.emit(task.task_id!);
     })
   }
   getFormat(taskType?: string) {
