@@ -19,8 +19,7 @@ const routes: Routes = [
       },
       {
         path: 'APIMart-image',
-        pathMatch: 'full',
-        redirectTo: 'gpt-image',
+        loadComponent: () => import('./apimart-image/apimart-image.component').then(m => m.APIMartImage),
       },
       {
         path: "task-lib",

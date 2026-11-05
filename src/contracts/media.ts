@@ -39,5 +39,23 @@ export interface APIMartTaskResult { images: APIMartImageItem[]; }
 export interface APIMartTaskDetail {
   id: string; status: string; progress: number; result: APIMartTaskResult | null;
   created: number; completed: number; estimated_time: number; actual_time: number;
+  error?: {code?: string | number; message?: string; type?: string} | null;
+  cost?: number; credits_cost?: number;
+  usage?: ImageUsageResponse & {svg_usage?: {model: string; input_tokens: number; output_tokens: number; reasoning_tokens: number}};
 }
 export interface APIMartTaskResponse { code: number; data: APIMartTaskDetail | null; }
+
+export type APIMartImageModel = 'gpt-image-2.5-flare' | 'gpt-image-2.5-sunburst' | 'gpt-image-2.6-flare' | 'gpt-image-2.6-sunburst' | 'gpt-image-2.5-ext' | 'gpt-image-2.6-ext';
+export interface APIMartImageGenerationRequest {
+  model: APIMartImageModel; prompt: string; n: number; idempotency_key: string;
+  size?: string; resolution?: string; version?: 'flare' | 'sunburst'; quality?: ImageQuality;
+  output_format?: ImageOutputFormat; output_compression?: number; background?: 'auto' | 'opaque' | 'transparent';
+  moderation?: 'auto' | 'low'; complexity?: 'low' | 'medium' | 'high';
+  image_urls?: string[]; mask_url?: string; markup_url?: string;
+  frame_count?: number; frame_duration_ms?: number; svg?: {model: string; reasoning?: {effort: string}};
+}
+export interface APIMartSubmissionResponse {
+  code?: number; request_id?: string;
+  data?: {task_id?: string; status?: string}[] | {id?: string; status?: string; progress?: number; poll_url?: string} | null;
+  error?: {code?: string | number; message?: string; type?: string} | null;
+}

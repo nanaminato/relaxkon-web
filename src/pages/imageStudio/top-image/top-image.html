@@ -19,6 +19,7 @@
 
         <div class="d-flex flex-column p-3">
           <button class="m-2 rounded-2" (click)="closeMenuIfCompact()" nz-button routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/image-studio/gpt-image']">{{'workspace.openaiImage' | translate}}</button>
+          <button class="m-2 rounded-2" (click)="closeMenuIfCompact()" nz-button routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/image-studio/APIMart-image']">{{'apimartStudio.nav' | translate}}</button>
           <button class="m-2 rounded-2" (click)="closeMenuIfCompact()" nz-button routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/image-studio/task-lib']">{{'universal.storeHouse'| translate}}</button>
         </div>
       </div>
