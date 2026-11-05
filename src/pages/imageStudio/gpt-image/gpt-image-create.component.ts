@@ -101,7 +101,7 @@ export class GptImageCreate {
       this.pendingTask = {task_id: crypto.randomUUID(), account_id: accountId, task_type: 'any => image', images: urls, date: new Date()};
     } catch (error: unknown) {
       const code = (error as {error?: {code?: string}})?.error?.code;
-      const keys: Record<string, string> = {invalid_image_option: 'imageWorkspace.invalidOptions', image_provider_busy: 'imageWorkspace.providerBusy', image_provider_rejected: 'imageWorkspace.providerRejected', image_provider_error: 'imageWorkspace.providerError'};
+      const keys: Record<string, string> = {image_route_unavailable: 'imageWorkspace.routeUnavailable', invalid_image_option: 'imageWorkspace.invalidOptions', image_provider_busy: 'imageWorkspace.providerBusy', image_provider_rejected: 'imageWorkspace.providerRejected', image_provider_error: 'imageWorkspace.providerError'};
       this.error = code && keys[code] ? this.localization.text(keys[code]) : error instanceof Error && error.message === this.localization.text('imageWorkspace.noImages') ? error.message : apiErrorMessage(error, this.localization.text('notifications.networkError'));
       this.retryRequest = structuredClone(request);
     } finally { this.loading = false; }

@@ -770,6 +770,7 @@
     "account_already_exists": "此账户已存在。"
   },
   "imageWorkspace": {
+    "routeUnavailable": "当前模型没有可用的 OpenAI 类型图像生成路由。请联系管理员添加或启用支持该模型的 Key；APIMart 类型 Key 请使用 APIMart 图像入口。",
     "eyebrow": "图像创作空间",
     "intro": "让想法成为画面，需要时再细调每一处细节。",
     "history": "生成记录",

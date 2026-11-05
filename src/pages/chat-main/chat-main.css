@@ -23,3 +23,5 @@ h1{font-size:30px;color:inherit}
 .send-muted{opacity:.45}
 .notice{justify-content:center;padding:10px 20px 16px;text-align:center}
 @media(max-width:600px){.topbar{min-height:64px;padding:12px 16px!important}.chat-title span,.starters small{display:none}h1{font-size:24px}.starters{gap:8px}.starters button{padding:12px 8px}.composer{width:calc(100% - 24px)}}
+
+.tools button, .send-button { display:inline-flex; align-items:center; justify-content:center; box-sizing:border-box; padding:0; line-height:1; flex-shrink:0; }

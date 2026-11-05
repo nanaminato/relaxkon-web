@@ -151,7 +151,7 @@ button, [role="button"] {
 .ant-modal-header { padding:22px 24px 18px; border-radius:18px 18px 0 0; border-bottom:1px solid var(--app-border, #e2e8f0); background:transparent; }
 .ant-modal-title { padding-right:28px; font-size:17px; font-weight:650; color:var(--app-text, #172033); }
 .ant-modal-close { top:12px; right:12px; color:var(--app-text-muted, #64748b); border-radius:9px; }
-.ant-modal-close-x { width:36px; height:36px; line-height:36px; font-size:14px; }
+.ant-modal-close-x { display:flex; align-items:center; justify-content:center; box-sizing:border-box; width:36px; height:36px; padding:0; line-height:1; font-size:14px; }
 .ant-modal-close:hover { color:var(--app-text, #172033); background:var(--app-hover, #f1f5f9); }
 .ant-modal-body { padding:24px; max-height:calc(100dvh - 240px); overflow-y:auto; overscroll-behavior:contain; }
 .ant-modal-footer { padding:16px 24px; border-top:1px solid var(--app-border, #e2e8f0); }

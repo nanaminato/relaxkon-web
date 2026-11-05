@@ -770,6 +770,7 @@
     "account_already_exists": "This account already exists."
   },
   "imageWorkspace": {
+    "routeUnavailable": "No OpenAI-type image route is available for this model. Ask an administrator to add or enable a compatible key. Use the APIMart image page for APIMart keys.",
     "eyebrow": "IMAGE WORKSPACE",
     "intro": "Turn an idea into an image. Fine-tune the details when you need to.",
     "history": "Image history",

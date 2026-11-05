@@ -770,6 +770,7 @@
     "account_already_exists": "このアカウントは既に存在します。"
   },
   "imageWorkspace": {
+    "routeUnavailable": "このモデルで利用できる OpenAI タイプの画像生成ルートがありません。管理者に対応キーの追加・有効化を依頼してください。APIMart キーは APIMart 画像ページで使用してください。",
     "eyebrow": "画像ワークスペース",
     "intro": "アイデアを画像に。必要に応じて細部まで調整できます。",
     "history": "生成履歴",
