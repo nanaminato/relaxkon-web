@@ -1,4 +1,4 @@
-// 与后端 Turbo.Auth.Application.Providers.HandlerType 保持一致，
+// 与后端 RelaxKon.Auth.Application.Providers.HandlerType 保持一致，
 // 不可随意改动顺序（数据库中的 SupplierKey.RequestIdentifier 与之一一对应）。
 export enum HandlerType {
   Openai = 0,
@@ -17,7 +17,7 @@ export interface ProviderDefinition {
   supportsChat: boolean;
 }
 
-// 镜像后端 Turbo.Auth.Application.Providers.ProviderCatalog.All。
+// 镜像后端 RelaxKon.Auth.Application.Providers.ProviderCatalog.All。
 // 当后端新增供应商时，请同步补全此列表。
 export const providerCatalog: ProviderDefinition[] = [
   { type: HandlerType.Openai,    displayName: 'OpenAI',   supportsChat: true  },

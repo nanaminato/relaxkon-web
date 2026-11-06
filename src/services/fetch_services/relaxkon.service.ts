@@ -15,7 +15,7 @@ import {retryAfterMs, retryAfterSeconds} from '../retry-after';
 @Injectable({
   providedIn: "root"
 })
-export class TurboService {
+export class RelaxKonService {
   provider = inject(ServiceProvider);
   get baseUrl(): string {
     return `${this.provider.apiUrl ?? ''}api/ai`;

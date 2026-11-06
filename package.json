@@ -67,5 +67,5 @@
     "typescript": "~5.9.2",
     "typescript-eslint": "^8.72.1"
   },
-  "description": "Relaxkon web application with user chat and administration"
+  "description": "RelaxKon web application with user chat and administration"
 }

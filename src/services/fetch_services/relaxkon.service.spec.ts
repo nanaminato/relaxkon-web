@@ -4,7 +4,7 @@ import {of, toArray, firstValueFrom, Subject} from 'rxjs';
 import {AuthService} from '../../auth_module';
 import {ServiceProvider} from '../../roots';
 import {LocalizationService} from '../normal-services/localization.service';
-import {TurboService} from './turbo.service';
+import {RelaxKonService} from './relaxkon.service';
 import {ChatHistoryModel, ChatPacket} from '../../models';
 import {ErrorType} from '../../errors';
 
@@ -16,7 +16,7 @@ describe('Multilingual chat streaming', () => {
       {provide: AuthService, useValue: {token: 'test'}},
       {provide: LocalizationService, useValue: {requestLanguage: 'en'}}
     ]});
-    const service = TestBed.inject(TurboService);
+    const service = TestBed.inject(RelaxKonService);
     const history = new ChatHistoryModel();
     const restored = Object.assign(new ChatHistoryModel(), structuredClone(history));
     const send = spyOn(service, 'fetchChatBase').and.returnValue(of(''));
@@ -36,7 +36,7 @@ describe('Multilingual chat streaming', () => {
         {provide: LocalizationService, useValue: {requestLanguage: 'zh'}}
       ]});
       spyOn(window, 'fetch').and.resolveTo(new Response(JSON.stringify({code}), {status}));
-      await expectAsync(firstValueFrom(TestBed.inject(TurboService).fetchChatBase('/api/ai/chat',
+      await expectAsync(firstValueFrom(TestBed.inject(RelaxKonService).fetchChatBase('/api/ai/chat',
         {model: 'test', messages: []}))).toBeRejectedWith(jasmine.objectContaining({status, code}));
     });
   }
@@ -47,7 +47,7 @@ describe('Multilingual chat streaming', () => {
       {provide: AuthService, useValue: {token: 'test'}},
       {provide: LocalizationService, useValue: {requestLanguage: 'ja'}}
     ]});
-    const service = TestBed.inject(TurboService);
+    const service = TestBed.inject(RelaxKonService);
     service.config = {
       model: {modelValue: 'gpt-5', vision: true},
       chatConfiguration: {temperature: 0.6, top_p: 0.6, max_completion_tokens: 4000,
@@ -75,7 +75,7 @@ describe('Multilingual chat streaming', () => {
       controller.close();
     }});
     const fetchSpy = spyOn(window, 'fetch').and.resolveTo(new Response(stream, {headers: {'Content-Type': 'text/event-stream'}}));
-    const chunks = await firstValueFrom(TestBed.inject(TurboService).fetchChatBase('/api/ai/chat', {model: 'test', messages: [{role: 'user', content: 'hello'}]}).pipe(toArray()));
+    const chunks = await firstValueFrom(TestBed.inject(RelaxKonService).fetchChatBase('/api/ai/chat', {model: 'test', messages: [{role: 'user', content: 'hello'}]}).pipe(toArray()));
     expect(chunks.join('')).toBe(text);
     expect((fetchSpy.calls.mostRecent().args[1]?.headers as Record<string, string>)['Accept-Language']).toBe('ja');
   });  it('does not restart a cancelled chat after token refresh completes', async () => {
@@ -88,7 +88,7 @@ describe('Multilingual chat streaming', () => {
       {provide: LocalizationService, useValue: {requestLanguage: 'en'}}
     ]});
     const fetchSpy = spyOn(window, 'fetch').and.resolveTo(new Response('', {status: 401}));
-    const subscription = TestBed.inject(TurboService).fetchChatBase('/api/ai/chat', {model: 'test', messages: [{role: 'user', content: 'hello'}]}).subscribe();
+    const subscription = TestBed.inject(RelaxKonService).fetchChatBase('/api/ai/chat', {model: 'test', messages: [{role: 'user', content: 'hello'}]}).subscribe();
     await new Promise(resolve => setTimeout(resolve, 0));
     expect(auth.refreshAccessToken).toHaveBeenCalled();
     subscription.unsubscribe();
@@ -101,7 +101,7 @@ describe('Multilingual chat streaming', () => {
 });
 
 describe('Chat throttling without automatic generation replay', () => {
-  let service: TurboService;
+  let service: RelaxKonService;
   let auth: {token: string; user: {id: number}; refreshToken?: string; refreshAccessToken?: jasmine.Spy};
   const body = {model: 'test', messages: []};
   const completed = () => new Response('data: {"type":"delta","text":"done"}\n\ndata: {"type":"completed"}\n\n',
@@ -114,9 +114,9 @@ describe('Chat throttling without automatic generation replay', () => {
       {provide: AuthService, useValue: auth},
       {provide: LocalizationService, useValue: {requestLanguage: 'en'}}
     ]});
-    service = TestBed.inject(TurboService);
+    service = TestBed.inject(RelaxKonService);
   });
-  const send = (service: TurboService) => firstValueFrom(service.fetchChatBase('/api/ai/chat', body));
+  const send = (service: RelaxKonService) => firstValueFrom(service.fetchChatBase('/api/ai/chat', body));
 
   it('preserves Retry-After, blocks early manual repeats and allows an explicit attempt after expiry', async () => {
     const now = spyOn(Date, 'now').and.returnValue(100000);

@@ -4,7 +4,7 @@
 
 - `systems/store`：持久化配置、历史标题、会话和提示词的不可变快照。页面不能直接修改 selector 返回的对象。
 - `services/chat/chat-session.facade.ts`：组件作用域的可变聊天草稿、固定请求身份与完成/取消后的保存。页面继续负责输入、文件解析、上下文选择和展示；响应保存由 facade 协调。
-- `services/chat/chat-stream.ts`：SSE 分片解码及显式完成校验；传输代码仍由 `TurboService` 处理认证与取消。
+- `services/chat/chat-stream.ts`：SSE 分片解码及显式完成校验；传输代码仍由 `RelaxKonService` 处理认证与取消。
 - `services/sync`：同步协议、持久化队列、重试与本地合并。`SyncEffects` 将已提交的本地结果发布为 Store 快照，`SyncStatus` 显示等待或重试状态。
 - `services/db-services`：统一 IndexedDB 就绪 Promise、原子会话保存和账户/会话隔离。聊天数据库 v4 保留旧存储用于升级追溯。
 - `auth_module`：认证；原 Request/Send 管理器路径保留兼容入口，写同步实现位于 `services/sync`。

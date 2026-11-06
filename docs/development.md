@@ -3,7 +3,7 @@
 ## 前置条件
 
 - 使用与 Angular 21 兼容的 Node.js LTS 版本和 npm。
-- 一个本地或测试环境的 Relaxkon Server；不要连接生产数据库或使用生产供应商密钥进行日常开发。
+- 一个本地或测试环境的 RelaxKon Server；不要连接生产数据库或使用生产供应商密钥进行日常开发。
 
 ## 安装与运行
 
@@ -39,7 +39,7 @@ npm run test:migration
 npm test
 ```
 
-构建产物继续位于 `dist/app/browser/`（保留原路径以兼容部署脚本）。将其中浏览器产物部署到 Relaxkon Server 的 `src/Turbo.Auth/wwwroot`，或部署到等价的静态站点根目录。服务端会将非文件请求回退到应用入口，因此聊天、图像、多媒体与合并后的管理页面均使用同一套前端资源。
+构建产物继续位于 `dist/app/browser/`（保留原路径以兼容部署脚本）。将其中浏览器产物部署到 RelaxKon Server 的 `src/RelaxKon.Auth/wwwroot`，或部署到等价的静态站点根目录。服务端会将非文件请求回退到应用入口，因此聊天、图像、多媒体与合并后的管理页面均使用同一套前端资源。
 
 ## 项目结构
 
@@ -110,7 +110,7 @@ Mermaid 在聊天组件实例化后异步加载，加载失败时仍显示可读
 
 ## 仓库与部署更名
 
-项目名称为 `relaxkon-web`，包含用户界面与管理后台。Angular 工作区目标 `app`、构建输出目录、同源 API 根地址、浏览器数据库与配置导入格式继续保留。改名不是更换域名或重建数据库。详见 [安全迁移指南](relaxkon-migration.md)。
+项目名称为 `relaxkon-web`，包含用户界面与管理后台。Angular 工作区项目名为 `relaxkon-web`，构建输出目录、同源 API 根地址、浏览器数据库与配置导入格式继续保留。改名不是更换域名或重建数据库。详见 [安全迁移指南](relaxkon-migration.md)。
 
 GitHub Actions 的前端检查运行类型检查、国际化检查、迁移回归、ChromeHeadless 测试与生产构建，不自动部署。`npm run lint` 使用 Angular 21、ESLint 10 的 flat config；现有构造器注入和公共输出事件命名仅告警，不为更名批量修改业务 API。
 

@@ -1,4 +1,4 @@
-name: Relaxkon Web CI
+name: RelaxKon Web CI
 
 on:
   push:

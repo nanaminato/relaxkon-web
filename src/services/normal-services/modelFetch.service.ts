@@ -1,6 +1,6 @@
 import {inject, Injectable} from "@angular/core";
 import {Observable} from "rxjs";
-import {TurboService} from "../fetch_services";
+import {RelaxKonService} from "../fetch_services";
 import {AuthService} from "../../auth_module";
 import {ChatPacket} from "../../models";
 
@@ -8,12 +8,12 @@ import {ChatPacket} from "../../models";
   providedIn: "root",
 })
 export class ModelFetchService{
-  turboService: TurboService = inject(TurboService);
+  relaxKonService: RelaxKonService = inject(RelaxKonService);
   public getFetchResponse(
                           param:  ChatPacket,
                           model?: string){
     let subject: Observable<string>;
-    subject = this.turboService.fetchChat(param as ChatPacket,model);
+    subject = this.relaxKonService.fetchChat(param as ChatPacket,model);
     return subject!;
   }
 }

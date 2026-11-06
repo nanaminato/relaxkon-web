@@ -1,17 +1,17 @@
-# Relaxkon Web 安全迁移
+# RelaxKon Web 安全迁移
 
 `turbo-user` 更名为 `relaxkon-web`，配套 `turbo-ai-server` 更名为 `relaxkon-server`。前端仍是已合并 `turbo-admin` 的同一个 Angular 项目，包含聊天、图像、多媒体、账户和管理员页面。保留现有仓库和全部 Git 历史，不初始化新仓库、不迁移到新数据库。
 
 ## 本次修改与兼容边界
 
 - 更新 npm 包名、README、用户界面名称、PWA 显示名称及跨仓库文档链接。
-- 保留 Angular CLI 的 `app` 目标与显式构建目录 `dist/app/browser/`。原有 `ng build app`、静态资源复制脚本与服务端 `src/Turbo.Auth/wwwroot` 路径继续有效。
+- Angular CLI 项目名为 `relaxkon-web`，显式构建命令为 `ng build relaxkon-web`，构建产物路径仍为 `dist/app/browser/`。
 - 保留生产 API 根地址 `/` 与开发地址 `http://localhost:5111/`。GitHub 仓库名不是 API 域名，不能直接代入请求地址。
 - 保留 `/chat`、`/admin`、`/accounts`、图像、多媒体路由与 `/api/*` 契约。没有新增硬编码普通用户、VIP 或管理员额度。
 - 保留 IndexedDB 名称 `chatDb-v1`、数据版本与存储结构、APIMart 待恢复任务键 `turbo-apimart-receipt:`、配置导出/导入前缀 `Turbo://`。这些名称是兼容协议，不是遗漏的品牌文案。
 - 保留 PWA 的 `start_url`、`scope`、manifest 路径与 service worker 路径。无需卸载 PWA、清空浏览器缓存或清除本地数据。
 - 本前端仓库原先没有独立 Docker Compose 或部署工作流。继续由服务端统一提供静态资源，Docker Compose 迁移在服务端进行；本次只新增验证用 GitHub Actions，不自动部署。
-- `TurboService` 等内部符号与服务端 `Turbo.Auth` 目录暂时保留，避免把品牌迁移扩大成代码和部署接口的破坏性重命名。
+- 聊天请求服务的内部符号已统一为 `RelaxKonService`。
 
 ## 仓库切换
 

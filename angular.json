@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "app": {
+    "relaxkon-web": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -126,10 +126,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "app:build:production"
+              "buildTarget": "relaxkon-web:build:production"
             },
             "development": {
-              "buildTarget": "app:build:development"
+              "buildTarget": "relaxkon-web:build:development"
             },
             "ci": {
             }
