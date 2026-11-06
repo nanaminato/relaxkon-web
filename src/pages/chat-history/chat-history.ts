@@ -2,7 +2,8 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Component, HostListener, inject,} from '@angular/core';
 import {NzButtonModule} from "ng-zorro-antd/button";
 import {NzIconModule} from "ng-zorro-antd/icon";
-import {TranslateModule} from "@ngx-translate/core";
+import {NzModalService} from "ng-zorro-antd/modal";
+import {TranslateModule, TranslateService} from "@ngx-translate/core";
 import {ChatHistoryTitle, } from "../../models";
 import {SizeReportService} from "../../services/normal-services";
 import {Store} from "@ngrx/store";
@@ -32,6 +33,8 @@ export class ChatHistory
   selectId: number | undefined;
   sizeReportService: SizeReportService = inject(SizeReportService);
   store = inject(Store);
+  private readonly modal = inject(NzModalService);
+  private readonly translate = inject(TranslateService);
   constructor() {
     this.store.select(selectHistoryTitle).pipe(takeUntilDestroyed()).subscribe((histories: ChatHistoryTitle[]) => {
       this.historyTitles = histories;
@@ -60,9 +63,22 @@ export class ChatHistory
     this.contextMenuPosition = { x: event.clientX, y: event.clientY };
     this.contextMenuVisible = true;
   }
-  async deleteHistory(dataId: number) {
+  deleteHistory(dataId: number) {
     this.contextMenuVisible = false;
-    this.store.dispatch(historyTitleActions.delete({ dataId }));
+    this.contextMenuDataId = null;
+    this.hideDeleteButton();
+
+    this.modal.confirm({
+      nzTitle: this.translate.instant('chat-history.delete-title'),
+      nzContent: this.translate.instant('chat-history.delete-description'),
+      nzOkText: this.translate.instant('universal.delete'),
+      nzCancelText: this.translate.instant('universal.cancel'),
+      nzOkDanger: true,
+      nzAutofocus: 'cancel',
+      nzCentered: true,
+      nzWidth: 'min(420px, calc(100vw - 32px))',
+      nzOnOk: () => this.store.dispatch(historyTitleActions.delete({dataId}))
+    });
   }
 
   selectHistory(dataId: number) {

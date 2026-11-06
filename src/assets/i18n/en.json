@@ -170,6 +170,8 @@
     "embeddingSelector": "Embedding Selector"
   },
   "chat-history": {
+    "delete-title": "Delete this conversation?",
+    "delete-description": "The conversation and its messages will be removed from chat history. This cannot be undone.",
     "new-chat": "New Chat",
     "settings": "Settings",
     "prompts": "Prompts",

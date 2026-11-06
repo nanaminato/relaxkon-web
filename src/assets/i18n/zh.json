@@ -170,6 +170,8 @@
     "embeddingSelector": "图像嵌入模型选择器"
   },
   "chat-history": {
+    "delete-title": "删除这段对话？",
+    "delete-description": "对话及其消息将从聊天记录中移除，删除后无法恢复。",
     "new-chat": "新的聊天",
     "settings": "设置",
     "prompts": "预设",

@@ -170,6 +170,8 @@
     "embeddingSelector": "Embedding選択器"
   },
   "chat-history": {
+    "delete-title": "この会話を削除しますか？",
+    "delete-description": "会話とメッセージがチャット履歴から削除されます。この操作は取り消せません。",
     "new-chat": "新規チャット",
     "settings": "設定",
     "prompts": "プリセット",
