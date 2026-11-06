@@ -1,6 +1,8 @@
-# Turbo AI 用户端
+# Relaxkon Web
 
-Turbo AI 用户端是一个 Angular 单页应用，用于访问 Turbo AI Server 提供的聊天、图像生成和音频处理能力。它面向日常使用者，也为部署和二次开发提供清晰的配置说明。
+Relaxkon Web是一个 Angular 单页应用，用于访问 Relaxkon Server 提供的聊天、图像生成和音频处理能力。它是原 `turbo-user` 的渐进式更名，已合并原 `turbo-admin`，同时包含用户对话界面与管理员后台，不是新项目。
+
+服务端仓库对应更名为 [`relaxkon-server`](https://github.com/nanaminato/relaxkon-server)。现有 Git 历史、账户、数据库与 API 保持兼容。更名与部署检查见 [安全迁移指南](docs/relaxkon-migration.md)。
 
 ## 你想做什么？
 
@@ -11,13 +13,14 @@ Turbo AI 用户端是一个 Angular 单页应用，用于访问 Turbo AI Server 
 | 注册并验证邮箱 | [邮箱验证](docs/registration-email-verification.md) |
 | 对照后端接口与类型 | [API 契约](docs/api-contracts.md) |
 | 在本机运行或参与开发 | [开发指南](docs/development.md) |
-| 配置后端、账户、模型与密钥 | [Turbo AI Server 文档](https://github.com/nanaminato/turbo-ai-server/tree/master/docs) |
+| 配置后端、账户、模型与密钥 | [Relaxkon Server 文档](https://github.com/nanaminato/relaxkon-server/tree/master/docs) |
 
 ## 功能概览
 
 - 流式 AI 聊天，支持会话历史、系统提示词、Markdown、代码与文件上下文。
 - 图像工作室，可使用后端已启用的 OpenAI 或 APIMart 图像模型。
 - 多媒体工作室，提供文本转语音、语音转写、语音翻译与文件文本提取。
+- 管理员后台支持账户、稳定编码角色、模型、供应商密钥与按角色配置的功能权限和请求配额。
 - 本地保存显示偏好、常用模型与会话设置；账户登录后可使用服务端提供的同步能力。
 - 支持中文、英文和日文，以及响应式页面与离线资源缓存。
 
@@ -25,7 +28,7 @@ Turbo AI 用户端是一个 Angular 单页应用，用于访问 Turbo AI Server 
 
 已部署的站点无需安装任何软件：使用管理员提供的地址注册或登录，选择可用模型后即可开始对话。若页面提示没有可用模型或无权调用功能，请联系管理员完成账户角色、模型和供应商密钥配置。
 
-开发环境请先准备一个可访问的 Turbo AI Server，再执行：
+开发环境请先准备一个可访问的 Relaxkon Server，再执行：
 
 ```bash
 npm ci
@@ -38,4 +41,4 @@ npm start
 
 - 本仓库不保存供应商 API 密钥、数据库密码或生产令牌。
 - 生产环境将前端部署到后端站点根目录，使用同源根路径 `/` 调用 API。
-- 文档中的接口、角色和服务端配置以 Turbo AI Server 的 Swagger 与服务端文档为准。
+- 文档中的接口、角色和服务端配置以 Relaxkon Server 的 Swagger 与服务端文档为准。

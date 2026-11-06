@@ -6,6 +6,7 @@ import {ServiceProvider} from '../../roots';
 import {LocalizationService} from '../normal-services/localization.service';
 import {TurboService} from './turbo.service';
 import {ChatHistoryModel, ChatPacket} from '../../models';
+import {ErrorType} from '../../errors';
 
 describe('Multilingual chat streaming', () => {
   it('keeps the persisted conversation identifier across turns and model changes', () => {
@@ -97,4 +98,94 @@ describe('Multilingual chat streaming', () => {
     expect(fetchSpy).toHaveBeenCalledTimes(1);
   });
 
+});
+
+describe('Chat throttling without automatic generation replay', () => {
+  let service: TurboService;
+  let auth: {token: string; user: {id: number}; refreshToken?: string; refreshAccessToken?: jasmine.Spy};
+  const body = {model: 'test', messages: []};
+  const completed = () => new Response('data: {"type":"delta","text":"done"}\n\ndata: {"type":"completed"}\n\n',
+    {headers: {'Content-Type': 'text/event-stream'}});
+  beforeEach(() => {
+    auth = {token: 'test', user: {id: 7}};
+    TestBed.configureTestingModule({providers: [
+      {provide: Store, useValue: {select: () => of(null)}},
+      {provide: ServiceProvider, useValue: {apiUrl: '/'}},
+      {provide: AuthService, useValue: auth},
+      {provide: LocalizationService, useValue: {requestLanguage: 'en'}}
+    ]});
+    service = TestBed.inject(TurboService);
+  });
+  const send = (service: TurboService) => firstValueFrom(service.fetchChatBase('/api/ai/chat', body));
+
+  it('preserves Retry-After, blocks early manual repeats and allows an explicit attempt after expiry', async () => {
+    const now = spyOn(Date, 'now').and.returnValue(100000);
+    const fetch = spyOn(window, 'fetch').and.resolveTo(new Response('{"code":"feature_limit_exceeded"}',
+      {status: 429, headers: {'Retry-After': '10'}}));
+    await expectAsync(send(service)).toBeRejectedWith(jasmine.objectContaining({type: ErrorType.Busy, status: 429, retryAfterSeconds: 10}));
+    expect(fetch).toHaveBeenCalledTimes(1);
+    now.and.returnValue(104001);
+    await expectAsync(send(service)).toBeRejectedWith(jasmine.objectContaining({code: 'feature_limit_exceeded', retryAfterSeconds: 6}));
+    expect(fetch).toHaveBeenCalledTimes(1);
+    now.and.returnValue(110000); fetch.and.resolveTo(completed());
+    expect(await send(service)).toBe('done'); expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  for (const retryAfter of [undefined, 'garbage', '-1']) {
+    it(`preserves manual-retry fallback for Retry-After ${retryAfter}`, async () => {
+      const fetch = spyOn(window, 'fetch').and.callFake(async () => new Response('{"code":"feature_limit_exceeded"}',
+        {status: 429, headers: retryAfter ? {'Retry-After': retryAfter} : {}}));
+      const error = await send(service).catch(error => error);
+      expect(error.code).toBe('feature_limit_exceeded'); expect(error.retryAfterSeconds).toBeUndefined();
+      expect(fetch).toHaveBeenCalledTimes(1);
+      await send(service).catch(() => undefined); expect(fetch).toHaveBeenCalledTimes(2);
+    });
+  }
+
+  it('honors an HTTP-date header and does not mistake a provider limit for a feature quota', async () => {
+    spyOn(Date, 'now').and.returnValue(Date.parse('Fri, 06 Nov 2026 12:00:00 GMT'));
+    spyOn(window, 'fetch').and.resolveTo(new Response('{}', {status: 429, headers: {'Retry-After': 'Fri, 06 Nov 2026 12:01:00 GMT'}}));
+    await expectAsync(send(service)).toBeRejectedWith(jasmine.objectContaining({status: 429, code: undefined, retryAfterSeconds: 60}));
+  });
+
+  it('isolates cooldowns by account and retains the original account cooldown when switching back', async () => {
+    const fetch = spyOn(window, 'fetch').and.resolveTo(new Response('{}', {status: 429, headers: {'Retry-After': '60'}}));
+    await send(service).catch(() => undefined);
+    auth.user = {id: 8}; fetch.and.resolveTo(completed());
+    expect(await send(service)).toBe('done'); expect(fetch).toHaveBeenCalledTimes(2);
+    auth.user = {id: 7};
+    await expectAsync(send(service)).toBeRejectedWith(jasmine.objectContaining({status: 429}));
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not apply an in-flight response to a new account or replay its generation', async () => {
+    let resolve!: (response: Response) => void;
+    const fetch = spyOn(window, 'fetch').and.returnValue(new Promise<Response>(done => resolve = done));
+    const result = send(service).catch(error => error);
+    auth.user = {id: 8};
+    resolve(new Response('{}', {status: 429, headers: {'Retry-After': '60'}}));
+    expect((await result).code).toBe('account_changed'); expect(fetch).toHaveBeenCalledTimes(1);
+    fetch.and.resolveTo(completed()); expect(await send(service)).toBe('done');
+  });
+
+  it('does not refresh or replay after the account changes before a 401 response', async () => {
+    let resolve!: (response: Response) => void;
+    auth.refreshToken = 'refresh'; auth.refreshAccessToken = jasmine.createSpy().and.returnValue(of('new'));
+    const fetch = spyOn(window, 'fetch').and.returnValue(new Promise<Response>(done => resolve = done));
+    const result = send(service).catch(error => error); auth.user = {id: 8};
+    resolve(new Response('', {status: 401}));
+    expect((await result).code).toBe('account_changed');
+    expect(fetch).toHaveBeenCalledTimes(1); expect(auth.refreshAccessToken).not.toHaveBeenCalled();
+  });
+
+  it('aborts a cancelled request and never schedules a rate-limit retry', async () => {
+    let resolve!: (response: Response) => void;
+    const fetch = spyOn(window, 'fetch').and.returnValue(new Promise<Response>(done => resolve = done));
+    const error = jasmine.createSpy();
+    const subscription = service.fetchChatBase('/api/ai/chat', body).subscribe({error});
+    subscription.unsubscribe(); resolve(new Response('{}', {status: 429, headers: {'Retry-After': '1'}}));
+    await new Promise(done => setTimeout(done, 0));
+    expect(fetch.calls.mostRecent().args[1]?.signal?.aborted).toBeTrue();
+    expect(fetch).toHaveBeenCalledTimes(1); expect(error).not.toHaveBeenCalled();
+  });
 });

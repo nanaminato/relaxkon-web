@@ -1,6 +1,6 @@
 # 前端 API 契约
 
-实施日期：2026-11-04。注册邮箱验证扩展见 [验证流程](registration-email-verification.md)；基础契约对齐后端 [2a31082](https://github.com/nanaminato/turbo-ai-server/commit/2a31082) 的 `src/Turbo.Auth/Contracts/`，后端设计见 [Controller 契约与官方 SDK](https://github.com/nanaminato/turbo-ai-server/blob/2a31082/docs/api-contracts-and-sdks.md)。
+实施日期：2026-11-04。注册邮箱验证扩展见 [验证流程](registration-email-verification.md)；基础契约对齐后端 [2a31082](https://github.com/nanaminato/relaxkon-server/commit/2a31082) 的 `src/Turbo.Auth/Contracts/`，后端设计见 [Controller 契约与官方 SDK](https://github.com/nanaminato/relaxkon-server/blob/2a31082/docs/api-contracts-and-sdks.md)。
 
 ## 类型边界
 
@@ -66,3 +66,11 @@ npm run build -- --configuration production --progress=false
 类型当前由前后端分别维护，没有引入代码生成或新依赖。后端契约变化时，先核对该版本的 Contracts 和运行中的 Swagger，再修改前端类型、映射与 HTTP 样例，并运行上述检查。不能只改类型断言让编译通过。
 
 构建仍提示原有 Browserslist 包含 Angular 不支持的旧浏览器，以及 Mermaid 传递依赖的 CommonJS 提示；本次没有修改浏览器支持或打包配置。测试使用模拟 HTTP 与隔离 IndexedDB，不会读取真实账户数据或调用计费供应商，也不代表完整部署环境的端到端联调。
+
+## 当前账户用量（渐进式扩展）
+
+`GET /api/feature-access/usage` 使用现有 bearer 认证，只返回当前账户的只读快照，无账户 ID 查询参数。响应为 `{observedAt, policyRevision, features}`；每项功能包括原有限额、`minuteUsed`、`dayUsed`、`activeRequests`、`minuteRemaining`、`dayRemaining`、`concurrentRemaining`、`minuteResetsAt` 和 `dayResetsAt`。时间为 UTC；已启用且无限制的剩余量为 null，禁用功能剩余量为 0。
+
+账户页将同一响应中的限额与计数一起显示，明确说明只是观察快照，不能预留调用额度。账户切换、重新加载或失败时不复用旧数据。旧服务端 404/501、用量暂不可用 503 时退回 `/api/feature-access/me`，只显示配置限额，不伪造剩余计数。401/403 不降级为成功。最终限流与并发准入仍完全由后端执行。
+
+旧服务端的 SPA fallback 可能把未知 usage API 返回为 `200 text/html`，Angular 会将 JSON 解析失败报告为 status 200。前端仅对明确的 200 HTML 解析错误降级到 `/me`；200 无效 JSON、401/403、其他 500 或网络错误不伪装成兼容成功。

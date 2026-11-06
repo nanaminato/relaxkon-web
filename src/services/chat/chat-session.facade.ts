@@ -28,13 +28,16 @@ export class ChatSessionFacade {
       tap({
         next: chunk => message.content += chunk,
         error: (error: ResponseError) => {
-          const key = error?.code === 'feature_disabled' ? 'featureDisabled'
+          const limited = error?.status === 429 || error?.type === ErrorType.Busy;
+          const key = error?.code === 'account_changed' ? 'accountChanged'
+            : limited && error?.retryAfterSeconds != null ? 'rateLimitedRetryAfter'
+            : error?.code === 'feature_disabled' ? 'featureDisabled'
             : error?.code === 'feature_limit_exceeded' ? 'featureLimitExceeded'
             : error?.code === 'feature_access_unavailable' ? 'featureAccessUnavailable'
             : error?.status === 403 ? 'accessDenied'
             : error?.type === ErrorType.NotAuthorize ? 'authorizationRequired'
-            : error?.type === ErrorType.Busy ? 'featureLimitExceeded' : 'responseInterrupted';
-          message.content += this.locale.text(`chat-main.${key}`);
+            : limited ? 'rateLimited' : 'responseInterrupted';
+          message.content += this.locale.text(`chat-main.${key}`, {seconds: error?.retryAfterSeconds});
         }
       }),
       finalize(() => {

@@ -21,6 +21,12 @@ describe('Feature access service', () => {
     expect(request.request.method).toBe('PUT');
     expect(request.request.body).toEqual(policy);
     request.flush({...policy, revision: 4});
+    service.usage().subscribe();
+    const usage = http.expectOne('/backend/api/feature-access/usage');
+    expect(usage.request.method).toBe('GET');
+    expect(usage.request.params.keys()).toEqual([]);
+    expect(usage.request.body).toBeNull();
+    usage.flush({observedAt: '2026-11-06T00:00:00Z', policyRevision: 4, features: []});
     service.me().subscribe();
     http.expectOne('/backend/api/feature-access/me').flush({canManagePolicies: false, features: []});
     http.verify();

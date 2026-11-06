@@ -2,7 +2,8 @@ export interface ResponseError{
   type: ErrorType,
   error?: string,
   code?: string,
-  status?: number
+  status?: number,
+  retryAfterSeconds?: number
 }
 export enum ErrorType{
   NotAuthorize,

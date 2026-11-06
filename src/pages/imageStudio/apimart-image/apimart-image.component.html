@@ -71,6 +71,7 @@
       }
       @if (error) { <p class="message error" role="alert">{{error}}</p> }
       @if (notice) { <p class="message" role="status">{{notice}}</p> }
+      @if (pollNotice) { <p class="message" role="status">{{pollNotice}}</p> }
       @if (historyWarning) { <div class="message" role="status"><p>{{historyWarning}}</p>@if (canSave) { <button type="button" (click)="retrySave()">{{'imageWorkspace.retrySave' | translate}}</button> }</div> }
       @if (savingHistory) { <p class="message" role="status">{{'imageWorkspace.saving' | translate}}</p> }
       @if ((!receipt || state === 'unknown') && !busy) {

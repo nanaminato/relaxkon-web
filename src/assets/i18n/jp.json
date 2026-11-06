@@ -371,6 +371,9 @@
     "translation": "翻訳"
   },
   "chat-main": {
+    "rateLimitedRetryAfter": "リクエストが一時的に制限されています。{{seconds}} 秒後に再試行してください。このリクエストは自動で再送信されません。",
+    "rateLimited": "リクエストが一時的に制限されています。しばらくしてから再試行してください。",
+    "accountChanged": "アカウントが変更されました。現在のアカウントで新しくリクエストしてください。",
     "askChatGPT": "メッセージを入力…",
     "potentialErrorNotice": "AIの回答には誤りが含まれる場合があります。重要な情報は確認してください。",
     "ctrlEnterShortcut": "Ctrl + Enterで送信",
@@ -749,7 +752,15 @@
     "disabled": "無効",
     "unlimited": "無制限",
     "generatedImage": "生成された画像",
-    "imageError": "保護された画像を読み込めませんでした。"
+    "imageError": "保護された画像を読み込めませんでした。",
+    "usageHint": "使用量はサーバーのスナップショットであり、枠の予約ではありません。許可されたリクエストはプロバイダーで失敗しても計上されます。他のリクエストやポリシー変更で残り枠が変わるため、再読み込みして更新してください。",
+    "observedAt": "取得日時",
+    "policyRevision": "ポリシーバージョン",
+    "used": "使用済み",
+    "remaining": "残り",
+    "resetsAt": "リセット日時",
+    "activeRequests": "実行中のリクエスト",
+    "usageUnavailable": "現在の使用量を取得できません。設定済みの上限のみ表示しています。"
   },
   "roleManager": {
     "code": "ロールコード",
@@ -841,6 +852,10 @@
     "providerError": "画像プロバイダーが処理を完了できませんでした。再試行してください。"
   },
   "apimartStudio": {
+    "pollRateLimited": "タスクの確認が制限されています。{{seconds}} 秒後に確認を再開します。生成リクエストは再送信しません。",
+    "pollRateLimitPaused": "リクエスト制限により自動確認を停止しました。{{seconds}} 秒後に同じタスク ID で再開してください。タスクは実行中の可能性があります。",
+    "submitRateLimited": "リクエスト制限により送信できませんでした。しばらくしてから再試行してください。自動再送信は行っていません。",
+    "submitRateLimitedRetryAfter": "リクエスト制限により送信できませんでした。{{seconds}} 秒後に再試行してください。自動再送信は行っていません。",
     "nav": "APIMart 画像",
     "title": "APIMart 画像スタジオ",
     "intro": "GPT Image 2.5 と 2.6 で画像を生成・編集し、完了までタスクを確認できます。",

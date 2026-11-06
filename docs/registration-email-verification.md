@@ -21,7 +21,7 @@
 
 ## 部署
 
-后端复用现有 PasswordReset SMTP 配置，Registration.Enabled 默认为 true，并独立于 PasswordReset.Enabled。已有数据库需先执行后端的 `registration-email-verification.sql`，新库初始化已包含挑战表。后台详细说明见 [服务端注册邮箱验证](https://github.com/nanaminato/turbo-ai-server/blob/master/docs/registration-email-verification.md)。
+后端复用现有 PasswordReset SMTP 配置，Registration.Enabled 默认为 true，并独立于 PasswordReset.Enabled。已有数据库需先执行后端的 `registration-email-verification.sql`，新库初始化已包含挑战表。后台详细说明见 [服务端注册邮箱验证](https://github.com/nanaminato/relaxkon-server/blob/master/docs/registration-email-verification.md)。
 
 当前开发库已补齐新表，原有表行数未改变。代码不会在普通启动时自动建表，也不会在邮件失败时绕过验证。
 

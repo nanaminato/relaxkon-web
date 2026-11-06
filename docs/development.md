@@ -3,7 +3,7 @@
 ## 前置条件
 
 - 使用与 Angular 21 兼容的 Node.js LTS 版本和 npm。
-- 一个本地或测试环境的 Turbo AI Server；不要连接生产数据库或使用生产供应商密钥进行日常开发。
+- 一个本地或测试环境的 Relaxkon Server；不要连接生产数据库或使用生产供应商密钥进行日常开发。
 
 ## 安装与运行
 
@@ -29,11 +29,17 @@ apiUrl: 'http://localhost:5111/'
 # 生产构建（部署在站点根目录）
 npm run build
 
+# 类型、lint 与迁移兼容性检查
+npm run typecheck
+npm run lint
+npm run test:i18n
+npm run test:migration
+
 # 单元测试
 npm test
 ```
 
-构建产物位于 `dist/`。将其中浏览器产物部署到 Turbo AI Server 的 `src/Turbo.Auth/wwwroot`，或部署到等价的静态站点根目录。服务端会将非文件请求回退到应用入口，因此聊天、图像、多媒体与合并后的管理页面均使用同一套前端资源。
+构建产物继续位于 `dist/app/browser/`（保留原路径以兼容部署脚本）。将其中浏览器产物部署到 Relaxkon Server 的 `src/Turbo.Auth/wwwroot`，或部署到等价的静态站点根目录。服务端会将非文件请求回退到应用入口，因此聊天、图像、多媒体与合并后的管理页面均使用同一套前端资源。
 
 ## 项目结构
 
@@ -101,3 +107,17 @@ Mermaid 在聊天组件实例化后异步加载，加载失败时仍显示可读
 ## 注册邮件联调
 
 注册请求新增必填 emailCode，邮箱发送接口不接收密码或图形验证码。后端先补齐 registration-email-verification.sql，前端再一起发布；复用后端现有 SMTP，不能通过关闭前端控件绕过验证。字段、限流与测试见 [注册邮箱验证](registration-email-verification.md)。
+
+## 仓库与部署更名
+
+项目名称为 `relaxkon-web`，包含用户界面与管理后台。Angular 工作区目标 `app`、构建输出目录、同源 API 根地址、浏览器数据库与配置导入格式继续保留。改名不是更换域名或重建数据库。详见 [安全迁移指南](relaxkon-migration.md)。
+
+GitHub Actions 的前端检查运行类型检查、国际化检查、迁移回归、ChromeHeadless 测试与生产构建，不自动部署。`npm run lint` 使用 Angular 21、ESLint 10 的 flat config；现有构造器注入和公共输出事件命名仅告警，不为更名批量修改业务 API。
+
+组件样式预算根据已合并的管理后台和图像工作室校准为警告 4 KB / 错误 8 KB（原 4 KB 错误阈值会阻止当前主分支构建，最大现有组件约 7.45 KB）。首包警告 5 MB / 错误 8 MB 保持不变。构建仍会报告体积与 CommonJS 警告。
+
+账户页通过 `/api/feature-access/usage` 展示服务端 UTC 快照的用量、剩余数和并发，旧服务端或用量服务暂不可用时降级为配置限额。未做前端本地计数、倒计时补量或预留配额。
+
+聊天保留 HTTP `Retry-After`（秒数或 HTTP 日期），在当前账户的冷却窗口内阻止重复发送并显示等待提示，不自动重放聊天 POST。APIMart 已接受任务的 429 查询只重试 GET，保留任务 ID 和冷却时间；至多连续重试 5 次且仍受 75 次 / 5 分钟总查询上限约束，过长限额则暂停，手动恢复也不能跳过冷却。重新提交图像生成始终需要用户明确操作。
+
+旧服务端的 SPA fallback 可能把未知 usage API 返回为 `200 text/html`，Angular 会将 JSON 解析失败报告为 status 200。前端仅对明确的 200 HTML 解析错误降级到 `/me`；200 无效 JSON、401/403、其他 500 或网络错误不伪装成兼容成功。
