@@ -13,12 +13,14 @@ import type {APIMartImageGenerationRequest, APIMartImageModel, ImageOutputFormat
 import type {GenerateTask} from '../../../models/media';
 import type {UrlImage} from '../../../models/images';
 import {apimartCapabilities, apimartModels, apimartRequest, publicImageUrl, submissionTaskIds, taskDetail, taskImages} from './apimart-capabilities';
+import {retryAfterMs, retryAfterSeconds} from '../../../services/retry-after';
 
 type State = 'idle' | 'submitting' | 'unknown' | 'receiptPending' | 'recovering' | 'polling' | 'paused' | 'completed' | 'failed' | 'cancelled';
 interface Receipt {
   accountId: number; taskId?: string; taskIds?: string[]; model: APIMartImageModel; format: ImageOutputFormat;
   operationId: string; created: string; recoveryToken?: string; urls?: string[]; historySaved?: boolean; terminalIds?: string[];
   state?: 'completed' | 'failed' | 'cancelled';
+  pollRetryAt?: number;
 }
 @Component({
   selector: 'app-apimart-image', standalone: true, imports: [FormsModule, RouterLink, TranslateModule, Gallery],
@@ -50,12 +52,13 @@ export class APIMartImage implements OnInit, OnDestroy {
   state: State = 'idle';
   receipt?: Receipt;
   images: UrlImage[] = [];
-  error = ''; notice = ''; historyWarning = '';
+  error = ''; notice = ''; historyWarning = ''; pollNotice = '';
   progress = 0; uploading = false; savingHistory = false;
   resumeId = ''; acknowledgeUnknown = false;
   private timer?: ReturnType<typeof setTimeout>;
   private query?: Subscription;
   private attempts = 0;
+  private rateLimitRetries = 0;
   private deadline = 0;
   private destroyed = false;
   private localSaved = false;
@@ -107,7 +110,7 @@ export class APIMartImage implements OnInit, OnDestroy {
     if (!['png', 'webp'].includes(this.format) && this.background === 'transparent') this.background = 'auto';
   }
   clearOverlay() { this.overlayKind = 'none'; this.overlayUrl = ''; this.overlayConfirmed = false; }
-  private text(key: string) { return this.localization.text(key); }
+  private text(key: string, params?: Record<string, unknown>) { return this.localization.text(key, params); }
   private storageKey(accountId: number) { return 'turbo-apimart-receipt:' + accountId; }
   private persist() {
     if (!this.receipt) return;
@@ -168,14 +171,17 @@ export class APIMartImage implements OnInit, OnDestroy {
       this.persist();
       if (!this.destroyed && this.sameAccount()) this.resumePolling();
     } catch (error: unknown) {
-      const failure = error as {status?: number; error?: {code?: string; task_ids?: string[]; recovery_token?: string}};
+      const failure = error as {status?: number; headers?: {get(name: string): string | null}; error?: {code?: string; task_ids?: string[]; recovery_token?: string}};
       if (failure.error?.code === 'image_task_receipt_pending' && failure.error.recovery_token) {
         this.receipt.recoveryToken = failure.error.recovery_token;
         this.receipt.taskIds = failure.error.task_ids; this.receipt.taskId = failure.error.task_ids?.[0]; this.state = 'receiptPending'; this.persist();
       } else if (failure.status != null && failure.status >= 400 && failure.status < 500 && failure.status !== 408) {
         const code = failure.error?.code;
         const keys: Record<string, string> = {invalid_image_option: 'apimartStudio.invalidOptions', image_provider_busy: 'imageWorkspace.providerBusy', image_provider_rejected: 'imageWorkspace.providerRejected', image_model_unavailable: 'apimartStudio.unavailable'};
-        this.error = this.text(code && keys[code] ? keys[code] : 'apimartStudio.submitRejected');
+        const delay = failure.status === 429 ? retryAfterMs(failure.headers?.get('Retry-After')) : undefined;
+        this.error = failure.status === 429
+          ? this.text(delay == null ? 'apimartStudio.submitRateLimited' : 'apimartStudio.submitRateLimitedRetryAfter', {seconds: retryAfterSeconds(delay ?? 0)})
+          : this.text(code && keys[code] ? keys[code] : 'apimartStudio.submitRejected');
         this.removeReceipt(); this.state = 'idle';
       } else { this.state = 'unknown'; this.error = this.text('apimartStudio.submitUnknown'); this.persist(); }
     }
@@ -192,21 +198,26 @@ export class APIMartImage implements OnInit, OnDestroy {
   resumePolling() {
     if (!this.receipt?.taskId || this.receipt.recoveryToken || this.destroyed || this.state === 'polling') return;
     if (!this.sameAccount()) { this.error = this.text('apimartStudio.accountChanged'); return; }
-    this.stopTimer(); this.state = 'polling'; this.error = ''; this.attempts = 0; this.deadline = Date.now() + 300000;
+    this.stopTimer(); this.state = 'polling'; this.error = ''; this.pollNotice = ''; this.attempts = 0; this.rateLimitRetries = 0; this.deadline = Date.now() + 300000;
     this.poll();
   }
   pause() {
     this.stopTimer();
+    this.pollNotice = '';
     if (this.state === 'polling') this.state = 'paused';
   }
   private poll() {
     if (this.destroyed || this.state !== 'polling' || !this.receipt?.taskId) return;
     if (!this.sameAccount()) { this.pause(); this.error = this.text('apimartStudio.accountChanged'); return; }
+    const remaining = (this.receipt.pollRetryAt ?? 0) - Date.now();
+    if (remaining > 0) { this.scheduleRateLimitedPoll(remaining); return; }
     if (++this.attempts > 75 || Date.now() >= this.deadline) { this.pause(); this.error = this.text('apimartStudio.pollTimeout'); return; }
+    this.pollNotice = '';
     const id = this.receipt.taskId;
     this.query = this.api.watchTask(id, this.localization.requestLanguage).subscribe({
       next: response => {
         if (this.destroyed || this.state !== 'polling' || !this.sameAccount()) { this.pause(); return; }
+        this.rateLimitRetries = 0; this.receipt!.pollRetryAt = undefined;
         try {
           const task = taskDetail(response, id);
           this.progress = Number.isFinite(task.progress) ? Math.max(0, Math.min(100, task.progress)) : 0;
@@ -225,8 +236,24 @@ export class APIMartImage implements OnInit, OnDestroy {
           } else this.timer = setTimeout(() => this.poll(), 4000);
         } catch { this.pause(); this.error = this.text('apimartStudio.queryError'); }
       },
-      error: () => { if (!this.destroyed) { this.pause(); this.error = this.text('apimartStudio.queryError'); } }
+      error: (failure: {status?: number; headers?: {get(name: string): string | null}}) => {
+        if (this.destroyed || this.state !== 'polling') return;
+        if (!this.sameAccount()) { this.pause(); this.error = this.text('apimartStudio.accountChanged'); return; }
+        if (failure?.status !== 429) { this.pause(); this.error = this.text('apimartStudio.queryError'); return; }
+        const delay = Math.max(4000, retryAfterMs(failure.headers?.get('Retry-After')) ?? Math.min(60000, 4000 * 2 ** this.rateLimitRetries));
+        this.receipt!.pollRetryAt = Date.now() + delay; this.persist(); this.rateLimitRetries++;
+        this.scheduleRateLimitedPoll(delay);
+      }
     });
+  }
+  private scheduleRateLimitedPoll(delay: number) {
+    const params = {seconds: retryAfterSeconds(delay)};
+    // Long daily quotas and repeated throttling pause instead of hiding an unbounded timer.
+    if (this.rateLimitRetries > 5 || Date.now() + delay >= this.deadline) {
+      this.pause(); this.error = this.text('apimartStudio.pollRateLimitPaused', params); return;
+    }
+    this.pollNotice = this.text('apimartStudio.pollRateLimited', params);
+    this.timer = setTimeout(() => this.poll(), delay);
   }
   resumeById() {
     if (this.busy || this.receipt?.taskId || !this.resumeId.trim() || this.auth.user?.id == null) return;

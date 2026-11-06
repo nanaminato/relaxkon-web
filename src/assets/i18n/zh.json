@@ -371,6 +371,9 @@
     "translation": "翻译"
   },
   "chat-main": {
+    "rateLimitedRetryAfter": "请求暂时受到限制，请在 {{seconds}} 秒后重试。本次请求不会自动重新发送。",
+    "rateLimited": "请求暂时受到限制，请稍后重试。",
+    "accountChanged": "账户已切换，请使用当前账户重新发起请求。",
     "askChatGPT": "输入消息，开始对话…",
     "potentialErrorNotice": "AI 生成的内容可能有误，请核实重要信息。",
     "ctrlEnterShortcut": "Ctrl + Enter 发送消息",
@@ -749,7 +752,15 @@
     "disabled": "已禁用",
     "unlimited": "不限",
     "generatedImage": "生成的图像",
-    "imageError": "无法加载受保护的图像。"
+    "imageError": "无法加载受保护的图像。",
+    "usageHint": "用量是服务端快照，不代表预留额度。已获准的请求即使供应商失败也会计数。其他请求和策略调整会改变剩余额度，请重新加载以更新。",
+    "observedAt": "快照时间",
+    "policyRevision": "策略版本",
+    "used": "已用",
+    "remaining": "剩余",
+    "resetsAt": "重置时间",
+    "activeRequests": "当前并发",
+    "usageUnavailable": "暂时无法读取当前用量，仅显示已配置的限额。"
   },
   "roleManager": {
     "code": "角色编码",
@@ -841,6 +852,10 @@
     "providerError": "图像供应商未能完成请求，请稍后重试。"
   },
   "apimartStudio": {
+    "pollRateLimited": "任务查询受到限制，将在 {{seconds}} 秒后继续查询，不会重新提交生成请求。",
+    "pollRateLimitPaused": "自动查询因请求限制已暂停，请在 {{seconds}} 秒后使用同一任务 ID 继续查询。供应商任务可能仍在运行。",
+    "submitRateLimited": "提交受到请求限制，请稍后重试。没有自动重试提交。",
+    "submitRateLimitedRetryAfter": "提交受到请求限制，请在 {{seconds}} 秒后重试。没有自动重试提交。",
     "nav": "APIMart 图像",
     "title": "APIMart 图像工作室",
     "intro": "通过 GPT Image 2.5、2.6 生成、编辑图像，追踪任务直到完成。",

@@ -371,6 +371,9 @@
     "translation": "Translation"
   },
   "chat-main": {
+    "rateLimitedRetryAfter": "Requests are temporarily limited. Try again in {{seconds}} seconds. This request will not be resent automatically.",
+    "rateLimited": "Requests are temporarily limited. Please try again later.",
+    "accountChanged": "The account changed. Start a new request with the current account.",
     "askChatGPT": "Write a message…",
     "potentialErrorNotice": "AI can make mistakes. Check important information.",
     "ctrlEnterShortcut": "Ctrl + Enter to send",
@@ -669,7 +672,7 @@
     "signInDescription": "Sign in to pick up where you left off.",
     "createAccount": "Create an account",
     "registerDescription": "Your AI workspace starts here.",
-    "noAccount": "New to Turbo AI?",
+    "noAccount": "New to Relaxkon?",
     "captchaPlaceholder": "Enter the code",
     "refreshCaptcha": "Click the image to refresh",
     "retryCaptcha": "Could not load the code. Click the image to retry.",
@@ -749,7 +752,15 @@
     "disabled": "Disabled",
     "unlimited": "Unlimited",
     "generatedImage": "Generated image",
-    "imageError": "Could not load the protected image."
+    "imageError": "Could not load the protected image.",
+    "usageHint": "Usage is a server snapshot, not a reservation. Admitted requests count even if a provider fails. Other requests and policy changes can change the remaining quota. Reload to update.",
+    "observedAt": "Observed at",
+    "policyRevision": "Policy revision",
+    "used": "Used",
+    "remaining": "Remaining",
+    "resetsAt": "Resets at",
+    "activeRequests": "Active requests",
+    "usageUnavailable": "Current usage is unavailable. Only configured limits are shown."
   },
   "roleManager": {
     "code": "Role code",
@@ -841,6 +852,10 @@
     "providerError": "The image provider could not complete the request. Please try again."
   },
   "apimartStudio": {
+    "pollRateLimited": "Task checks are limited. The next check will run in {{seconds}} seconds. No generation request is resubmitted.",
+    "pollRateLimitPaused": "Automatic checks are paused due to request limits. Resume in {{seconds}} seconds using the same task ID. The provider task may still be running.",
+    "submitRateLimited": "Submission was rate-limited. Try again later. No automatic submission retry was made.",
+    "submitRateLimitedRetryAfter": "Submission was rate-limited. Try again in {{seconds}} seconds. No automatic submission retry was made.",
     "nav": "APIMart Images",
     "title": "APIMart image studio",
     "intro": "Create, edit and refine with GPT Image 2.5 and 2.6. Follow every task from submission to download.",

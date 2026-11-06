@@ -1,7 +1,7 @@
 <div class="admin-workspace" [class.navigation-collapsed]="isCollapsed">
   @if (compact && !isCollapsed) { <button class="admin-backdrop" (click)="isCollapsed = true" [attr.aria-label]="'workspace.closeNavigation' | translate"></button> }
   <aside class="admin-navigation" id="admin-navigation" [attr.aria-label]="'admin.controlCenter' | translate" [attr.inert]="isCollapsed ? '' : null">
-    <a class="workspace-brand" routerLink="/chat"><span class="workspace-mark" aria-hidden="true">T</span>Turbo AI</a>
+    <a class="workspace-brand" routerLink="/chat"><span class="workspace-mark" aria-hidden="true">R</span>Relaxkon</a>
     <p class="nav-caption">{{'workspace.manage' | translate}}</p>
     <nav>
       <a routerLink="feature-access" routerLinkActive="nav-active" (click)="closeOnMobile()">{{'featureAccess.title' | translate}}</a>

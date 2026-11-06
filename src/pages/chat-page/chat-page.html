@@ -2,7 +2,7 @@
   @if (visible()) {
     @if (isCompact()) { <button class="menu-backdrop" (click)="hideMenu()" [attr.aria-label]="'workspace.closeNavigation' | translate"></button> }
     <aside class="app-sidebar d-flex flex-column h-100" [attr.aria-label]="'workspace.conversationNavigation' | translate">
-      <a class="sidebar-brand" routerLink="/chat" (click)="closeMenuIfCompact()"><span class="brand-mark" aria-hidden="true">T</span>Turbo AI</a>
+      <a class="sidebar-brand" routerLink="/chat" (click)="closeMenuIfCompact()"><span class="brand-mark" aria-hidden="true">R</span>Relaxkon</a>
       <div class="history-area">
         @defer (on immediate) { <app-chat-history></app-chat-history> } @placeholder { <nz-skeleton></nz-skeleton> }
       </div>

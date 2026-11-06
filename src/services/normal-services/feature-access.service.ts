@@ -4,7 +4,7 @@ import {ServiceProvider} from '../../roots';
 
 import type {FeatureGrant, FeaturePolicyDocument as FeaturePolicies} from '../../contracts/feature-access';
 export type {FeatureGrant, FeaturePolicy, FeaturePolicyDocument as FeaturePolicies, FeatureAccessResponse as FeatureAccess} from '../../contracts/feature-access';
-import type {FeatureAccessResponse as FeatureAccess} from '../../contracts/feature-access';
+import type {FeatureUsageResponse, FeatureAccessResponse as FeatureAccess} from '../../contracts/feature-access';
 
 export function validFeatureGrant(grant: FeatureGrant): boolean {
   return [grant.requestsPerMinute, grant.requestsPerDay, grant.maxConcurrent]
@@ -18,6 +18,7 @@ export class FeatureAccessService {
   private get url() { return `${this.provider.apiUrl}api/feature-access`; }
   // Never cache identity/entitlements across accounts or infer them from local roles.
   me() { return this.http.get<FeatureAccess>(`${this.url}/me`); }
+  usage() { return this.http.get<FeatureUsageResponse>(`${this.url}/usage`); }
   policies() { return this.http.get<FeaturePolicies>(`${this.url}/policies`); }
   save(policies: FeaturePolicies) { return this.http.put<FeaturePolicies>(`${this.url}/policies`, policies); }
 }
