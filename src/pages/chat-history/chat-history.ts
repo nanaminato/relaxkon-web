@@ -69,8 +69,8 @@ export class ChatHistory
     this.hideDeleteButton();
 
     this.modal.confirm({
-      nzTitle: this.translate.instant('chat-history.delete-title'),
-      nzContent: this.translate.instant('chat-history.delete-description'),
+      nzTitle: this.translate.instant('chat.history.delete-title'),
+      nzContent: this.translate.instant('chat.history.delete-description'),
       nzOkText: this.translate.instant('universal.delete'),
       nzCancelText: this.translate.instant('universal.cancel'),
       nzOkDanger: true,

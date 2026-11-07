@@ -15,7 +15,7 @@ export class SendManagerService {
   private readonly i18n = inject(TranslateService);
   private async queue(operation: Omit<SyncMutation, 'operationId'>): Promise<string> {
     await this.sync.enqueue(operation);
-    return this.i18n.instant('management.syncQueued');
+    return this.i18n.instant('admin.management.syncQueued');
   }
   sendHistory(history: ChatHistoryTitle) { return this.queue({kind: 'history', action: 'upsert', entityId: String(history.dataId), payload: history}); }
   updateHistory(history: ChatHistory) { return this.sendHistory(history); }
@@ -27,7 +27,7 @@ export class SendManagerService {
       {kind: 'history', action: 'upsert', entityId: String(historyId), payload: {dataId: historyId, title: history.title}},
       {kind: 'message', action: 'upsert', entityId: String(message.dataId), historyId, payload: message}
     ]);
-    return this.i18n.instant('management.syncQueued');
+    return this.i18n.instant('admin.management.syncQueued');
   }
   updateMessage(historyId: number, message: ChatInterface) { return this.sendMessage(historyId, message); }
   sendTask(task: GenerateTask) { return this.queue({kind: 'task', action: 'upsert', entityId: task.task_id!, payload: task}); }

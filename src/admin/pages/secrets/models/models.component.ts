@@ -79,13 +79,13 @@ export class ModelsComponent {
         this.models = models;
         this.filterModels();
         if (refresh) {
-          this.message.success(this.i18n.instant('management.refreshSuccess'));
+          this.message.success(this.i18n.instant('admin.management.refreshSuccess'));
         }
       },
       error: (err: any) => {
         this.models = [];
         this.filterModels();
-        this.message.error(this.i18n.instant('management.modelsFailed'));
+        this.message.error(this.i18n.instant('admin.management.modelsFailed'));
       }
     });
   }
@@ -106,11 +106,11 @@ export class ModelsComponent {
   delete(roleId: number) {
     this.call.deleteModel(roleId).subscribe({
       next: () => {
-        this.message.success(this.i18n.instant('management.deleteSuccess'));
+        this.message.success(this.i18n.instant('admin.management.deleteSuccess'));
         this.fetchModels(true);
       },
       error: () => {
-        this.message.error(this.i18n.instant('management.deleteFailed'));
+        this.message.error(this.i18n.instant('admin.management.deleteFailed'));
       }
     });
   }

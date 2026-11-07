@@ -93,8 +93,8 @@ describe('Current-account usage snapshot', () => {
   });
   it('renders zero separately from unlimited and labels the server timestamp as UTC', () => {
     const translations = TestBed.inject(TranslateService);
-    translations.setTranslation('en', {featureAccess: {unlimited: 'Unlimited', remaining: 'Remaining',
-      used: 'Used', activeRequests: 'Active', names: {chat: 'Chat'}}}); translations.use('en');
+    translations.setTranslation('en', {admin: {featureAccess: {unlimited: 'Unlimited', remaining: 'Remaining',
+      used: 'Used', activeRequests: 'Active', names: {chat: 'Chat'}}}}); translations.use('en');
     const fixture = TestBed.createComponent(FeatureAccessStatus); fixture.detectChanges();
     const text = fixture.nativeElement.textContent;
     expect(text).toContain('Remaining: 0');

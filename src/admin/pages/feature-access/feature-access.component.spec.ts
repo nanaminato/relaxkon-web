@@ -59,7 +59,7 @@ describe('Feature policy editor', () => {
     expect(component.document!.revision).toBe(5);
     expect(component.saving).toBeFalse();
     expect(component.dirty).toBeFalse();
-    expect(component.status).toBe('featureAccess.saved');
+    expect(component.status).toBe('admin.featureAccess.saved');
   });
   it('rejects unchanged and invalid policies before calling the API', () => {
     component.save();
@@ -86,7 +86,7 @@ describe('Feature policy editor', () => {
     expect(component.document).toBeUndefined();
     pending.error({status: 503});
     expect(component.loading).toBeFalse();
-    expect(component.status).toBe('featureAccess.loadError');
+    expect(component.status).toBe('admin.featureAccess.loadError');
     api.policies.and.returnValue(of(policy()));
     component.reload();
     expect(component.document!.revision).toBe(4);

@@ -14,6 +14,8 @@ export class SyncService {
   private readonly provider = inject(ServiceProvider);
   private readonly database = inject(SyncLocalStore);
   private running?: {accountId: number; promise: Promise<void>};
+  private readonly languagePackSnapshots = new Set<number>();
+  private readonly uiLanguageSupport = new Set<number>();
   readonly completed$ = new Subject<{accountId: number}>();
   readonly status$ = new BehaviorSubject<{accountId?: number; pending: boolean; error?: unknown}>({pending: false});
 
@@ -28,10 +30,13 @@ export class SyncService {
     return this.enqueueBatch([operation]);
   }
 
-  async enqueueBatch(operations: Omit<SyncMutation, 'operationId'>[]): Promise<void> {
+  async enqueueBatch(operations: Omit<SyncMutation, 'operationId'>[], expectedAccount?: number, migrateLanguagePacks = false): Promise<void> {
     const accountId = this.auth.user?.id;
-    if (!accountId) throw new Error('A signed-in account is required for sync');
-    await this.database.enqueueSyncBatch(accountId, operations.map(operation => ({...structuredClone(operation), operationId: crypto.randomUUID()})));
+    if (!accountId || (expectedAccount !== undefined && accountId !== expectedAccount))
+      throw new Error('A matching signed-in account is required for sync');
+    const queued = await this.database.enqueueSyncBatch(accountId,
+      operations.map(operation => ({...structuredClone(operation), operationId: crypto.randomUUID()})), migrateLanguagePacks);
+    if (!queued) return;
     this.status$.next({accountId, pending: true});
     void this.synchronize().catch(() => undefined);
   }
@@ -70,12 +75,18 @@ export class SyncService {
       }
       assertAccount();
       const cursor = await this.database.syncCursor(accountId);
-      const response = await firstValueFrom(this.http.get<SyncBatchResponse>(`${url}?cursor=${cursor}`, options));
+      const snapshot = !this.supportsLanguagePacks(accountId);
+      const response = await firstValueFrom(this.http.get<SyncBatchResponse>(
+        `${url}?cursor=${cursor}&languagePacks=true&languagePackSnapshot=${snapshot}&uiLanguage=true`, options));
       assertAccount();
-      const batch: SyncBatch = {...response, changes: response.changes.map(change => ({...change, historyId: change.historyId ?? undefined}))};
+      const batch: SyncBatch = {...response, changes: response.changes.map(change => ({...change, historyId: change.historyId ?? undefined})),
+        languagePacks: response.languagePacks?.map(change => ({...change, historyId: undefined}))};
       if (await this.database.prepareBootstrap(accountId, batch)) continue;
-      if (!await this.database.applySyncBatch(accountId, batch, cursor)) continue;
-      changed ||= batch.reset || batch.changes.length > 0;
+      const applied = await this.database.applySyncBatch(accountId, batch, cursor);
+      if (!applied) continue;
+      if (response.uiLanguageSupported) this.uiLanguageSupport.add(accountId);
+      if (batch.languagePacks) this.languagePackSnapshots.add(accountId);
+      changed ||= batch.reset || batch.changes.length > 0 || !!batch.languagePacks;
       if (batch.hasMore) continue;
       if ((await this.database.pendingSync(accountId)).length) continue;
       this.status$.next({accountId, pending: false});
@@ -85,4 +96,6 @@ export class SyncService {
   }
 
   async entities(accountId: number) { return this.database.syncEntities(accountId); }
+  supportsLanguagePacks(accountId: number) { return this.languagePackSnapshots.has(accountId); }
+  supportsUiLanguage(accountId: number) { return this.uiLanguageSupport.has(accountId); }
 }

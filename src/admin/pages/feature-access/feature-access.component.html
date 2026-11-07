@@ -1,70 +1,70 @@
 <section class="access-page" [attr.aria-busy]="loading || saving">
   <header class="page-heading">
-    <div><span class="eyebrow">{{'featureAccess.policyCenter' | translate}}</span>
-      <h1>{{'featureAccess.title' | translate}}</h1><p>{{'featureAccess.description' | translate}}</p></div>
-    <a class="roles-link" routerLink="/admin/accounts/roles">{{'management.roles' | translate}} <span aria-hidden="true">↗</span></a>
+    <div><span class="eyebrow">{{'admin.featureAccess.policyCenter' | translate}}</span>
+      <h1>{{'admin.featureAccess.title' | translate}}</h1><p>{{'admin.featureAccess.description' | translate}}</p></div>
+    <a class="roles-link" routerLink="/admin/accounts/roles">{{'admin.management.roles' | translate}} <span aria-hidden="true">↗</span></a>
   </header>
   <div class="save-toolbar">
-    <div class="save-state" role="status">@if (document) { <span class="state-dot" [class.pending]="dirty"></span>{{(dirty ? 'featureAccess.unsaved' : 'featureAccess.upToDate') | translate}} } @else { {{(loading ? 'featureAccess.loading' : 'featureAccess.loadError') | translate}} }</div>
+    <div class="save-state" role="status">@if (document) { <span class="state-dot" [class.pending]="dirty"></span>{{(dirty ? 'admin.featureAccess.unsaved' : 'admin.featureAccess.upToDate') | translate}} } @else { {{(loading ? 'admin.featureAccess.loading' : 'admin.featureAccess.loadError') | translate}} }</div>
     <div class="actions">
-      <button class="btn btn-outline-primary" [disabled]="loading || saving" (click)="reload()">{{(dirty ? 'featureAccess.discardReload' : 'universal.reload') | translate}}</button>
-      <button class="btn btn-primary" [disabled]="!valid || !dirty || loading || saving || conflict" (click)="save()">{{(saving ? 'featureAccess.saving' : 'featureAccess.save') | translate}}</button>
+      <button class="btn btn-outline-primary" [disabled]="loading || saving" (click)="reload()">{{(dirty ? 'admin.featureAccess.discardReload' : 'universal.reload') | translate}}</button>
+      <button class="btn btn-primary" [disabled]="!valid || !dirty || loading || saving || conflict" (click)="save()">{{(saving ? 'admin.featureAccess.saving' : 'admin.featureAccess.save') | translate}}</button>
     </div>
   </div>
-  @if (status) { <div class="status-banner" [class.success]="status === 'featureAccess.saved'" role="status">{{status | translate}}</div> }
-  @if (loading) { <div class="loading-state" role="status">{{'featureAccess.loading' | translate}}</div> }
+  @if (status) { <div class="status-banner" [class.success]="status === 'admin.featureAccess.saved'" role="status">{{status | translate}}</div> }
+  @if (loading) { <div class="loading-state" role="status">{{'admin.featureAccess.loading' | translate}}</div> }
   @if (document) {
     <div class="editor-layout">
-      <nav class="feature-nav" [attr.aria-label]="'roleManager.feature' | translate">
-        <div class="nav-heading">{{'roleManager.feature' | translate}} <span>{{document.features.length}}</span></div>
+      <nav class="feature-nav" [attr.aria-label]="'admin.roles.feature' | translate">
+        <div class="nav-heading">{{'admin.roles.feature' | translate}} <span>{{document.features.length}}</span></div>
         @for (feature of document.features; track feature.key) {
           <button type="button" [class.current]="activeFeature?.key === feature.key" [attr.aria-current]="activeFeature?.key === feature.key ? 'true' : null" (click)="activeKey = feature.key">
-            <span>{{('featureAccess.names.' + feature.key) | translate}}<small>{{feature.key}}</small></span>
+            <span>{{('admin.featureAccess.names.' + feature.key) | translate}}<small>{{feature.key}}</small></span>
             <span class="count" [class.has-access]="enabledCount(feature) > 0">{{enabledCount(feature)}} / {{roleNames.length}}</span>
           </button>
         }
       </nav>
       <div class="editor-card">
         @if (activeFeature; as feature) {
-          <header class="card-heading"><div><h2>{{('featureAccess.names.' + feature.key) | translate}}</h2><p>{{'featureAccess.roleCount' | translate: {enabled: enabledCount(feature), total: roleNames.length} }}</p></div><code>{{feature.key}}</code></header>
-          @if (!enabledCount(feature)) { <div class="disabled-hint">{{'featureAccess.noneEnabled' | translate}}</div> }
+          <header class="card-heading"><div><h2>{{('admin.featureAccess.names.' + feature.key) | translate}}</h2><p>{{'admin.featureAccess.roleCount' | translate: {enabled: enabledCount(feature), total: roleNames.length} }}</p></div><code>{{feature.key}}</code></header>
+          @if (!enabledCount(feature)) { <div class="disabled-hint">{{'admin.featureAccess.noneEnabled' | translate}}</div> }
           <fieldset [disabled]="loading || saving">
-            <legend class="visually-hidden">{{('featureAccess.names.' + feature.key) | translate}}</legend>
+            <legend class="visually-hidden">{{('admin.featureAccess.names.' + feature.key) | translate}}</legend>
             <div class="policy-table"><table>
-              <thead><tr><th>{{'account.roles' | translate}}</th><th>{{'featureAccess.enabled' | translate}}</th><th>{{'featureAccess.perMinute' | translate}}</th><th>{{'featureAccess.perDay' | translate}}</th><th>{{'featureAccess.concurrent' | translate}}</th></tr></thead>
+              <thead><tr><th>{{'account.roles' | translate}}</th><th>{{'admin.featureAccess.enabled' | translate}}</th><th>{{'admin.featureAccess.perMinute' | translate}}</th><th>{{'admin.featureAccess.perDay' | translate}}</th><th>{{'admin.featureAccess.concurrent' | translate}}</th></tr></thead>
               <tbody>@for (role of roleNames; track role) {
                 <tr [class.role-disabled]="!feature.roles[role].enabled">
-                  <th scope="row"><span class="role-name">{{roleLabel(role)}}</span><code>{{role}}</code><small>{{'roleManager.editImpact' | translate: {count: memberCount(role)} }}</small></th>
-                  <td><label class="access-switch"><input type="checkbox" [(ngModel)]="feature.roles[role].enabled" (ngModelChange)="changed()" [attr.aria-label]="role + ' ' + feature.key + ' ' + ('featureAccess.enabled' | translate)"><span aria-hidden="true"></span></label></td>
+                  <th scope="row"><span class="role-name">{{roleLabel(role)}}</span><code>{{role}}</code><small>{{'admin.roles.editImpact' | translate: {count: memberCount(role)} }}</small></th>
+                  <td><label class="access-switch"><input type="checkbox" [(ngModel)]="feature.roles[role].enabled" (ngModelChange)="changed()" [attr.aria-label]="role + ' ' + feature.key + ' ' + ('admin.featureAccess.enabled' | translate)"><span aria-hidden="true"></span></label></td>
                   @for (limit of limits; track limit.key) {
-                    <td><input type="number" min="1" max="2147483647" step="1" [placeholder]="'featureAccess.unlimited' | translate" [(ngModel)]="feature.roles[role][limit.key]" (ngModelChange)="changed()" [attr.aria-invalid]="!validLimit(feature.roles[role][limit.key])" [attr.aria-label]="role + ' ' + feature.key + ' ' + (limit.label | translate)"></td>
+                    <td><input type="number" min="1" max="2147483647" step="1" [placeholder]="'admin.featureAccess.unlimited' | translate" [(ngModel)]="feature.roles[role][limit.key]" (ngModelChange)="changed()" [attr.aria-invalid]="!validLimit(feature.roles[role][limit.key])" [attr.aria-label]="role + ' ' + feature.key + ' ' + (limit.label | translate)"></td>
                   }
                 </tr>
-              } @empty { <tr><td colspan="5">{{'featureAccess.noRoles' | translate}}</td></tr> }</tbody>
+              } @empty { <tr><td colspan="5">{{'admin.featureAccess.noRoles' | translate}}</td></tr> }</tbody>
             </table></div>
           </fieldset>
-          @if (!valid) { <p class="validation-error" role="alert">{{'featureAccess.invalid' | translate}}</p> }
-          <div class="editor-hint">{{'featureAccess.mergeHint' | translate}}</div>
-          <details class="limit-details"><summary>{{'featureAccess.limitDetails' | translate}}</summary><p>{{'featureAccess.limitHint' | translate}}</p></details>
+          @if (!valid) { <p class="validation-error" role="alert">{{'admin.featureAccess.invalid' | translate}}</p> }
+          <div class="editor-hint">{{'admin.featureAccess.mergeHint' | translate}}</div>
+          <details class="limit-details"><summary>{{'admin.featureAccess.limitDetails' | translate}}</summary><p>{{'admin.featureAccess.limitHint' | translate}}</p></details>
         }
       </div>
     </div>
     <section class="preview-card">
-      <header class="card-heading"><div><h2>{{'roleManager.preview' | translate}}</h2><p>{{'featureAccess.previewIntro' | translate}}</p></div><span class="draft-badge">{{'featureAccess.draftPreview' | translate}}</span></header>
+      <header class="card-heading"><div><h2>{{'admin.roles.preview' | translate}}</h2><p>{{'admin.featureAccess.previewIntro' | translate}}</p></div><span class="draft-badge">{{'admin.featureAccess.draftPreview' | translate}}</span></header>
       <div class="preview-content">
-        <div class="role-chips" role="group" [attr.aria-label]="'roleManager.previewSelect' | translate">
+        <div class="role-chips" role="group" [attr.aria-label]="'admin.roles.previewSelect' | translate">
           @for (role of roles; track role.roleId) {
             @let code = role.code ?? role.name;
             <button type="button" [class.selected]="selectedCodes.includes(code)" [attr.aria-pressed]="selectedCodes.includes(code)" (click)="togglePreview(code)"><span aria-hidden="true">{{selectedCodes.includes(code) ? '✓' : '+'}}</span> {{role.name}} <small>{{code}}</small></button>
           }
         </div>
         @if (selectedCodes.length) {
-          <div class="policy-table"><table><thead><tr><th>{{'roleManager.feature' | translate}}</th><th>{{'featureAccess.enabled' | translate}}</th><th>{{'featureAccess.perMinute' | translate}}</th><th>{{'featureAccess.perDay' | translate}}</th><th>{{'featureAccess.concurrent' | translate}}</th></tr></thead>
+          <div class="policy-table"><table><thead><tr><th>{{'admin.roles.feature' | translate}}</th><th>{{'admin.featureAccess.enabled' | translate}}</th><th>{{'admin.featureAccess.perMinute' | translate}}</th><th>{{'admin.featureAccess.perDay' | translate}}</th><th>{{'admin.featureAccess.concurrent' | translate}}</th></tr></thead>
             <tbody>@for (feature of document.features; track feature.key) { @let grant = effective(feature);
-              <tr><th>{{('featureAccess.names.' + feature.key) | translate}}</th><td><span class="grant-badge" [class.allowed]="grant.enabled">{{(grant.enabled ? 'roleManager.allowed' : 'roleManager.denied') | translate}}</span></td><td>{{grant.enabled ? (grant.requestsPerMinute ?? ('roleManager.unlimited' | translate)) : unavailable}}</td><td>{{grant.enabled ? (grant.requestsPerDay ?? ('roleManager.unlimited' | translate)) : unavailable}}</td><td>{{grant.enabled ? (grant.maxConcurrent ?? ('roleManager.unlimited' | translate)) : unavailable}}</td></tr>
+              <tr><th>{{('admin.featureAccess.names.' + feature.key) | translate}}</th><td><span class="grant-badge" [class.allowed]="grant.enabled">{{(grant.enabled ? 'admin.roles.allowed' : 'admin.roles.denied') | translate}}</span></td><td>{{grant.enabled ? (grant.requestsPerMinute ?? ('admin.roles.unlimited' | translate)) : unavailable}}</td><td>{{grant.enabled ? (grant.requestsPerDay ?? ('admin.roles.unlimited' | translate)) : unavailable}}</td><td>{{grant.enabled ? (grant.maxConcurrent ?? ('admin.roles.unlimited' | translate)) : unavailable}}</td></tr>
             }</tbody></table></div>
-        } @else { <p class="preview-empty">{{'roleManager.previewSelect' | translate}}</p> }
-        <p class="preview-note">{{'roleManager.previewHint' | translate}}</p>
+        } @else { <p class="preview-empty">{{'admin.roles.previewSelect' | translate}}</p> }
+        <p class="preview-note">{{'admin.roles.previewHint' | translate}}</p>
       </div>
     </section>
   }

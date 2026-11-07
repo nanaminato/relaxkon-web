@@ -38,7 +38,7 @@ export class EditRoleComponent {
     this.saving = true;
     const body = {...this.validateForm.getRawValue(), roleId: this._role!.roleId};
     this.call.updateRole(body).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.saving = false)).subscribe({
-      next: () => { this.message.success(this.i18n.instant('management.roleUpdated')); this.close.emit(true); },
+      next: () => { this.message.success(this.i18n.instant('admin.management.roleUpdated')); this.close.emit(true); },
       error: error => this.message.error(this.i18n.instant(roleErrorKey(error)))
     });
   }

@@ -38,7 +38,7 @@ export class KeyExhibitComponent {
     this.call.deleteKey(id)
       .subscribe({
         next: msg=>{
-          this.message.success(this.i18n.instant('management.deleteSuccess'))
+          this.message.success(this.i18n.instant('admin.management.deleteSuccess'))
           this.refresh.next(true);
         },
         error: err=>{
@@ -52,7 +52,7 @@ export class KeyExhibitComponent {
         this.types = types;
       },
       error: err => {
-        this.message.error(this.i18n.instant('management.keyTypesFailed'))
+        this.message.error(this.i18n.instant('admin.management.keyTypesFailed'))
       }
     })
   }
@@ -60,6 +60,6 @@ export class KeyExhibitComponent {
 
   getKeyDescription(requestIdentifier: number | undefined) {
     let type = this.types?.find(t=>t.requestIdentifier === requestIdentifier);
-    return type === undefined? this.i18n.instant('management.unknown'):type.type;
+    return type === undefined? this.i18n.instant('admin.management.unknown'):type.type;
   }
 }

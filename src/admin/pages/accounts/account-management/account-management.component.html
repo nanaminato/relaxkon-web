@@ -1,19 +1,19 @@
 <div class="overflow-y-scroll h-100">
   <div class="d-flex flex-row-reverse sticky-top z-1">
     <div class="my-1">
-      <button class="btn btn-primary mx-1" [routerLink]="['create']" [queryParams]="{returnUrl: admin_routes.management.join('/')}">{{'management.add' | translate}}</button>
+      <button class="btn btn-primary mx-1" [routerLink]="['create']" [queryParams]="{returnUrl: admin_routes.management.join('/')}">{{'admin.management.add' | translate}}</button>
       <button class="btn btn-primary mx-1"
               (click)="refresh()"
-      >{{'management.refresh' | translate}}</button>
+      >{{'admin.management.refresh' | translate}}</button>
     </div>
   </div>
   <table class="table table-sm table-striped table-bordered">
     <thead>
-    <th scope="col">{{'management.accountId' | translate}}</th>
-    <th scope="col">{{'management.username' | translate}}</th>
-    <th scope="col">{{'management.email' | translate}}</th>
-    <th scope="col">{{'management.roles' | translate}}</th>
-    <th>{{'management.actions' | translate}}</th>
+    <th scope="col">{{'admin.management.accountId' | translate}}</th>
+    <th scope="col">{{'admin.management.username' | translate}}</th>
+    <th scope="col">{{'admin.management.email' | translate}}</th>
+    <th scope="col">{{'admin.management.roles' | translate}}</th>
+    <th>{{'admin.management.actions' | translate}}</th>
     </thead>
 
     @if(accounts===undefined){
@@ -35,14 +35,14 @@
             <td>
               <div class="d-flex">
                 <button class="btn btn-primary mx-1" [routerLink]="['edit',''+account.accountId]" [queryParams]="{returnUrl: admin_routes.management.join('/')}">
-                  {{'management.edit' | translate}}
+                  {{'admin.management.edit' | translate}}
                 </button>
                 <button class="btn btn-warning mx-1"
                         nz-popconfirm
-                        [nzPopconfirmTitle]="'management.confirmAccountDelete' | translate"
+                        [nzPopconfirmTitle]="'admin.management.confirmAccountDelete' | translate"
                         nzPopconfirmPlacement="bottom"
                         [disabled]="deleting.has(account.accountId)" (nzOnConfirm)="delete(account.accountId)">
-                  {{'management.delete' | translate}}
+                  {{'admin.management.delete' | translate}}
                 </button>
               </div>
             </td>

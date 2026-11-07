@@ -23,19 +23,19 @@ export function validExactSize(value: string): boolean {
 }
 /** Explicit capability allowlist: ignored/unsupported controls never enter the wire request. */
 export function apimartRequest(input: APIMartImageGenerationRequest): APIMartImageGenerationRequest {
-  if (!apimartModels.includes(input.model)) throw new Error('apimartStudio.invalidModel');
+  if (!apimartModels.includes(input.model)) throw new Error('studio.image.apimart.invalidModel');
   const caps = apimartCapabilities(input.model), format = input.output_format ?? 'png';
-  if (!input.prompt.trim() || input.prompt.trim().length > 32000) throw new Error('apimartStudio.invalidPrompt');
-  if (!Number.isInteger(input.n) || input.n < 1 || input.n > caps.maxCount || (format === 'svg' && input.n !== 1)) throw new Error('apimartStudio.invalidCount');
-  if (!caps.formats.includes(format)) throw new Error('apimartStudio.invalidOptions');
-  if (input.resolution && !caps.resolutions.includes(input.resolution)) throw new Error('apimartStudio.invalidOptions');
-  if (input.size && input.size !== 'auto' && !caps.ratios.includes(input.size) && (caps.ext || !validExactSize(input.size))) throw new Error('apimartStudio.invalidSize');
+  if (!input.prompt.trim() || input.prompt.trim().length > 32000) throw new Error('studio.image.apimart.invalidPrompt');
+  if (!Number.isInteger(input.n) || input.n < 1 || input.n > caps.maxCount || (format === 'svg' && input.n !== 1)) throw new Error('studio.image.apimart.invalidCount');
+  if (!caps.formats.includes(format)) throw new Error('studio.image.apimart.invalidOptions');
+  if (input.resolution && !caps.resolutions.includes(input.resolution)) throw new Error('studio.image.apimart.invalidOptions');
+  if (input.size && input.size !== 'auto' && !caps.ratios.includes(input.size) && (caps.ext || !validExactSize(input.size))) throw new Error('studio.image.apimart.invalidSize');
   const refs = input.image_urls ?? [];
-  if (refs.length > 16 || refs.some(url => !publicImageUrl(url) && !(caps.ext && /^data:image\/(png|jpeg|webp|gif|bmp);base64,[A-Za-z0-9+/=\s]+$/i.test(url)))) throw new Error('apimartStudio.invalidReferences');
-  if (['gif', 'svg'].includes(format) && (refs.length || input.mask_url || input.markup_url)) throw new Error('apimartStudio.textOnly');
-  if (input.mask_url && input.markup_url) throw new Error('apimartStudio.overlayConflict');
+  if (refs.length > 16 || refs.some(url => !publicImageUrl(url) && !(caps.ext && /^data:image\/(png|jpeg|webp|gif|bmp);base64,[A-Za-z0-9+/=\s]+$/i.test(url)))) throw new Error('studio.image.apimart.invalidReferences');
+  if (['gif', 'svg'].includes(format) && (refs.length || input.mask_url || input.markup_url)) throw new Error('studio.image.apimart.textOnly');
+  if (input.mask_url && input.markup_url) throw new Error('studio.image.apimart.overlayConflict');
   for (const [kind, value] of [['mask', input.mask_url], ['markup', input.markup_url]] as const) {
-    if (value && (!refs.length || !caps[kind] || (!(publicImageUrl(value) && (kind !== 'markup' || /^https:\/\//i.test(value))) && !/^data:image\/png;base64,[A-Za-z0-9+/=\s]+$/i.test(value)))) throw new Error('apimartStudio.invalidOverlay');
+    if (value && (!refs.length || !caps[kind] || (!(publicImageUrl(value) && (kind !== 'markup' || /^https:\/\//i.test(value))) && !/^data:image\/png;base64,[A-Za-z0-9+/=\s]+$/i.test(value)))) throw new Error('studio.image.apimart.invalidOverlay');
   }
   const body: APIMartImageGenerationRequest = {model: input.model, prompt: input.prompt.trim(), n: input.n, idempotency_key: input.idempotency_key};
   if (input.size) body.size = format === 'gif' ? 'auto' : input.size;
@@ -48,37 +48,37 @@ export function apimartRequest(input: APIMartImageGenerationRequest): APIMartIma
   if (caps.v26 && input.complexity) body.complexity = input.complexity;
   if (!caps.ext) {
     if (format !== 'svg') body.background = input.background ?? 'auto';
-    if (body.background === 'transparent' && !['png', 'webp'].includes(format)) throw new Error('apimartStudio.invalidOptions');
+    if (body.background === 'transparent' && !['png', 'webp'].includes(format)) throw new Error('studio.image.apimart.invalidOptions');
     body.moderation = input.moderation ?? 'auto';
     if (['jpeg', 'webp'].includes(format) && input.output_compression != null) {
-      if (!Number.isInteger(input.output_compression) || input.output_compression < 0 || input.output_compression > 100) throw new Error('apimartStudio.invalidOptions');
+      if (!Number.isInteger(input.output_compression) || input.output_compression < 0 || input.output_compression > 100) throw new Error('studio.image.apimart.invalidOptions');
       body.output_compression = input.output_compression;
     }
     if (input.mask_url) body.mask_url = input.mask_url;
     if (input.markup_url) body.markup_url = input.markup_url;
     if (format === 'gif') {
       if (!Number.isInteger(input.frame_count) || input.frame_count! < 2 || input.frame_count! > 16 ||
-        !Number.isInteger(input.frame_duration_ms) || input.frame_duration_ms! < 20 || input.frame_duration_ms! > 2000) throw new Error('apimartStudio.invalidOptions');
+        !Number.isInteger(input.frame_duration_ms) || input.frame_duration_ms! < 20 || input.frame_duration_ms! > 2000) throw new Error('studio.image.apimart.invalidOptions');
       body.frame_count = input.frame_count; body.frame_duration_ms = Math.round(input.frame_duration_ms! / 10) * 10;
     }
   }
   if (format === 'svg') {
-    if (!caps.ext && !input.svg?.model.trim()) throw new Error('apimartStudio.svgRequired');
+    if (!caps.ext && !input.svg?.model.trim()) throw new Error('studio.image.apimart.svgRequired');
     if (input.svg?.model.trim()) body.svg = {model: input.svg.model.trim()};
   }
   return body;
 }
 export function submissionTaskIds(response: APIMartSubmissionResponse): string[] {
-  if (response.code != null && ![200, 202].includes(response.code)) throw new Error('apimartStudio.submitUnknown');
+  if (response.code != null && ![200, 202].includes(response.code)) throw new Error('studio.image.apimart.submitUnknown');
   const values = Array.isArray(response.data) ? response.data.map(item => item.task_id) : [response.data?.id];
-  if (!values.length || values.some(id => typeof id !== 'string' || !id.trim() || id.length > 255 || /[\x00-\x1f]/.test(id))) throw new Error('apimartStudio.submitUnknown');
+  if (!values.length || values.some(id => typeof id !== 'string' || !id.trim() || id.length > 255 || /[\x00-\x1f]/.test(id))) throw new Error('studio.image.apimart.submitUnknown');
   return [...new Set(values.map(id => id!.trim()))];
 }
 export function submissionTaskId(response: APIMartSubmissionResponse): string { return submissionTaskIds(response)[0]; }
 export function taskDetail(response: APIMartTaskResponse | APIMartTaskDetail, taskId: string): APIMartTaskDetail {
-  if ('code' in response && response.code !== 200) throw new Error('apimartStudio.queryError');
+  if ('code' in response && response.code !== 200) throw new Error('studio.image.apimart.queryError');
   const task = 'data' in response ? response.data : response;
-  if (!task || task.id !== taskId || !['pending', 'submitted', 'queued', 'processing', 'completed', 'failed', 'cancelled'].includes(task.status)) throw new Error('apimartStudio.queryError');
+  if (!task || task.id !== taskId || !['pending', 'submitted', 'queued', 'processing', 'completed', 'failed', 'cancelled'].includes(task.status)) throw new Error('studio.image.apimart.queryError');
   return task;
 }
 export function taskImages(task: APIMartTaskDetail): string[] {

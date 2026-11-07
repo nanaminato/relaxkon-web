@@ -72,7 +72,7 @@ export class KeyCreateComponent {
   modelKeyBinds: ModelKeyBind[] = [];
   allModels: Model[] | undefined;
   actionTip(modelId: number){
-    return this.modelKeyBinds.find(r=>r.modelId===modelId)!==undefined?this.i18n.instant('management.remove'):this.i18n.instant('management.add');
+    return this.modelKeyBinds.find(r=>r.modelId===modelId)!==undefined?this.i18n.instant('admin.management.remove'):this.i18n.instant('admin.management.add');
   }
   active(modelId: number){
     return this.modelKeyBinds.find(r=>r.modelId===modelId)!==undefined;
@@ -83,7 +83,7 @@ export class KeyCreateComponent {
         this.types = types;
       },
       error: err => {
-        this.message.error(this.i18n.instant('management.keyTypesFailed'))
+        this.message.error(this.i18n.instant('admin.management.keyTypesFailed'))
       }
     })
   }
@@ -92,11 +92,11 @@ export class KeyCreateComponent {
       next: models=>{
         this.allModels = models;
         if(refresh){
-          this.message.success(this.i18n.instant('management.refreshSuccess'));
+          this.message.success(this.i18n.instant('admin.management.refreshSuccess'));
         }
       },
       error:() => {
-        this.message.error(this.i18n.instant('management.modelsFailed'))
+        this.message.error(this.i18n.instant('admin.management.modelsFailed'))
       }
     })
   }
@@ -114,11 +114,11 @@ export class KeyCreateComponent {
         })
         .subscribe({
           next: () =>{
-            this.message.success(this.i18n.instant('management.keyCreated'));
+            this.message.success(this.i18n.instant('admin.management.keyCreated'));
             this.router.navigate(admin_routes.keys);
           },
           error: (err: any) => {
-            this.message.error(apiErrorMessage(err, this.i18n.instant('management.networkError')));
+            this.message.error(apiErrorMessage(err, this.i18n.instant('admin.management.networkError')));
           }
         })
     } else {

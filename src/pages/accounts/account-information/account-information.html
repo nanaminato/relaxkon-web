@@ -1,17 +1,17 @@
 <section class="profile-card">
-  <div class="profile-heading"><span class="profile-avatar" aria-hidden="true">{{user?.name?.slice(0, 1)?.toUpperCase() || 'R'}}</span><div><h1>{{'account.self' | translate}}</h1><p>{{'studioUi.profileIntro' | translate}}</p></div></div>
+  <div class="profile-heading"><span class="profile-avatar" aria-hidden="true">{{user?.name?.slice(0, 1)?.toUpperCase() || 'R'}}</span><div><h1>{{'account.self' | translate}}</h1><p>{{'account.profile.profileIntro' | translate}}</p></div></div>
   @if(user){
     <dl>
       <div><dt>{{'account.username' | translate}}</dt><dd>{{user!.name}}</dd></div>
       <div><dt>{{'account.nickname' | translate}}</dt><dd>{{user!.nickname || ('universal.none' | translate)}}</dd></div>
       <div><dt>{{'account.roles' | translate}}</dt><dd aria-live="polite">
-        @if(rolesLoading){ {{'studioUi.profileLoading' | translate}} }
-        @else if(rolesError){<p>{{'studioUi.profileError' | translate}}</p><button class="btn btn-outline-primary btn-sm" (click)="fetchRolesOfThisUser()">{{'universal.reload' | translate}}</button>}
+        @if(rolesLoading){ {{'account.profile.profileLoading' | translate}} }
+        @else if(rolesError){<p>{{'account.profile.profileError' | translate}}</p><button class="btn btn-outline-primary btn-sm" (click)="fetchRolesOfThisUser()">{{'universal.reload' | translate}}</button>}
         @else{ @for(role of roles;track role.roleId){<span class="role-tag">{{role.name}}</span>} @empty{ {{'universal.none' | translate}} } }
       </dd></div>
     </dl>
     <app-feature-access-status></app-feature-access-status>
-    <aside><p>{{'studioUi.securityHint' | translate}}</p><a routerLink="/accounts/forgot-me-password">{{'account.forgotPassword' | translate}} →</a></aside>
-    <div class="profile-actions"><a class="btn btn-primary" routerLink="/chat">{{'accountUi.backToChat' | translate}}</a><button class="btn btn-outline-secondary" (click)="logout()">{{'account.signOut' | translate}}</button></div>
-  }@else{<p>{{'studioUi.profileGuest' | translate}}</p><a class="btn btn-primary" routerLink="/accounts/sign-in">{{'account.signIn' | translate}}</a>}
+    <aside><p>{{'account.profile.securityHint' | translate}}</p><a routerLink="/accounts/forgot-me-password">{{'account.forgotPassword' | translate}} →</a></aside>
+    <div class="profile-actions"><a class="btn btn-primary" routerLink="/chat">{{'account.ui.backToChat' | translate}}</a><button class="btn btn-outline-secondary" (click)="logout()">{{'account.signOut' | translate}}</button></div>
+  }@else{<p>{{'account.profile.profileGuest' | translate}}</p><a class="btn btn-primary" routerLink="/accounts/sign-in">{{'account.signIn' | translate}}</a>}
 </section>

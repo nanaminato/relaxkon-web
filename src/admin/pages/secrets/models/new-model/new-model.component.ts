@@ -63,7 +63,7 @@ export class NewModelComponent {
         vision: this.validateForm.value.vision!
       }).subscribe({
         next: () =>{
-          this.message.success(this.i18n.instant('management.addSuccess'));
+          this.message.success(this.i18n.instant('admin.management.addSuccess'));
           this.close.next(true);
         },
         error: (err: any) => {

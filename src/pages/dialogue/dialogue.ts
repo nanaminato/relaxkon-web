@@ -117,7 +117,7 @@ export class Dialogue {
       return this.localization.text('universal.unknown');
     }
     if(chatModel.role===UserRole){
-      return this.localization.text('dialog.you');
+      return this.localization.text('chat.message.you');
     }
     return chatModel.model;
   }

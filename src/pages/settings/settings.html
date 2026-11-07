@@ -13,7 +13,7 @@
       </div>
     </div>
     <div class="py-2 my-auto pe-4 ms-5 ms-sm-0">
-      <button nz-button class="border-1 rounded-2" [routerLink]="['/chat']" [attr.aria-label]="'accountUi.backToChat' | translate">
+      <button nz-button class="border-1 rounded-2" [routerLink]="['/chat']" [attr.aria-label]="'account.ui.backToChat' | translate">
         <span nz-icon nzType="close" nzTheme="outline"></span>
       </button>
     </div>
@@ -147,15 +147,41 @@
       <div class="d-flex justify-content-between m-1">
         <div class="title">{{ 'settings.language' | translate }}</div>
         <div>
-          <nz-select class="select big" [(ngModel)]="dynamicConfig!.language" (ngModelChange)="languageChange($event)">
+          <nz-select class="select big" [ngModel]="selectedLanguage" (ngModelChange)="languageChange($event)">
             <nz-option-group [nzLabel]="'settings.language' | translate">
-              @for (language_pair of displayLanguages; track language_pair) {
+              @for (language of displayLanguages; track language.code) {
                 <nz-option
-                  [nzValue]="language_pair.code" [nzLabel]="language_pair.labelKey | translate"></nz-option>
+                  [nzValue]="language.code" [nzLabel]="language.name"></nz-option>
               }
             </nz-option-group>
           </nz-select>
         </div>
+      </div>
+      <div class="language-packs">
+        <h2 class="title">{{ 'settings.languagePacks.title' | translate }}</h2>
+        <p class="follow">{{ 'settings.languagePacks.hint' | translate }}</p>
+        <div class="language-pack-actions">
+          <button nz-button type="button" (click)="downloadLanguageTemplate()">
+            {{ 'settings.languagePacks.downloadTemplate' | translate }}
+          </button>
+          <button nz-button type="button" (click)="packFile.click()">
+            {{ 'settings.languagePacks.importPack' | translate }}
+          </button>
+          <input #packFile hidden type="file" accept=".json,application/json" (change)="importLanguagePack(packFile)">
+        </div>
+        @if (customLanguages.length) {
+          <ul class="language-pack-list">
+            @for (language of customLanguages; track language.code) {
+              <li>
+                <span>{{ language.name }} ({{ language.code }})</span>
+                <button nz-button nzType="text" nzDanger type="button" (click)="removeLanguagePack(language.code)"
+                        [attr.aria-label]="'settings.languagePacks.removeNamed' | translate: {name: language.name}">
+                  {{ 'settings.languagePacks.remove' | translate }}
+                </button>
+              </li>
+            }
+          </ul>
+        }
       </div>
     </nz-card>
     <nz-card class="m-2 rounded-4">

@@ -2,13 +2,13 @@
   <div class="work-media" [class.has-images]="task?.images?.length">
     @if (task?.images?.length && getFormat(task?.task_type) === 'image') {
       @for (url of task!.images; track $index) { <app-authenticated-image [url]="url" [proxy]="useProxy()"></app-authenticated-image> }
-    } @else { <div class="media-placeholder"><span aria-hidden="true">▧</span><p>{{'library.noPreview' | translate}}</p></div> }
+    } @else { <div class="media-placeholder"><span aria-hidden="true">▧</span><p>{{'studio.library.noPreview' | translate}}</p></div> }
   </div>
   <div class="work-body">
     <div class="work-meta"><span class="type-badge">{{task?.task_type || '—'}}</span><span>{{task?.date | date:'yyyy-MM-dd HH:mm'}}</span></div>
     <h2 [title]="task?.task_id">{{task?.task_id}}</h2>
-    <div class="work-footer"><span>{{'library.imageCount' | translate: {count: task?.images?.length ?? 0} }}</span><div class="work-actions">
-      @if (!task?.images?.length && !task?.videos?.length && task?.task_type?.startsWith('apimart')) { <button nz-button (click)="recheck_task_status(task!)">{{'storeHouse.get-task-result' | translate}}</button> }
+    <div class="work-footer"><span>{{'studio.library.imageCount' | translate: {count: task?.images?.length ?? 0} }}</span><div class="work-actions">
+      @if (!task?.images?.length && !task?.videos?.length && task?.task_type?.startsWith('apimart')) { <button nz-button (click)="recheck_task_status(task!)">{{'studio.tasks.get-task-result' | translate}}</button> }
       <button nz-button nzDanger nz-popconfirm [nzPopconfirmTitle]="'notifications.confirmDeleteTask' | translate: {taskId: task?.task_id}" nzPopconfirmPlacement="bottom" (nzOnConfirm)="deleteItem(task!)">{{'universal.delete' | translate}}</button>
     </div></div>
   </div>

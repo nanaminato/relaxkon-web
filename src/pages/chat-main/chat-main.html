@@ -1,5 +1,5 @@
 @defer (on immediate) {
-  <nz-modal [(nzVisible)]="isVisible" [nzTitle]="'chat-main.edit' | translate"
+  <nz-modal [(nzVisible)]="isVisible" [nzTitle]="'chat.composer.edit' | translate"
             (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()">
     <ng-container *nzModalContent>
       <app-model-editor [chatModel]="editModel"></app-model-editor>
@@ -68,24 +68,24 @@
                      [nzBeforeUpload]="beforeUpload">
             <button nz-button class="bg-theme2 text-theme2">
               <span nz-icon nzType="upload"></span>
-              {{'chat-main.selectFile' | translate}}
+              {{'chat.composer.selectFile' | translate}}
             </button>
           </nz-upload>
         </div>
         <div class="tools align-items-start">
           <button type="button" class="text-theme2 border-1 border-theme2 bg-theme2 rounded-2"
                   (click)="clearContext()" [disabled]="answering"
-                  nz-tooltip [nzTooltipTitle]="'chat-main.clearContext' | translate" [attr.aria-label]="'chat-main.clearContext' | translate">
-            <img src="assets/svgs/clear.svg" width="30" height="20" [alt]="'chat-main.clear' | translate ">
+                  nz-tooltip [nzTooltipTitle]="'chat.composer.clearContext' | translate" [attr.aria-label]="'chat.composer.clearContext' | translate">
+            <img src="assets/svgs/clear.svg" width="30" height="20" [alt]="'chat.composer.clear' | translate ">
           </button>
           <button type="button" class="text-theme2 border-1 border-theme2 bg-theme2 rounded-2"
                   (click)="insertInlineCodeFlags()"
-                  nz-tooltip [nzTooltipTitle]="'chat-main.insertInlineCode' | translate" [attr.aria-label]="'chat-main.insertInlineCode' | translate">
+                  nz-tooltip [nzTooltipTitle]="'chat.composer.insertInlineCode' | translate" [attr.aria-label]="'chat.composer.insertInlineCode' | translate">
             <span nz-icon nzType="italic" nzTheme="outline"></span>
           </button>
           <button type="button" class="text-theme2 border-1 border-theme2 bg-theme2 rounded-2"
                   (click)="insertCodeFlags()"
-                  nz-tooltip [nzTooltipTitle]="'chat-main.insertCodeBlock' | translate" [attr.aria-label]="'chat-main.insertCodeBlock' | translate">
+                  nz-tooltip [nzTooltipTitle]="'chat.composer.insertCodeBlock' | translate" [attr.aria-label]="'chat.composer.insertCodeBlock' | translate">
             <span nz-icon nzType="code" nzTheme="outline"></span>
           </button>
         </div>
@@ -93,7 +93,7 @@
       <div class="prompt-row p-1 m-2 rounded-2">
           <textarea nz-input
                     #promptBox
-                    [placeholder]="'chat-main.askChatGPT' | translate "
+                    [placeholder]="'chat.composer.askChatGPT' | translate "
                     [nzAutosize]="{minRows: 2,maxRows: 6}"
                     [(ngModel)]="inputText"
                     (keydown)="handlePromptKeydown($event)"
@@ -104,7 +104,7 @@
                   [nzSize]="'small'"
                   [class.send-muted]="isFade()"
                   [attr.aria-label]="(answering ? 'workspace.stopResponse' : 'workspace.sendMessage') | translate"
-                  nz-tooltip [nzTooltipTitle]="miniPhone()? '': 'chat-main.ctrlEnterShortcut' | translate "
+                  nz-tooltip [nzTooltipTitle]="miniPhone()? '': 'chat.composer.ctrlEnterShortcut' | translate "
                   (click)="buttonControlGPT()"
                   [disabled]="!enableTouch()">
             @if(answering){
@@ -123,7 +123,7 @@
   </div>
   <div class="notice">
     <div class="center fs-mini overflow-hidden">
-      {{'chat-main.potentialErrorNotice' | translate}}
+      {{'chat.composer.potentialErrorNotice' | translate}}
     </div>
   </div>
 </div>

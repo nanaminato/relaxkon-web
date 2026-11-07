@@ -1,15 +1,15 @@
 <nz-modal [(nzVisible)]="ttsEditModelVisible"
           (nzOnCancel)="ttsEditModelVisible = false"
           (nzOnOk)="ttsEditModelVisible = false"
-          [nzTitle]="'mediaStudio.editParsedFile' | translate">
+          [nzTitle]="'studio.media.editParsedFile' | translate">
   <ng-container *nzModalContent>
     <app-tts-file-editor [ttsFile]="editTtsFile">
     </app-tts-file-editor>
   </ng-container>
 </nz-modal>
-<header class="studio-heading"><button nz-button type="button" (click)="toggleMenu()" [attr.aria-label]="'studioUi.menu' | translate" [attr.aria-expanded]="menuVisible()"><nz-icon nzType="menu-unfold" nzTheme="outline" /></button><div><h1>{{ 'studioUi.extractTitle' | translate }}</h1><p>{{ 'studioUi.extractIntro' | translate }}</p></div></header>
+<header class="studio-heading"><button nz-button type="button" (click)="toggleMenu()" [attr.aria-label]="'studio.shared.menu' | translate" [attr.aria-expanded]="menuVisible()"><nz-icon nzType="menu-unfold" nzTheme="outline" /></button><div><h1>{{ 'studio.media.extractTitle' | translate }}</h1><p>{{ 'studio.media.extractIntro' | translate }}</p></div></header>
 <div class="border rounded-2 d-flex justify-content-end">
-  <button nz-button (click)="reparseAll()" class="m-2">{{ 'mediaStudio.parseAllFiles' | translate }}</button>
+  <button nz-button (click)="reparseAll()" class="m-2">{{ 'studio.media.parseAllFiles' | translate }}</button>
 </div>
 <div class="m-1 border-black">
   <div class="file-drop border d-flex justify-content-center align-items-center" style="height: 150px;"
@@ -17,7 +17,7 @@
        (drop)="onFileDrop($event)" (dragover)="onDragOver($event)">
     <div class="drop-message">
       <span nz-icon nzType="cloud-upload" nzTheme="outline"></span>
-      {{ 'mediaStudio.dropFiles' | translate }}
+      {{ 'studio.media.dropFiles' | translate }}
     </div>
     <input multiple type="file" (change)="onFileSelected($event)" style="display: none;" #fileInput>
   </div>
@@ -32,18 +32,18 @@
             <nz-col>
               <nz-row>
                 <nz-col class="mx-2">
-                  <div>{{ 'mediaStudio.file' | translate }}: </div>
+                  <div>{{ 'studio.media.file' | translate }}: </div>
                 </nz-col>
                 <nz-col class="mx-2">
-                  <div>{{ 'mediaStudio.type' | translate }}: {{ttsFile.file!.type}}</div>
+                  <div>{{ 'studio.media.type' | translate }}: {{ttsFile.file!.type}}</div>
                 </nz-col>
                 <nz-col class="mx-2">
-                  <div>{{ 'mediaStudio.size' | translate }}: {{ttsFile.file!.size}}</div>
+                  <div>{{ 'studio.media.size' | translate }}: {{ttsFile.file!.size}}</div>
                 </nz-col>
                 <nz-col>
                   <span
                     [class.parsed]="ttsFile.parsed === true"
-                    class="rounded-2 border">{{ (ttsFile.parsed === true ? 'mediaStudio.parsed' : 'mediaStudio.unparsed') | translate }}</span>
+                    class="rounded-2 border">{{ (ttsFile.parsed === true ? 'studio.media.parsed' : 'studio.media.unparsed') | translate }}</span>
                 </nz-col>
               </nz-row>
               <nz-row>
@@ -59,12 +59,12 @@
             <button nz-button class="m-1"
                     (click)="edit(ttsFile)">
               <span nz-icon nzType="edit" nzTheme="outline"></span>
-              {{ 'mediaStudio.editContent' | translate }}
+              {{ 'studio.media.editContent' | translate }}
             </button>
             <button nz-button class="m-1"
                     (click)="reparse(ttsFile)">
               <span nz-icon nzType="monitor" nzTheme="outline"></span>
-              {{ 'mediaStudio.parseContent' | translate }}
+              {{ 'studio.media.parseContent' | translate }}
             </button>
             <button nz-button class="m-1"
                     (click)="removeFile($index)">
@@ -79,4 +79,4 @@
 </div>
 
 
-@if(fileList.length === 0){<div class="studio-empty">{{ 'studioUi.extractEmpty' | translate }}</div>}
+@if(fileList.length === 0){<div class="studio-empty">{{ 'studio.media.extractEmpty' | translate }}</div>}

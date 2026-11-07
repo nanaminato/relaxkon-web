@@ -3,23 +3,23 @@
   <div class="d-flex flex-row-reverse">
     <button class="btn btn-primary"
             (click)="logout()">
-      {{'management.logout' | translate}}
+      {{'admin.management.logout' | translate}}
     </button>
   </div>
   <div class="d-flex justify-content-between mx-1 my-3">
-    <div>{{'management.server' | translate}}</div>
+    <div>{{'admin.management.server' | translate}}</div>
     <div>
       <input nz-input class="rounded"  [ngModel]="apiUrl()" />
     </div>
   </div>
   <div class="m-1 fs-u">
-    {{'management.username' | translate}}:  {{user?.name}}
+    {{'admin.management.username' | translate}}:  {{user?.name}}
   </div>
   <div class="m-1 fs-u">
-    {{'management.nickname' | translate}}:  {{user?.nickname ?? ('management.none' | translate)}}
+    {{'admin.management.nickname' | translate}}:  {{user?.nickname ?? ('admin.management.none' | translate)}}
   </div>
   <div class="m-1 fs-u">
-    {{'management.roles' | translate}}:
+    {{'admin.management.roles' | translate}}:
     @if(user!==undefined){
       @for(role of user!.roles;track role.roleId){
         {{role.name}}

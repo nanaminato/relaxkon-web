@@ -1,11 +1,11 @@
 /** Discriminated payload remains JSON at the durable replication boundary; never rewrite queued operations on retry. */
 export interface SyncMutationRequest {
-  operationId: string; kind: 'history' | 'message' | 'task'; action: 'upsert' | 'delete';
+  operationId: string; kind: 'history' | 'message' | 'task' | 'languagePack' | 'uiLanguage'; action: 'upsert' | 'delete';
   entityId: string; historyId?: number | null; payload?: unknown;
 }
 export interface SyncVersionResponse { version: number; }
 export interface SyncEventResponse extends Omit<SyncMutationRequest, 'operationId'> { version: number; }
-export interface SyncBatchResponse { cursor: number; reset: boolean; hasMore: boolean; changes: SyncEventResponse[]; }
+export interface SyncBatchResponse { cursor: number; reset: boolean; hasMore: boolean; changes: SyncEventResponse[]; languagePacks?: SyncEventResponse[]; uiLanguageSupported?: boolean; }
 export interface HistoryWriteRequest { dataId: number; title?: string | null; }
 export interface SyncFileContract {
   fileName?: string | null; fileType?: string | null; fileSize: number; fileContent?: string | null; parsedContent?: string | null;

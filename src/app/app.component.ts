@@ -1,4 +1,5 @@
 import {SyncStatus} from '../shared/sync-status';
+import {LanguagePackSync} from '../services/sync/language-pack-sync.service';
 import {
   Component,
   HostListener,
@@ -38,6 +39,7 @@ import {Store} from "@ngrx/store";
   ],
 })
 export class AppComponent implements OnInit{
+  readonly languagePackSync = inject(LanguagePackSync);
   config: Configuration | undefined;
   sizeReportService = inject(SizeReportService);
   router = inject(Router);

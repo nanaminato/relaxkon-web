@@ -1,20 +1,20 @@
 <nz-modal [(nzVisible)]="ttsEditModelVisible"
           (nzOnCancel)="ttsEditModelVisible = false"
           (nzOnOk)="ttsEditModelVisible = false"
-          [nzTitle]="'mediaStudio.editParsedFile' | translate">
+          [nzTitle]="'studio.media.editParsedFile' | translate">
   <ng-container *nzModalContent>
     <app-tts-file-editor [ttsFile]="editTtsFile">
     </app-tts-file-editor>
   </ng-container>
 </nz-modal>
-<header class="studio-heading"><button nz-button type="button" (click)="toggleMenu()" [attr.aria-label]="'studioUi.menu' | translate" [attr.aria-expanded]="menuVisible()"><nz-icon nzType="menu-unfold" nzTheme="outline" /></button><div><h1>{{ 'studioUi.ttsTitle' | translate }}</h1><p>{{ 'studioUi.ttsIntro' | translate }}</p></div></header>
-<nz-card [nzTitle]="'studioUi.settings' | translate">
+<header class="studio-heading"><button nz-button type="button" (click)="toggleMenu()" [attr.aria-label]="'studio.shared.menu' | translate" [attr.aria-expanded]="menuVisible()"><nz-icon nzType="menu-unfold" nzTheme="outline" /></button><div><h1>{{ 'studio.media.ttsTitle' | translate }}</h1><p>{{ 'studio.media.ttsIntro' | translate }}</p></div></header>
+<nz-card [nzTitle]="'studio.shared.settings' | translate">
   <nz-row class="align-items-center my-1 bg-theme2 text-theme2">
     <nz-col class="m-2">
-      <nz-col class="m-1">{{ 'mediaStudio.model' | translate }}</nz-col>
+      <nz-col class="m-1">{{ 'studio.media.model' | translate }}</nz-col>
       <nz-col>
         <nz-select class="select big" [(ngModel)]="model">
-          <nz-option-group [nzLabel]="'mediaStudio.textToSpeechModels' | translate">
+          <nz-option-group [nzLabel]="'studio.media.textToSpeechModels' | translate">
             @for (selection of models; track selection) {
               <nz-option [nzLabel]="selection" [nzValue]="selection"></nz-option>
             }
@@ -59,7 +59,7 @@
       </nz-col>
     </nz-col>
     <nz-row class="m-2">
-      <nz-col class="m-1">{{ 'mediaStudio.speed' | translate }}</nz-col>
+      <nz-col class="m-1">{{ 'studio.media.speed' | translate }}</nz-col>
       <nz-row>
         <nz-slider class="slider big" [nzMin]="0.25" [nzMax]="4" [nzStep]="0.25" [(ngModel)]="speed"></nz-slider>
         <nz-input-number [nzMin]="0.25" [nzMax]="4" [nzStep]="0.25" [(ngModel)]="speed"></nz-input-number>
@@ -73,7 +73,7 @@
        (drop)="onFileDrop($event)" (dragover)="onDragOver($event)">
     <div class="drop-message">
       <span nz-icon nzType="cloud-upload" nzTheme="outline"></span>
-      {{ 'mediaStudio.dropFiles' | translate }}
+      {{ 'studio.media.dropFiles' | translate }}
     </div>
     <input multiple
            accept=".pdf,application/pdf,.txt,text/plain,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -90,18 +90,18 @@
             <nz-col>
               <nz-row>
                 <nz-col class="mx-2">
-                  <div>{{ 'mediaStudio.file' | translate }}: </div>
+                  <div>{{ 'studio.media.file' | translate }}: </div>
                 </nz-col>
                 <nz-col class="mx-2">
-                  <div>{{ 'mediaStudio.type' | translate }}: {{ttsFile.file!.type}}</div>
+                  <div>{{ 'studio.media.type' | translate }}: {{ttsFile.file!.type}}</div>
                 </nz-col>
                 <nz-col class="mx-2">
-                  <div>{{ 'mediaStudio.size' | translate }}: {{ttsFile.file!.size}}</div>
+                  <div>{{ 'studio.media.size' | translate }}: {{ttsFile.file!.size}}</div>
                 </nz-col>
                 <nz-col>
                   <span
                     [class.parsed]="ttsFile.parsed === true"
-                    class="rounded-2 border">{{ (ttsFile.parsed === true ? 'mediaStudio.parsed' : 'mediaStudio.unparsed') | translate }}</span>
+                    class="rounded-2 border">{{ (ttsFile.parsed === true ? 'studio.media.parsed' : 'studio.media.unparsed') | translate }}</span>
                 </nz-col>
               </nz-row>
               <nz-row>
@@ -117,12 +117,12 @@
             <button nz-button class="m-1"
                     (click)="edit(ttsFile)">
               <span nz-icon nzType="edit" nzTheme="outline"></span>
-              {{ 'mediaStudio.editContent' | translate }}
+              {{ 'studio.media.editContent' | translate }}
             </button>
             <button nz-button class="m-1"
                     (click)="reparse(ttsFile)">
               <span nz-icon nzType="monitor" nzTheme="outline"></span>
-              {{ 'mediaStudio.parseContent' | translate }}
+              {{ 'studio.media.parseContent' | translate }}
             </button>
             <button nz-button class="m-1"
                     (click)="removeFile($index)">
@@ -135,33 +135,33 @@
     }
   </div>
 </div>
-<div class="border rounded-2"><h2 class="studio-section-title">{{ 'studioUi.textContent' | translate }}</h2>
+<div class="border rounded-2"><h2 class="studio-section-title">{{ 'studio.shared.textContent' | translate }}</h2>
   <div class="d-flex">
-    <button nz-button (click)="reparseAll()" class="m-2">{{ 'mediaStudio.parseAllFiles' | translate }}</button>
-    <button nz-button (click)="putAllContent()" class="m-2">{{ 'mediaStudio.importParsedContent' | translate }}</button>
-    <button nz-button (click)="inputText = ''" class="m-2">{{ 'mediaStudio.clearContent' | translate }}</button>
-    <button nz-button nzType="primary" [disabled]="loading || !inputText.trim()" (click)="generate()" class="m-2">{{ 'mediaStudio.generateAudio' | translate }}</button>
+    <button nz-button (click)="reparseAll()" class="m-2">{{ 'studio.media.parseAllFiles' | translate }}</button>
+    <button nz-button (click)="putAllContent()" class="m-2">{{ 'studio.media.importParsedContent' | translate }}</button>
+    <button nz-button (click)="inputText = ''" class="m-2">{{ 'studio.media.clearContent' | translate }}</button>
+    <button nz-button nzType="primary" [disabled]="loading || !inputText.trim()" (click)="generate()" class="m-2">{{ 'studio.media.generateAudio' | translate }}</button>
   </div>
   <div class="d-flex justify-content-center align-items-center p-2">
-    <textarea [attr.aria-label]="'mediaStudio.ttsInputPlaceholder' | translate" [(ngModel)]="inputText"
-      nz-input [placeholder]="'mediaStudio.ttsInputPlaceholder' | translate"
+    <textarea [attr.aria-label]="'studio.media.ttsInputPlaceholder' | translate" [(ngModel)]="inputText"
+      nz-input [placeholder]="'studio.media.ttsInputPlaceholder' | translate"
       cdkTextareaAutosize cdkAutosizeMinRows="3"
       cdkAutosizeMaxRows="10"
     ></textarea>
   </div>
   @if(loading){
     <div class="d-flex align-items-center flex-row m-5">
-      {{ 'mediaStudio.processing' | translate }}
+      {{ 'studio.media.processing' | translate }}
       <div class="mx-3">
         <nz-spin nzSize="large" nzSimple></nz-spin>
       </div>
       {{getPendingText()}}
     </div>
   }@else{
-    @if(!audioSrc){<div class="studio-empty">{{ 'studioUi.audioEmpty' | translate }}</div>}@else{<nz-card class="rounded-4">
+    @if(!audioSrc){<div class="studio-empty">{{ 'studio.media.audioEmpty' | translate }}</div>}@else{<nz-card class="rounded-4">
       <div class="d-flex flex-row align-items-center">
         <div class="music-player mx-2">
-          <img #musicIcon class="mx-2 music-icon" [class.playing]="isAudioPlaying" src="assets/svgs/audio_play.svg" width="50" height="50" [alt]="'mediaStudio.audioPlaybackIcon' | translate"/>
+          <img #musicIcon class="mx-2 music-icon" [class.playing]="isAudioPlaying" src="assets/svgs/audio_play.svg" width="50" height="50" [alt]="'studio.media.audioPlaybackIcon' | translate"/>
         </div>
         <audio #player class="mx-1" controls [src]="audioSrc" (play)="onAudioPlay()" (pause)="onAudioPause()"></audio>
       </div>

@@ -1,65 +1,65 @@
 <div class="image-workspace">
   <header class="workspace-heading">
-    <button class="menu-button" type="button" (click)="toggleMenu()" [attr.aria-label]="'studioUi.menu' | translate" [attr.aria-expanded]="menuVisible()">☰</button>
-    <div><p class="eyebrow">{{'imageWorkspace.eyebrow' | translate}}</p><h1>{{'studioUi.imageTitle' | translate}}</h1><p class="heading-description">{{'imageWorkspace.intro' | translate}}</p></div>
-    <a class="history-link" routerLink="/image-studio/task-lib">{{'imageWorkspace.history' | translate}} ↗</a>
+    <button class="menu-button" type="button" (click)="toggleMenu()" [attr.aria-label]="'studio.shared.menu' | translate" [attr.aria-expanded]="menuVisible()">☰</button>
+    <div><p class="eyebrow">{{'studio.image.workspace.eyebrow' | translate}}</p><h1>{{'studio.image.imageTitle' | translate}}</h1><p class="heading-description">{{'studio.image.workspace.intro' | translate}}</p></div>
+    <a class="history-link" routerLink="/image-studio/task-lib">{{'studio.image.workspace.history' | translate}} ↗</a>
   </header>
   <div class="workspace-columns">
-    <section class="composer" [attr.aria-label]="'imageWorkspace.compose' | translate">
+    <section class="composer" [attr.aria-label]="'studio.image.workspace.compose' | translate">
       <form (ngSubmit)="generateImages()">
         <fieldset [disabled]="busy">
-          <div class="section-heading"><span class="step-number">01</span><h2>{{'imageWorkspace.compose' | translate}}</h2></div>
-          <label for="image-model">{{'imageStudio.model' | translate}}</label>
+          <div class="section-heading"><span class="step-number">01</span><h2>{{'studio.image.workspace.compose' | translate}}</h2></div>
+          <label for="image-model">{{'studio.image.model' | translate}}</label>
           <select id="image-model" name="model" [(ngModel)]="model" (ngModelChange)="modelChange()">
-            <optgroup [label]="'imageWorkspace.currentModels' | translate">
+            <optgroup [label]="'studio.image.workspace.currentModels' | translate">
               @for (item of models.slice(0, 2); track item) { <option [value]="item">{{item}}</option> }
             </optgroup>
-            <optgroup [label]="'imageWorkspace.previousModels' | translate">
+            <optgroup [label]="'studio.image.workspace.previousModels' | translate">
               @for (item of models.slice(2); track item) { <option [value]="item">{{item}}</option> }
             </optgroup>
           </select>
-          <p class="field-hint">{{'imageWorkspace.availability' | translate}}</p>
-          <div class="prompt-label"><label for="image-prompt">{{'imageStudio.prompt' | translate}}</label><span>{{prompt.length}} / {{caps.promptLimit}}</span></div>
-          <textarea id="image-prompt" name="prompt" [(ngModel)]="prompt" rows="6" [maxLength]="caps.promptLimit" [placeholder]="'imageWorkspace.promptPlaceholder' | translate"></textarea>
-          <p class="field-hint">{{'imageWorkspace.promptHint' | translate}}</p>
+          <p class="field-hint">{{'studio.image.workspace.availability' | translate}}</p>
+          <div class="prompt-label"><label for="image-prompt">{{'studio.image.prompt' | translate}}</label><span>{{prompt.length}} / {{caps.promptLimit}}</span></div>
+          <textarea id="image-prompt" name="prompt" [(ngModel)]="prompt" rows="6" [maxLength]="caps.promptLimit" [placeholder]="'studio.image.workspace.promptPlaceholder' | translate"></textarea>
+          <p class="field-hint">{{'studio.image.workspace.promptHint' | translate}}</p>
           <div class="prompt-examples">
-            <button type="button" (click)="useExample('imageWorkspace.exampleProduct')">{{'imageWorkspace.product' | translate}}</button>
-            <button type="button" (click)="useExample('imageWorkspace.exampleEditorial')">{{'imageWorkspace.editorial' | translate}}</button>
-            <button type="button" (click)="useExample('imageWorkspace.exampleIllustration')">{{'imageWorkspace.illustration' | translate}}</button>
+            <button type="button" (click)="useExample('studio.image.workspace.exampleProduct')">{{'studio.image.workspace.product' | translate}}</button>
+            <button type="button" (click)="useExample('studio.image.workspace.exampleEditorial')">{{'studio.image.workspace.editorial' | translate}}</button>
+            <button type="button" (click)="useExample('studio.image.workspace.exampleIllustration')">{{'studio.image.workspace.illustration' | translate}}</button>
           </div>
           <div class="option-grid">
-            <div><label for="image-size">{{'imageStudio.size' | translate}}</label><select id="image-size" name="size" [(ngModel)]="size">@for (item of sizes; track item) { <option [value]="item">{{item === 'auto' ? ('imageOptions.auto' | translate) : item}}</option> }</select></div>
-            <div><label for="image-quality">{{'imageStudio.quality' | translate}}</label><select id="image-quality" name="quality" [(ngModel)]="quality">@for (item of qualities; track item) { <option [value]="item">{{('imageOptions.' + item) | translate}}</option> }</select></div>
-            <div><label for="image-count">{{'imageStudio.quantity' | translate}}</label><input id="image-count" name="count" type="number" min="1" [max]="image_num_max" step="1" [(ngModel)]="image_num" (change)="formatChange()"></div>
-            <div><label for="image-format">{{'imageStudio.imageFormat' | translate}}</label><select id="image-format" name="format" [(ngModel)]="output_format" (ngModelChange)="formatChange()">@for (item of output_formats; track item) { <option [value]="item">{{item.toUpperCase()}}</option> }</select></div>
+            <div><label for="image-size">{{'studio.image.size' | translate}}</label><select id="image-size" name="size" [(ngModel)]="size">@for (item of sizes; track item) { <option [value]="item">{{item === 'auto' ? ('studio.image.options.auto' | translate) : item}}</option> }</select></div>
+            <div><label for="image-quality">{{'studio.image.quality' | translate}}</label><select id="image-quality" name="quality" [(ngModel)]="quality">@for (item of qualities; track item) { <option [value]="item">{{('studio.image.options.' + item) | translate}}</option> }</select></div>
+            <div><label for="image-count">{{'studio.image.quantity' | translate}}</label><input id="image-count" name="count" type="number" min="1" [max]="image_num_max" step="1" [(ngModel)]="image_num" (change)="formatChange()"></div>
+            <div><label for="image-format">{{'studio.image.imageFormat' | translate}}</label><select id="image-format" name="format" [(ngModel)]="output_format" (ngModelChange)="formatChange()">@for (item of output_formats; track item) { <option [value]="item">{{item.toUpperCase()}}</option> }</select></div>
           </div>
-          @if (output_format === 'svg') { <p class="field-hint">{{'imageWorkspace.svgHint' | translate}}</p> }
-          @if (output_format === 'gif') { <p class="field-hint">{{'imageWorkspace.gifHint' | translate}}</p> }
+          @if (output_format === 'svg') { <p class="field-hint">{{'studio.image.workspace.svgHint' | translate}}</p> }
+          @if (output_format === 'gif') { <p class="field-hint">{{'studio.image.workspace.gifHint' | translate}}</p> }
           <details class="advanced-options">
-            <summary>{{'imageWorkspace.advanced' | translate}}<span aria-hidden="true">＋</span></summary>
+            <summary>{{'studio.image.workspace.advanced' | translate}}<span aria-hidden="true">＋</span></summary>
             <div class="option-grid">
-                <div><label for="image-background">{{'imageStudio.background' | translate}}</label><select id="image-background" name="background" [(ngModel)]="background">@for (item of backgrounds; track item) { <option [value]="item" [disabled]="item === 'transparent' && output_format !== 'png' && output_format !== 'webp'">{{('imageOptions.' + item) | translate}}</option> }</select></div>
-                <div><label for="image-moderation">{{'imageStudio.moderation' | translate}}</label><select id="image-moderation" name="moderation" [(ngModel)]="moderation">@for (item of moderations; track item) { <option [value]="item">{{('imageOptions.' + item) | translate}}</option> }</select></div>
-                @if (caps.complexity) { <div><label for="image-complexity">{{'imageWorkspace.complexity' | translate}}</label><select id="image-complexity" name="complexity" [(ngModel)]="complexity">@for (item of complexities; track item) { <option [value]="item">{{('imageOptions.' + item) | translate}}</option> }</select></div> }
-                @if (output_format === 'jpeg' || output_format === 'webp') { <div><label for="image-compression">{{'imageWorkspace.compression' | translate}}</label><input id="image-compression" name="compression" type="number" min="0" max="100" step="1" [(ngModel)]="output_compression"></div> }
+                <div><label for="image-background">{{'studio.image.background' | translate}}</label><select id="image-background" name="background" [(ngModel)]="background">@for (item of backgrounds; track item) { <option [value]="item" [disabled]="item === 'transparent' && output_format !== 'png' && output_format !== 'webp'">{{('studio.image.options.' + item) | translate}}</option> }</select></div>
+                <div><label for="image-moderation">{{'studio.image.moderation' | translate}}</label><select id="image-moderation" name="moderation" [(ngModel)]="moderation">@for (item of moderations; track item) { <option [value]="item">{{('studio.image.options.' + item) | translate}}</option> }</select></div>
+                @if (caps.complexity) { <div><label for="image-complexity">{{'studio.image.workspace.complexity' | translate}}</label><select id="image-complexity" name="complexity" [(ngModel)]="complexity">@for (item of complexities; track item) { <option [value]="item">{{('studio.image.options.' + item) | translate}}</option> }</select></div> }
+                @if (output_format === 'jpeg' || output_format === 'webp') { <div><label for="image-compression">{{'studio.image.workspace.compression' | translate}}</label><input id="image-compression" name="compression" type="number" min="0" max="100" step="1" [(ngModel)]="output_compression"></div> }
                 @if (output_format === 'gif') {
-                  <div><label for="image-frames">{{'imageWorkspace.frames' | translate}}</label><input id="image-frames" name="frames" type="number" min="2" max="16" step="1" [(ngModel)]="frame_count"></div>
-                  <div><label for="image-duration">{{'imageWorkspace.duration' | translate}}</label><input id="image-duration" name="duration" type="number" min="20" max="2000" step="1" [(ngModel)]="frame_duration_ms"></div>
+                  <div><label for="image-frames">{{'studio.image.workspace.frames' | translate}}</label><input id="image-frames" name="frames" type="number" min="2" max="16" step="1" [(ngModel)]="frame_count"></div>
+                  <div><label for="image-duration">{{'studio.image.workspace.duration' | translate}}</label><input id="image-duration" name="duration" type="number" min="20" max="2000" step="1" [(ngModel)]="frame_duration_ms"></div>
                 }
             </div>
           </details>
         </fieldset>
         <div class="generate-area">
-          <button type="submit" class="generate-button" [disabled]="!canGenerate"><span aria-hidden="true">✦</span> {{(loading ? 'imageWorkspace.generating' : savingHistory ? 'imageWorkspace.saving' : 'universal.generate') | translate}}</button>
-          <p>{{'imageWorkspace.generationHint' | translate}}</p>
+          <button type="submit" class="generate-button" [disabled]="!canGenerate"><span aria-hidden="true">✦</span> {{(loading ? 'studio.image.workspace.generating' : savingHistory ? 'studio.image.workspace.saving' : 'universal.generate') | translate}}</button>
+          <p>{{'studio.image.workspace.generationHint' | translate}}</p>
         </div>
       </form>
     </section>
-    <section class="results-panel" [attr.aria-label]="'studioUi.results' | translate">
-      <header class="results-heading"><div><p class="eyebrow">{{'imageWorkspace.output' | translate}}</p><h2>{{'studioUi.results' | translate}}</h2></div><span class="result-count">{{images.length}} {{'imageWorkspace.images' | translate}}</span></header>
-      @if (loading) { <div class="generation-status" role="status"><span class="status-dot"></span><div><strong>{{'imageWorkspace.generating' | translate}}</strong><p>{{'imageWorkspace.waitHint' | translate}}</p></div></div> }
-      @if (error) { <div class="status-message error-message" role="alert"><strong>{{'notifications.generationFailed' | translate}}</strong><p>{{error}}</p><button type="button" [disabled]="!canRetryGeneration" (click)="retryGeneration()">{{'imageWorkspace.retry' | translate}}</button></div> }
-      @if (historyWarning) { <div class="status-message warning-message" role="status"><p>{{historyWarning}}</p>@if (canRetryHistory) { <button type="button" (click)="retryHistory()">{{'imageWorkspace.retrySave' | translate}}</button> }</div> }
+    <section class="results-panel" [attr.aria-label]="'studio.shared.results' | translate">
+      <header class="results-heading"><div><p class="eyebrow">{{'studio.image.workspace.output' | translate}}</p><h2>{{'studio.shared.results' | translate}}</h2></div><span class="result-count">{{images.length}} {{'studio.image.workspace.images' | translate}}</span></header>
+      @if (loading) { <div class="generation-status" role="status"><span class="status-dot"></span><div><strong>{{'studio.image.workspace.generating' | translate}}</strong><p>{{'studio.image.workspace.waitHint' | translate}}</p></div></div> }
+      @if (error) { <div class="status-message error-message" role="alert"><strong>{{'notifications.generationFailed' | translate}}</strong><p>{{error}}</p><button type="button" [disabled]="!canRetryGeneration" (click)="retryGeneration()">{{'studio.image.workspace.retry' | translate}}</button></div> }
+      @if (historyWarning) { <div class="status-message warning-message" role="status"><p>{{historyWarning}}</p>@if (canRetryHistory) { <button type="button" (click)="retryHistory()">{{'studio.image.workspace.retrySave' | translate}}</button> }</div> }
       @if (lastResult) { <div class="result-meta"><span>{{lastResult.model}}</span><span>{{lastResult.size}}</span><span>{{lastResult.format.toUpperCase()}}</span></div> }
       <app-gallery [loading]="loading" [images]="images"></app-gallery>
     </section>

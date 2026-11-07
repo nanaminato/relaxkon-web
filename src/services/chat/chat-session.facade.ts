@@ -37,12 +37,12 @@ export class ChatSessionFacade {
             : error?.status === 403 ? 'accessDenied'
             : error?.type === ErrorType.NotAuthorize ? 'authorizationRequired'
             : limited ? 'rateLimited' : 'responseInterrupted';
-          message.content += this.locale.text(`chat-main.${key}`, {seconds: error?.retryAfterSeconds});
+          message.content += this.locale.text(`chat.composer.${key}`, {seconds: error?.retryAfterSeconds});
         }
       }),
       finalize(() => {
         message.finish = true;
-        if (!message.content) message.content = this.locale.text('chat-main.responseStopped');
+        if (!message.content) message.content = this.locale.text('chat.composer.responseStopped');
         void this.save(history, message);
       })
     );
@@ -52,7 +52,7 @@ export class ChatSessionFacade {
     try {
       await this.local.putHistory(history);
       await this.remote.sendMessage(history.dataId!, structuredClone(message) as ChatModel & {dataId: number});
-    } catch { this.notices.error(this.locale.text('management.saveFailed')); }
+    } catch { this.notices.error(this.locale.text('admin.management.saveFailed')); }
   }
 
   private async save(history: ChatHistoryModel, message: ChatModel) {
@@ -60,7 +60,7 @@ export class ChatSessionFacade {
       await this.local.putHistory(history);
       await this.remote.updateMessage(history.dataId!, structuredClone(message) as ChatModel & {dataId: number});
     } catch {
-      this.notices.error(this.locale.text('management.saveFailed'));
+      this.notices.error(this.locale.text('admin.management.saveFailed'));
     }
   }
 }

@@ -94,15 +94,15 @@ export class GptImageCreate {
       const result = await this.openaiService.gptImageCreate(request);
       const format = result?.output_format ?? request.output_format ?? 'png';
       const urls = (result?.data ?? []).map(image => imageSource(image, format)).filter(Boolean);
-      if (!urls.length) throw new Error(this.localization.text('imageWorkspace.noImages'));
+      if (!urls.length) throw new Error(this.localization.text('studio.image.workspace.noImages'));
       this.images = urls.map(url => ({image_url: url, image_type: format}));
       this.lastResult = {model: request.model!, count: urls.length, size: result?.size ?? request.size ?? 'auto', format};
-      if (accountId == null) { this.historyWarning = this.localization.text('imageWorkspace.historyUnavailable'); return; }
+      if (accountId == null) { this.historyWarning = this.localization.text('studio.image.workspace.historyUnavailable'); return; }
       this.pendingTask = {task_id: crypto.randomUUID(), account_id: accountId, task_type: 'any => image', images: urls, date: new Date()};
     } catch (error: unknown) {
       const code = (error as {error?: {code?: string}})?.error?.code;
-      const keys: Record<string, string> = {image_route_unavailable: 'imageWorkspace.routeUnavailable', invalid_image_option: 'imageWorkspace.invalidOptions', image_provider_busy: 'imageWorkspace.providerBusy', image_provider_rejected: 'imageWorkspace.providerRejected', image_provider_error: 'imageWorkspace.providerError'};
-      this.error = code && keys[code] ? this.localization.text(keys[code]) : error instanceof Error && error.message === this.localization.text('imageWorkspace.noImages') ? error.message : apiErrorMessage(error, this.localization.text('notifications.networkError'));
+      const keys: Record<string, string> = {image_route_unavailable: 'studio.image.workspace.routeUnavailable', invalid_image_option: 'studio.image.workspace.invalidOptions', image_provider_busy: 'studio.image.workspace.providerBusy', image_provider_rejected: 'studio.image.workspace.providerRejected', image_provider_error: 'studio.image.workspace.providerError'};
+      this.error = code && keys[code] ? this.localization.text(keys[code]) : error instanceof Error && error.message === this.localization.text('studio.image.workspace.noImages') ? error.message : apiErrorMessage(error, this.localization.text('notifications.networkError'));
       this.retryRequest = structuredClone(request);
     } finally { this.loading = false; }
     if (this.pendingTask) await this.retryHistory();
@@ -110,7 +110,7 @@ export class GptImageCreate {
   async retryHistory() {
     if (!this.pendingTask || this.busy) return;
     if (this.pendingTask.account_id !== this.authService.user?.id) {
-      this.historyWarning = this.localization.text('imageWorkspace.historyUnavailable'); return;
+      this.historyWarning = this.localization.text('studio.image.workspace.historyUnavailable'); return;
     }
     this.savingHistory = true;
     try {
@@ -121,7 +121,7 @@ export class GptImageCreate {
       await this.sendService.sendTask(this.pendingTask);
       this.pendingTask = undefined; this.historyWarning = '';
     } catch {
-      this.historyWarning = this.localization.text(this.localHistorySaved ? 'imageWorkspace.syncWarning' : 'imageWorkspace.saveWarning');
+      this.historyWarning = this.localization.text(this.localHistorySaved ? 'studio.image.workspace.syncWarning' : 'studio.image.workspace.saveWarning');
     } finally { this.savingHistory = false; }
   }
   get canRetryHistory() { return !!this.pendingTask && !this.busy; }

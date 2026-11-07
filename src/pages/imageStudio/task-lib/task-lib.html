@@ -1,21 +1,21 @@
 <div class="library-page">
   <header class="library-heading">
-    <div class="heading-main"><button nz-button class="menu-toggle" type="button" (click)="toggleMenu()" [attr.aria-label]="'studioUi.menu' | translate" [attr.aria-expanded]="menuVisible()"><nz-icon nzType="menu-unfold" nzTheme="outline" /></button><div><span class="eyebrow">{{'library.eyebrow' | translate}}</span><h1>{{'universal.storeHouse' | translate}}</h1><p>{{'studioUi.libraryIntro' | translate}}</p></div></div>
-    <a class="create-link" routerLink="/image-studio/APIMart-image">+ {{'library.create' | translate}}</a>
+    <div class="heading-main"><button nz-button class="menu-toggle" type="button" (click)="toggleMenu()" [attr.aria-label]="'studio.shared.menu' | translate" [attr.aria-expanded]="menuVisible()"><nz-icon nzType="menu-unfold" nzTheme="outline" /></button><div><span class="eyebrow">{{'studio.library.eyebrow' | translate}}</span><h1>{{'universal.storeHouse' | translate}}</h1><p>{{'studio.library.libraryIntro' | translate}}</p></div></div>
+    <a class="create-link" routerLink="/image-studio/APIMart-image">+ {{'studio.library.create' | translate}}</a>
   </header>
-  <div class="library-stats"><span><strong>{{generateTasks.length}}</strong> {{'library.total' | translate}}</span><span><strong>{{imageCount}}</strong> {{'library.images' | translate}}</span><span class="stats-note">{{'library.collectionHint' | translate}}</span></div>
-  <section class="library-toolbar" [attr.aria-label]="'library.tools' | translate">
-    <div class="search-control"><span aria-hidden="true">⌕</span><input type="search" [(ngModel)]="search" [placeholder]="'library.search' | translate" [attr.aria-label]="'library.search' | translate"></div>
-    <select [(ngModel)]="sortOrder" [attr.aria-label]="'library.sort' | translate"><option value="newest">{{'library.newest' | translate}}</option><option value="oldest">{{'library.oldest' | translate}}</option></select>
-    <div class="toolbar-actions"><button nz-button [disabled]="loading" (click)="loadGenerateTasks()">{{(loading ? 'featureAccess.loading' : 'universal.reload') | translate}}</button><button nz-button (click)="stopAllTask()">{{'image.stopAllTasks' | translate}}</button><button nz-button nzDanger (click)="openBatchDelete()" [disabled]="!generateTasks.length || loading">{{'image.batchDelete' | translate}}</button></div>
-    <label class="proxy-control"><span [nz-tooltip]="'image.proxyTip' | translate">{{'image.proxy' | translate}}</span><nz-switch [(ngModel)]="useProxy" (ngModelChange)="changeProxySetting()"></nz-switch></label>
+  <div class="library-stats"><span><strong>{{generateTasks.length}}</strong> {{'studio.library.total' | translate}}</span><span><strong>{{imageCount}}</strong> {{'studio.library.images' | translate}}</span><span class="stats-note">{{'studio.library.collectionHint' | translate}}</span></div>
+  <section class="library-toolbar" [attr.aria-label]="'studio.library.tools' | translate">
+    <div class="search-control"><span aria-hidden="true">⌕</span><input type="search" [(ngModel)]="search" [placeholder]="'studio.library.search' | translate" [attr.aria-label]="'studio.library.search' | translate"></div>
+    <select [(ngModel)]="sortOrder" [attr.aria-label]="'studio.library.sort' | translate"><option value="newest">{{'studio.library.newest' | translate}}</option><option value="oldest">{{'studio.library.oldest' | translate}}</option></select>
+    <div class="toolbar-actions"><button nz-button [disabled]="loading" (click)="loadGenerateTasks()">{{(loading ? 'admin.featureAccess.loading' : 'universal.reload') | translate}}</button><button nz-button (click)="stopAllTask()">{{'studio.image.generation.stopAllTasks' | translate}}</button><button nz-button nzDanger (click)="openBatchDelete()" [disabled]="!generateTasks.length || loading">{{'studio.image.generation.batchDelete' | translate}}</button></div>
+    <label class="proxy-control"><span [nz-tooltip]="'studio.image.generation.proxyTip' | translate">{{'studio.image.generation.proxy' | translate}}</span><nz-switch [(ngModel)]="useProxy" (ngModelChange)="changeProxySetting()"></nz-switch></label>
   </section>
-  @if (loadError) { <div class="load-error" role="alert">{{'library.loadError' | translate}} <button nz-button (click)="loadGenerateTasks()">{{'universal.reload' | translate}}</button></div> }
+  @if (loadError) { <div class="load-error" role="alert">{{'studio.library.loadError' | translate}} <button nz-button (click)="loadGenerateTasks()">{{'universal.reload' | translate}}</button></div> }
   <section class="library-content" [attr.aria-busy]="loading">
-    @if (loading && !generateTasks.length) { <div class="library-empty" role="status"><span class="empty-art" aria-hidden="true">▧</span><p>{{'featureAccess.loading' | translate}}</p></div> }
+    @if (loading && !generateTasks.length) { <div class="library-empty" role="status"><span class="empty-art" aria-hidden="true">▧</span><p>{{'admin.featureAccess.loading' | translate}}</p></div> }
     @else {
       @let tasks = visibleTasks;
-      @if (!tasks.length) { <div class="library-empty"><span class="empty-art" aria-hidden="true">▧</span><h2>{{(search.trim() ? 'library.noMatches' : 'studioUi.libraryEmpty') | translate}}</h2><p>{{(search.trim() ? 'library.searchHint' : 'library.emptyHint') | translate}}</p>@if(search.trim()){<button nz-button (click)="search = ''">{{'library.clearSearch' | translate}}</button>}@else{<a class="create-link" routerLink="/image-studio/APIMart-image">{{'library.create' | translate}} ↗</a>}</div> }
+      @if (!tasks.length) { <div class="library-empty"><span class="empty-art" aria-hidden="true">▧</span><h2>{{(search.trim() ? 'studio.library.noMatches' : 'studio.library.libraryEmpty') | translate}}</h2><p>{{(search.trim() ? 'studio.library.searchHint' : 'studio.library.emptyHint') | translate}}</p>@if(search.trim()){<button nz-button (click)="search = ''">{{'studio.library.clearSearch' | translate}}</button>}@else{<a class="create-link" routerLink="/image-studio/APIMart-image">{{'studio.library.create' | translate}} ↗</a>}</div> }
       <div class="works-grid">
         @for(task of tasks; track task.task_id) {
           <app-task-item [task]="task" [useProxy]="useProxy" (delete)="awareDeleteItem($event)"></app-task-item>
@@ -26,8 +26,8 @@
 
   <!-- 批量删除对话框：列出所有任务，可多选 -->
   <nz-modal [(nzVisible)]="batchDeleteVisible"
-            [nzTitle]="'image.batchDeleteTitle' | translate"
-            [nzOkText]="'image.batchDeleteConfirm' | translate"
+            [nzTitle]="'studio.image.generation.batchDeleteTitle' | translate"
+            [nzOkText]="'studio.image.generation.batchDeleteConfirm' | translate"
             [nzCancelText]="'universal.cancel' | translate"
             [nzOkDanger]="true"
             [nzOkDisabled]="selectedTaskIds.size === 0 || batchDeleteRunning"
@@ -38,10 +38,10 @@
     <ng-container *nzModalContent>
       <div class="d-flex justify-content-between align-items-center mb-2">
         <span class="text-secondary small">
-          {{'image.batchDeleteHint'|translate:{selected: selectedTaskIds.size, total: generateTasks.length} }}
+          {{'studio.image.generation.batchDeleteHint'|translate:{selected: selectedTaskIds.size, total: generateTasks.length} }}
         </span>
         <button nz-button nzSize="small" (click)="toggleSelectAll()">
-          {{ (isAllSelected() ? 'image.deselectAll' : 'image.selectAll') | translate }}
+          {{ (isAllSelected() ? 'studio.image.generation.deselectAll' : 'studio.image.generation.selectAll') | translate }}
         </button>
       </div>
       <nz-list nzBordered class="batch-delete-task-list" [nzLoading]="batchDeleteRunning">
@@ -56,15 +56,15 @@
               <div class="d-flex flex-column flex-grow-1 overflow-hidden">
                 <div class="d-flex flex-row flex-wrap">
                   <nz-col class="me-3">
-                    <span class="text-secondary small">{{'storeHouse.task-id' | translate}}:</span>
+                    <span class="text-secondary small">{{'studio.tasks.task-id' | translate}}:</span>
                     <span class="ms-1">{{task.task_id}}</span>
                   </nz-col>
                   <nz-col class="me-3">
-                    <span class="text-secondary small">{{'storeHouse.task-type' | translate}}:</span>
+                    <span class="text-secondary small">{{'studio.tasks.task-type' | translate}}:</span>
                     <span class="ms-1">{{task.task_type}}</span>
                   </nz-col>
                   <nz-col class="me-3">
-                    <span class="text-secondary small">{{'storeHouse.date' | translate}}:</span>
+                    <span class="text-secondary small">{{'studio.tasks.date' | translate}}:</span>
                     <span class="ms-1">{{task.date}}</span>
                   </nz-col>
                 </div>
@@ -73,7 +73,7 @@
           </nz-list-item>
         }
         @empty {
-          <nz-empty [nzNotFoundContent]="'image.batchDeleteEmpty'|translate"></nz-empty>
+          <nz-empty [nzNotFoundContent]="'studio.image.generation.batchDeleteEmpty'|translate"></nz-empty>
         }
       </nz-list>
     </ng-container>

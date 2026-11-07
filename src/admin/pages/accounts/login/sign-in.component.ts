@@ -63,7 +63,7 @@ export class SignInPageComponent {
   submitForm(): void {
     if (this.validateForm.valid) {
       if(this.code?.toLowerCase()!==this.vCode?.nativeElement.value.toLowerCase()){
-        this.message.error(this.i18n.instant('management.invalidCaptcha'));
+        this.message.error(this.i18n.instant('admin.management.invalidCaptcha'));
         this.generateVerificationCode();
         return;
       }

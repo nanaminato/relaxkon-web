@@ -3,21 +3,21 @@
     @if (loading) {
       <div class="loading-art" aria-hidden="true"><div class="skeleton-frame"><span>✦</span></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
     } @else {
-      <div class="gallery-empty"><div class="empty-composition" aria-hidden="true"><span class="art-back"></span><span class="art-front"><svg viewBox="0 0 64 64" fill="none"><rect x="11" y="13" width="42" height="38" rx="6" stroke="currentColor" stroke-width="2"/><circle cx="24" cy="25" r="4" stroke="currentColor" stroke-width="2"/><path d="m13 43 13-12 9 8 7-6 10 10" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></span><span class="art-spark">✧</span></div><h3>{{'imageWorkspace.emptyTitle' | translate}}</h3><p>{{'imageWorkspace.emptyHint' | translate}}</p><div class="empty-formats"><span>PNG</span><span>WEBP</span><span>GIF</span><span>SVG</span></div></div>
+      <div class="gallery-empty"><div class="empty-composition" aria-hidden="true"><span class="art-back"></span><span class="art-front"><svg viewBox="0 0 64 64" fill="none"><rect x="11" y="13" width="42" height="38" rx="6" stroke="currentColor" stroke-width="2"/><circle cx="24" cy="25" r="4" stroke="currentColor" stroke-width="2"/><path d="m13 43 13-12 9 8 7-6 10 10" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></span><span class="art-spark">✧</span></div><h3>{{'studio.image.workspace.emptyTitle' | translate}}</h3><p>{{'studio.image.workspace.emptyHint' | translate}}</p><div class="empty-formats"><span>PNG</span><span>WEBP</span><span>GIF</span><span>SVG</span></div></div>
     }
   }
-  @if (downloadError) { <p class="download-error" role="alert">{{'imageWorkspace.downloadError' | translate}}</p> }
+  @if (downloadError) { <p class="download-error" role="alert">{{'studio.image.workspace.downloadError' | translate}}</p> }
   <div class="result-grid" [class.single-result]="images?.length === 1">
     @for (image of images; track image; let index = $index) {
       <figure class="result-card">
-        @if (failed.has(image) || !source(image)) { <div class="failed-preview" role="status">{{'imageWorkspace.previewError' | translate}}</div> }
-        @else { <button class="preview-button" type="button" (click)="open(image, index)" [attr.aria-label]="'imageWorkspace.openImage' | translate: {number: index + 1}"><img [src]="source(image)" [alt]="'imageWorkspace.generatedImage' | translate: {number: index + 1}" loading="lazy" decoding="async" (error)="failed.add(image)"><span class="preview-affordance" aria-hidden="true">⤢</span></button> }
-        <figcaption><span><strong>{{'imageWorkspace.imageNumber' | translate: {number: index + 1} }}</strong><small>{{format(image)}}</small></span><button type="button" [disabled]="downloading.has(image) || !source(image)" (click)="download(image, index)" [attr.aria-label]="'imageWorkspace.downloadImage' | translate: {number: index + 1}">↓ <span>{{'imageWorkspace.download' | translate}}</span></button></figcaption>
+        @if (failed.has(image) || !source(image)) { <div class="failed-preview" role="status">{{'studio.image.workspace.previewError' | translate}}</div> }
+        @else { <button class="preview-button" type="button" (click)="open(image, index)" [attr.aria-label]="'studio.image.workspace.openImage' | translate: {number: index + 1}"><img [src]="source(image)" [alt]="'studio.image.workspace.generatedImage' | translate: {number: index + 1}" loading="lazy" decoding="async" (error)="failed.add(image)"><span class="preview-affordance" aria-hidden="true">⤢</span></button> }
+        <figcaption><span><strong>{{'studio.image.workspace.imageNumber' | translate: {number: index + 1} }}</strong><small>{{format(image)}}</small></span><button type="button" [disabled]="downloading.has(image) || !source(image)" (click)="download(image, index)" [attr.aria-label]="'studio.image.workspace.downloadImage' | translate: {number: index + 1}">↓ <span>{{'studio.image.workspace.download' | translate}}</span></button></figcaption>
       </figure>
     }
   </div>
 </div>
-<dialog #viewer class="image-viewer" (close)="selected = undefined" [attr.aria-label]="'imageWorkspace.imagePreview' | translate">
-  <div class="viewer-toolbar"><strong>{{'imageWorkspace.imagePreview' | translate}}</strong><button type="button" (click)="close()" [attr.aria-label]="'imageWorkspace.close' | translate">×</button></div>
-  @if (selected) { <img [src]="source(selected)" [alt]="'imageWorkspace.generatedImage' | translate: {number: selectedIndex + 1}"><button class="viewer-download" type="button" [disabled]="downloading.has(selected)" (click)="download(selected, selectedIndex)">{{'imageWorkspace.download' | translate}}</button> }
+<dialog #viewer class="image-viewer" (close)="selected = undefined" [attr.aria-label]="'studio.image.workspace.imagePreview' | translate">
+  <div class="viewer-toolbar"><strong>{{'studio.image.workspace.imagePreview' | translate}}</strong><button type="button" (click)="close()" [attr.aria-label]="'studio.image.workspace.close' | translate">×</button></div>
+  @if (selected) { <img [src]="source(selected)" [alt]="'studio.image.workspace.generatedImage' | translate: {number: selectedIndex + 1}"><button class="viewer-download" type="button" [disabled]="downloading.has(selected)" (click)="download(selected, selectedIndex)">{{'studio.image.workspace.download' | translate}}</button> }
 </dialog>

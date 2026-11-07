@@ -221,7 +221,7 @@ export interface ChatDb extends DBSchema{
   sessionHistories: {key: string, value: ChatHistory & {localKey: string}};
   sessionMessages: {key: string, value: ChatInterface & {localKey: string, historyId: number, userId?: number}};
   sessionTitles: {key: string, value: ChatHistoryTitle & {localKey: string}};
-  syncBootstrap: {key: number, value: boolean};
+  syncBootstrap: {key: number | 'languagePacks', value: boolean};
   syncOutbox: {key: number, value: PendingSync};
   syncState: {key: number, value: number};
   syncEntities: {key: string, value: SyncEntity};

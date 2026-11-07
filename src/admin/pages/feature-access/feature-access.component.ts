@@ -26,9 +26,9 @@ export class FeatureAccessComponent implements OnInit {
   readonly unavailable = '\u2014';
   activeKey = 'chat';
   readonly limits = [
-    {key: 'requestsPerMinute', label: 'featureAccess.perMinute'},
-    {key: 'requestsPerDay', label: 'featureAccess.perDay'},
-    {key: 'maxConcurrent', label: 'featureAccess.concurrent'}
+    {key: 'requestsPerMinute', label: 'admin.featureAccess.perMinute'},
+    {key: 'requestsPerDay', label: 'admin.featureAccess.perDay'},
+    {key: 'maxConcurrent', label: 'admin.featureAccess.concurrent'}
   ] as const;
   validLimit(value: number | null) { return value === null || Number.isInteger(value) && value > 0 && value <= 2147483647; }
   get activeFeature() { return this.document?.features.find(feature => feature.key === this.activeKey) ?? this.document?.features[0]; }
@@ -80,7 +80,7 @@ export class FeatureAccessComponent implements OnInit {
           this.conflict = false;
           this.loading = false;
         },
-        error: () => { this.loading = false; this.status = 'featureAccess.loadError'; }
+        error: () => { this.loading = false; this.status = 'admin.featureAccess.loadError'; }
       });
   }
   get valid() {
@@ -91,11 +91,11 @@ export class FeatureAccessComponent implements OnInit {
     if (!this.document || !this.valid || !this.dirty || this.loading || this.saving || this.conflict) return;
     this.saving = true;
     this.access.save(structuredClone(this.document)).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: document => { this.document = document; this.saving = false; this.dirty = false; this.status = 'featureAccess.saved'; },
+      next: document => { this.document = document; this.saving = false; this.dirty = false; this.status = 'admin.featureAccess.saved'; },
       error: error => {
         this.saving = false;
         this.conflict = error.status === 409;
-        this.status = this.conflict ? 'featureAccess.conflict' : 'featureAccess.saveError';
+        this.status = this.conflict ? 'admin.featureAccess.conflict' : 'admin.featureAccess.saveError';
       }
     });
   }

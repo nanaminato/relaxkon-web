@@ -68,12 +68,12 @@ export class KeysComponent {
       next: keys=>{
         this.keys = keys;
         if(refresh){
-          this.message.success(this.i18n.instant('management.refreshSuccess'));
+          this.message.success(this.i18n.instant('admin.management.refreshSuccess'));
         }
       },
       error: err => {
         this.failed = true;
-        this.message.error(this.i18n.instant('management.keysFailed'))
+        this.message.error(this.i18n.instant('admin.management.keysFailed'))
       }
     });
   }

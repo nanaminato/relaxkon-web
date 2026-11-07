@@ -77,3 +77,24 @@
     bottom: 24px;
   }
 }
+
+.language-packs {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--app-border);
+}
+
+.language-pack-actions,
+.language-pack-list li {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.language-pack-list {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  overflow-wrap: anywhere;
+}

@@ -49,8 +49,8 @@ export class RolesComponent implements OnInit {
     if (this.protectedRole(role) || this.deleting.has(role.roleId)) return;
     this.deleting.add(role.roleId);
     this.call.deleteRoleById(role.roleId).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.deleting.delete(role.roleId))).subscribe({
-      next: () => { this.message.success(this.i18n.instant('management.deleteSuccess')); this.fetchRoles(); },
-      error: error => this.message.error(this.i18n.instant(roleErrorKey(error, 'roleManager.deleteError')))
+      next: () => { this.message.success(this.i18n.instant('admin.management.deleteSuccess')); this.fetchRoles(); },
+      error: error => this.message.error(this.i18n.instant(roleErrorKey(error, 'admin.roles.deleteError')))
     });
   }
   tackleClose(saved: boolean) { if (saved) { this.newRoleVisible = false; this.fetchRoles(); } }

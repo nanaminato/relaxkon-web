@@ -8,7 +8,7 @@
   </ng-template>
   @if(visible()){
     @if(isCompact()){
-      <button class="menu-backdrop" type="button" [attr.aria-label]="'studioUi.menu' | translate" (click)="hideMenu()"></button>
+      <button class="menu-backdrop" type="button" [attr.aria-label]="'studio.shared.menu' | translate" (click)="hideMenu()"></button>
     }
     <div class="d-flex flex-column h-100 menu" [class.w-100]="!isCompact()" [class.menu-overlay]="isCompact()">
       <div class="bg-theme overflow-y-scroll scrollbar-y-none flex-grow-1">
@@ -19,7 +19,7 @@
 
         <div class="d-flex flex-column p-3">
           <button class="m-2 rounded-2" (click)="closeMenuIfCompact()" nz-button routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/image-studio/gpt-image']">{{'workspace.openaiImage' | translate}}</button>
-          <button class="m-2 rounded-2" (click)="closeMenuIfCompact()" nz-button routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/image-studio/APIMart-image']">{{'apimartStudio.nav' | translate}}</button>
+          <button class="m-2 rounded-2" (click)="closeMenuIfCompact()" nz-button routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/image-studio/APIMart-image']">{{'studio.image.apimart.nav' | translate}}</button>
           <button class="m-2 rounded-2" (click)="closeMenuIfCompact()" nz-button routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/image-studio/task-lib']">{{'universal.storeHouse'| translate}}</button>
         </div>
       </div>

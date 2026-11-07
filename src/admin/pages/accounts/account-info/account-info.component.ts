@@ -48,11 +48,11 @@ export class AccountInfoComponent {
       catchError((err: any) => {
         if (err instanceof HttpErrorResponse) {
           if (err.status === 401 || err.status === 403) {
-            this.message.error(this.i18n.instant('management.sessionExpired'));
+            this.message.error(this.i18n.instant('admin.management.sessionExpired'));
             this.router.navigate(admin_routes.sign_in);
           }
         } else {
-          this.message.error(this.i18n.instant('management.networkError'))
+          this.message.error(this.i18n.instant('admin.management.networkError'))
         }
         throw err;
       })

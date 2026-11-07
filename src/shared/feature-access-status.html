@@ -1,21 +1,21 @@
 <section>
-  <h2>{{'featureAccess.myAccess' | translate}}</h2>
+  <h2>{{'admin.featureAccess.myAccess' | translate}}</h2>
   <button class="btn btn-outline-primary btn-sm" [disabled]="loading" (click)="reload()">{{'universal.reload' | translate}}</button>
-  @if(loading){<p role="status">{{'featureAccess.loading' | translate}}</p>}
-  @if(error){<p role="alert">{{'featureAccess.loadError' | translate}}</p>}
+  @if(loading){<p role="status">{{'admin.featureAccess.loading' | translate}}</p>}
+  @if(error){<p role="alert">{{'admin.featureAccess.loadError' | translate}}</p>}
   @if(usage; as snapshot){
-    <p>{{'featureAccess.usageHint' | translate}}</p>
-    <p>{{'featureAccess.observedAt' | translate}}: {{snapshot.observedAt | date:'yyyy-MM-dd HH:mm:ss':'UTC'}} UTC · {{'featureAccess.policyRevision' | translate}}: {{snapshot.policyRevision}}</p>
+    <p>{{'admin.featureAccess.usageHint' | translate}}</p>
+    <p>{{'admin.featureAccess.observedAt' | translate}}: {{snapshot.observedAt | date:'yyyy-MM-dd HH:mm:ss':'UTC'}} UTC · {{'admin.featureAccess.policyRevision' | translate}}: {{snapshot.policyRevision}}</p>
     <div class="usage-table">
       <table>
-        <thead><tr><th scope="col">{{'roleManager.feature' | translate}}</th><th scope="col">{{'featureAccess.perMinute' | translate}}</th><th scope="col">{{'featureAccess.perDay' | translate}}</th><th scope="col">{{'featureAccess.concurrent' | translate}}</th></tr></thead>
+        <thead><tr><th scope="col">{{'admin.roles.feature' | translate}}</th><th scope="col">{{'admin.featureAccess.perMinute' | translate}}</th><th scope="col">{{'admin.featureAccess.perDay' | translate}}</th><th scope="col">{{'admin.featureAccess.concurrent' | translate}}</th></tr></thead>
         <tbody>
           @for(feature of snapshot.features; track feature.key){
             <tr>
-              <th scope="row">{{'featureAccess.names.' + feature.key | translate}}<small>{{(feature.enabled ? 'featureAccess.enabled' : 'featureAccess.disabled') | translate}}</small></th>
-              <td>{{'featureAccess.used' | translate}}: {{feature.minuteUsed}} / {{feature.requestsPerMinute ?? ('featureAccess.unlimited' | translate)}}<small>{{'featureAccess.remaining' | translate}}: {{feature.minuteRemaining ?? ('featureAccess.unlimited' | translate)}}</small><small>{{'featureAccess.resetsAt' | translate}}: {{feature.minuteResetsAt | date:'HH:mm:ss':'UTC'}} UTC</small></td>
-              <td>{{'featureAccess.used' | translate}}: {{feature.dayUsed}} / {{feature.requestsPerDay ?? ('featureAccess.unlimited' | translate)}}<small>{{'featureAccess.remaining' | translate}}: {{feature.dayRemaining ?? ('featureAccess.unlimited' | translate)}}</small><small>{{'featureAccess.resetsAt' | translate}}: {{feature.dayResetsAt | date:'yyyy-MM-dd HH:mm:ss':'UTC'}} UTC</small></td>
-              <td>{{'featureAccess.activeRequests' | translate}}: {{feature.activeRequests}} / {{feature.maxConcurrent ?? ('featureAccess.unlimited' | translate)}}<small>{{'featureAccess.remaining' | translate}}: {{feature.concurrentRemaining ?? ('featureAccess.unlimited' | translate)}}</small></td>
+              <th scope="row">{{'admin.featureAccess.names.' + feature.key | translate}}<small>{{(feature.enabled ? 'admin.featureAccess.enabled' : 'admin.featureAccess.disabled') | translate}}</small></th>
+              <td>{{'admin.featureAccess.used' | translate}}: {{feature.minuteUsed}} / {{feature.requestsPerMinute ?? ('admin.featureAccess.unlimited' | translate)}}<small>{{'admin.featureAccess.remaining' | translate}}: {{feature.minuteRemaining ?? ('admin.featureAccess.unlimited' | translate)}}</small><small>{{'admin.featureAccess.resetsAt' | translate}}: {{feature.minuteResetsAt | date:'HH:mm:ss':'UTC'}} UTC</small></td>
+              <td>{{'admin.featureAccess.used' | translate}}: {{feature.dayUsed}} / {{feature.requestsPerDay ?? ('admin.featureAccess.unlimited' | translate)}}<small>{{'admin.featureAccess.remaining' | translate}}: {{feature.dayRemaining ?? ('admin.featureAccess.unlimited' | translate)}}</small><small>{{'admin.featureAccess.resetsAt' | translate}}: {{feature.dayResetsAt | date:'yyyy-MM-dd HH:mm:ss':'UTC'}} UTC</small></td>
+              <td>{{'admin.featureAccess.activeRequests' | translate}}: {{feature.activeRequests}} / {{feature.maxConcurrent ?? ('admin.featureAccess.unlimited' | translate)}}<small>{{'admin.featureAccess.remaining' | translate}}: {{feature.concurrentRemaining ?? ('admin.featureAccess.unlimited' | translate)}}</small></td>
             </tr>
           }
         </tbody>
@@ -23,13 +23,13 @@
     </div>
   }
   @if(access; as limits){
-    <p role="status">{{'featureAccess.usageUnavailable' | translate}}</p>
-    <p>{{'featureAccess.statusHint' | translate}}</p>
+    <p role="status">{{'admin.featureAccess.usageUnavailable' | translate}}</p>
+    <p>{{'admin.featureAccess.statusHint' | translate}}</p>
     <ul>@for(feature of limits.features;track feature.key){<li>
-      <strong>{{'featureAccess.names.' + feature.key | translate}}</strong>: {{(feature.enabled ? 'featureAccess.enabled' : 'featureAccess.disabled') | translate}}
-      @if(feature.enabled){<span> · {{'featureAccess.perMinute' | translate}}: {{feature.requestsPerMinute ?? ('featureAccess.unlimited' | translate)}}
-      · {{'featureAccess.perDay' | translate}}: {{feature.requestsPerDay ?? ('featureAccess.unlimited' | translate)}}
-      · {{'featureAccess.concurrent' | translate}}: {{feature.maxConcurrent ?? ('featureAccess.unlimited' | translate)}}</span>}
+      <strong>{{'admin.featureAccess.names.' + feature.key | translate}}</strong>: {{(feature.enabled ? 'admin.featureAccess.enabled' : 'admin.featureAccess.disabled') | translate}}
+      @if(feature.enabled){<span> · {{'admin.featureAccess.perMinute' | translate}}: {{feature.requestsPerMinute ?? ('admin.featureAccess.unlimited' | translate)}}
+      · {{'admin.featureAccess.perDay' | translate}}: {{feature.requestsPerDay ?? ('admin.featureAccess.unlimited' | translate)}}
+      · {{'admin.featureAccess.concurrent' | translate}}: {{feature.maxConcurrent ?? ('admin.featureAccess.unlimited' | translate)}}</span>}
     </li>}</ul>
   }
 </section>

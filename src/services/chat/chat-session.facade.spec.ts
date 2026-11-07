@@ -55,16 +55,16 @@ describe('Chat throttle messages', () => {
     const answer = new ChatModel();
     TestBed.inject(ChatSessionFacade).response(throwError(() => ({type: ErrorType.Busy, status: 429,
       code: 'feature_limit_exceeded', retryAfterSeconds: 17})), new ChatHistoryModel(), answer).subscribe({error: () => undefined});
-    expect(text).toHaveBeenCalledWith('chat-main.rateLimitedRetryAfter', {seconds: 17});
+    expect(text).toHaveBeenCalledWith('chat.composer.rateLimitedRetryAfter', {seconds: 17});
   });
   it('keeps quota wording for known admission failures on older servers', () => {
     TestBed.inject(ChatSessionFacade).response(throwError(() => ({type: ErrorType.Busy, status: 429,
       code: 'feature_limit_exceeded'})), new ChatHistoryModel(), new ChatModel()).subscribe({error: () => undefined});
-    expect(text).toHaveBeenCalledWith('chat-main.featureLimitExceeded', {seconds: undefined});
+    expect(text).toHaveBeenCalledWith('chat.composer.featureLimitExceeded', {seconds: undefined});
   });
   it('does not describe an unknown provider rate limit as an account quota', () => {
     TestBed.inject(ChatSessionFacade).response(throwError(() => ({type: ErrorType.Busy, status: 429})),
       new ChatHistoryModel(), new ChatModel()).subscribe({error: () => undefined});
-    expect(text).toHaveBeenCalledWith('chat-main.rateLimited', {seconds: undefined});
+    expect(text).toHaveBeenCalledWith('chat.composer.rateLimited', {seconds: undefined});
   });
 });

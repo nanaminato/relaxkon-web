@@ -19,14 +19,30 @@ export class SyncLocalStore {
     return (await (await this.database.connection()).getAll('syncEntities')).filter(item => item.accountId === accountId);
   }
   async enqueueSync(accountId: number, mutation: SyncMutation) { return this.enqueueSyncBatch(accountId, [mutation]); }
-  async enqueueSyncBatch(accountId: number, mutations: SyncMutation[]) {
+  async enqueueSyncBatch(accountId: number, mutations: SyncMutation[], migrateLanguagePacks = false) {
     const tx = (await this.database.connection()).transaction(SYNC_STORES, 'readwrite');
     try {
+      if (migrateLanguagePacks) {
+        const bootstrap = tx.objectStore('syncBootstrap');
+        if (await bootstrap.get('languagePacks')) { await tx.done; return 0; }
+        const existing = new Set((await tx.objectStore('syncEntities').getAll())
+          .filter(entity => entity.accountId === accountId && entity.kind === 'languagePack').map(entity => entity.entityId));
+        for (const item of await tx.objectStore('syncOutbox').getAll())
+          if (item.accountId === accountId && item.mutation.kind === 'languagePack') existing.add(item.mutation.entityId);
+        mutations = mutations.filter(mutation => !existing.has(mutation.entityId));
+        // The migration claim and every queued pack must commit together across browser tabs.
+        await bootstrap.put(true, 'languagePacks');
+      }
+      let queued = 0;
       for (const mutation of mutations) {
+        if (mutation.kind === 'uiLanguage' && (mutation.payload as {initialize?: boolean})?.initialize &&
+            await tx.objectStore('syncEntities').get(syncEntityKey(accountId, mutation))) continue;
         await tx.objectStore('syncOutbox').add({accountId, mutation});
         await this.applySyncEvent(tx, accountId, mutation);
+        queued++;
       }
       await tx.done;
+      return queued;
     } catch (error) {
       try { tx.abort(); } catch { /* already aborted */ }
       await tx.done.catch(() => undefined); throw error;
@@ -88,6 +104,12 @@ export class SyncLocalStore {
           if (task.account_id === accountId) await tx.objectStore('generateTask').delete(task.task_id!);
       }
       for (const change of batch.changes) await this.applySyncEvent(tx, accountId, change);
+      if (batch.languagePacks) {
+        const entities = tx.objectStore('syncEntities');
+        for (const item of await entities.getAll())
+          if (item.accountId === accountId && (item.kind === 'languagePack' || item.kind === 'uiLanguage')) await entities.delete(item.key);
+        for (const pack of batch.languagePacks) await this.applySyncEvent(tx, accountId, pack);
+      }
       await tx.objectStore('syncState').put(batch.cursor, accountId);
       await tx.done;
       return true;
@@ -135,7 +157,7 @@ export class SyncLocalStore {
         history.chatList.sort((left, right) => left - right);
       }
       await tx.objectStore('sessionHistories').put(history);
-    } else {
+    } else if (change.kind === 'task') {
       if (change.action === 'delete') await tx.objectStore('generateTask').delete(change.entityId);
       else await tx.objectStore('generateTask').put({...change.payload as GenerateTask, task_id: change.entityId, account_id: accountId});
     }

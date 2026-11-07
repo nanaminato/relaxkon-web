@@ -1,6 +1,6 @@
 <section class="auth-card">
-  <h1>{{'accountUi.welcome' | translate}}</h1>
-  <p class="auth-intro">{{'accountUi.signInDescription' | translate}}</p>
+  <h1>{{'account.ui.welcome' | translate}}</h1>
+  <p class="auth-intro">{{'account.ui.signInDescription' | translate}}</p>
   <form novalidate [formGroup]="validateForm" (ngSubmit)="submitForm()">
     <div class="field">
       <label for="login-username">{{'account.username' | translate}}</label>
@@ -22,15 +22,15 @@
     <div class="field">
       <label for="login-captcha">{{'account.verificationCode' | translate}}</label>
       <div class="captcha-row">
-        <input id="login-captcha" class="form-control" formControlName="captcha" autocomplete="off" maxlength="6" [placeholder]="'accountUi.captchaPlaceholder' | translate">
-        <button type="button" class="captcha-refresh" (click)="generateVerificationCode()" [disabled]="captchaLoading() || busy()" [attr.aria-label]="'accountUi.refreshCaptcha' | translate">
+        <input id="login-captcha" class="form-control" formControlName="captcha" autocomplete="off" maxlength="6" [placeholder]="'account.ui.captchaPlaceholder' | translate">
+        <button type="button" class="captcha-refresh" (click)="generateVerificationCode()" [disabled]="captchaLoading() || busy()" [attr.aria-label]="'account.ui.refreshCaptcha' | translate">
           @if (codeUrl) { <img [src]="codeUrl" width="154" height="46" [alt]="'account.verificationCode' | translate"> }
         </button>
       </div>
-      <p class="captcha-hint">{{(captchaLoading() ? 'accountUi.loadingCaptcha' : codeUrl ? 'accountUi.refreshCaptcha' : 'accountUi.retryCaptcha') | translate}}</p>
-      @if (validateForm.controls.captcha.invalid && validateForm.controls.captcha.touched) { <p class="field-error" role="alert">{{'accountUi.captchaPlaceholder' | translate}}</p> }
+      <p class="captcha-hint">{{(captchaLoading() ? 'account.ui.loadingCaptcha' : codeUrl ? 'account.ui.refreshCaptcha' : 'account.ui.retryCaptcha') | translate}}</p>
+      @if (validateForm.controls.captcha.invalid && validateForm.controls.captcha.touched) { <p class="field-error" role="alert">{{'account.ui.captchaPlaceholder' | translate}}</p> }
     </div>
-    <button type="submit" class="primary-button" [disabled]="busy() || captchaLoading() || !code">{{(busy() ? 'accountUi.signingIn' : 'account.signIn') | translate}}</button>
-    <p class="auth-alternative">{{'accountUi.noAccount' | translate}} <a routerLink="../register">{{'account.registerNow' | translate}}</a></p>
+    <button type="submit" class="primary-button" [disabled]="busy() || captchaLoading() || !code">{{(busy() ? 'account.ui.signingIn' : 'account.signIn') | translate}}</button>
+    <p class="auth-alternative">{{'account.ui.noAccount' | translate}} <a routerLink="../register">{{'account.registerNow' | translate}}</a></p>
   </form>
 </section>

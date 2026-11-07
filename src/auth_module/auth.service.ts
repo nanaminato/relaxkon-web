@@ -1,7 +1,7 @@
 import {LocalizationService} from '../services/normal-services/localization.service';
 import {inject, Injectable} from "@angular/core";
 import {HttpErrorResponse} from "@angular/common/http";
-import {catchError, finalize, map, Observable, shareReplay, throwError} from "rxjs";
+import {BehaviorSubject, catchError, finalize, map, Observable, shareReplay, throwError} from "rxjs";
 import {NzMessageService} from "ng-zorro-antd/message";
 import {User} from "../models/accounts";
 import {AuthCallService} from "./auth-call.service";
@@ -16,6 +16,8 @@ export class AuthService {
   private readonly refreshTokenKey = "refresh_token";
   private readonly userKey = "auth_user";
   private refreshRequest?: Observable<string>;
+  private readonly accountId = new BehaviorSubject<number | undefined>(undefined);
+  readonly accountId$ = this.accountId.asObservable();
 
   public user: User | undefined;
   public token: string | undefined;
@@ -33,7 +35,8 @@ export class AuthService {
     this.token = localStorage.getItem(this.tokenKey) ?? undefined;
     this.refreshToken = localStorage.getItem(this.refreshTokenKey) ?? undefined;
     const savedUser = localStorage.getItem(this.userKey);
-    if (savedUser) this.user = JSON.parse(savedUser);
+    this.user = savedUser ? JSON.parse(savedUser) : undefined;
+    this.accountId.next(this.token ? this.user?.id : undefined);
   }
 
   get isLogin(): boolean {
@@ -60,6 +63,7 @@ export class AuthService {
     localStorage.setItem(this.tokenKey, token);
     localStorage.setItem(this.refreshTokenKey, refreshToken);
     localStorage.setItem(this.userKey, JSON.stringify(user));
+    this.accountId.next(user.id);
   }
 
   refreshAccessToken(): Observable<string> {
@@ -101,6 +105,7 @@ export class AuthService {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.refreshTokenKey);
     localStorage.removeItem(this.userKey);
+    this.accountId.next(undefined);
   }
 
   private deviceName(): string {

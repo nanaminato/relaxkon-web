@@ -62,7 +62,7 @@ export class AccountCreateComponent {
   roles: Role[] = [];
   allRoles: Role[] | undefined;
   actionTip(roleId: number){
-    return this.roles.find(r=>r.roleId===roleId)!==undefined?this.i18n.instant('management.remove'):this.i18n.instant('management.add');
+    return this.roles.find(r=>r.roleId===roleId)!==undefined?this.i18n.instant('admin.management.remove'):this.i18n.instant('admin.management.add');
   }
   active(roleId: number){
     return this.roles.find(r=>r.roleId===roleId)!==undefined;
@@ -72,11 +72,11 @@ export class AccountCreateComponent {
       next: roles=>{
         this.allRoles = roles;
         if(refresh){
-          this.message.success(this.i18n.instant('management.refreshSuccess'));
+          this.message.success(this.i18n.instant('admin.management.refreshSuccess'));
         }
       },
       error:() => {
-        this.message.error(this.i18n.instant('management.accountsFailed'))
+        this.message.error(this.i18n.instant('admin.management.accountsFailed'))
       }
     })
   }
@@ -96,11 +96,11 @@ export class AccountCreateComponent {
         })
         .pipe(finalize(() => this.saving = false)).subscribe({
           next: () =>{
-            this.message.success(this.i18n.instant('management.accountCreated'));
+            this.message.success(this.i18n.instant('admin.management.accountCreated'));
             this.router.navigate(admin_routes.management);
           },
           error: (err: any) => {
-            this.message.error(this.i18n.instant(roleErrorKey(err, 'management.networkError')));
+            this.message.error(this.i18n.instant(roleErrorKey(err, 'admin.management.networkError')));
           }
         })
     } else {

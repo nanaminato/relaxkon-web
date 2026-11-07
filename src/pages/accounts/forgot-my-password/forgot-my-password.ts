@@ -44,7 +44,7 @@ export class ForgotMyPassword {
     this.busy.set(true); this.notice.set(''); this.errorKey.set('');
     const {username, email} = this.requestForm.getRawValue();
     this.call.requestPasswordReset(username.trim(), email.trim()).pipe(finalize(() => this.busy.set(false))).subscribe({
-      next: () => this.notice.set('passwordReset.requested'),
+      next: () => this.notice.set('account.passwordReset.requested'),
       error: error => this.handleError(error)
     });
   }
@@ -56,11 +56,11 @@ export class ForgotMyPassword {
     this.errorKey.set('');
     if (this.resetForm.invalid) return;
     if (password !== confirm) { this.errorKey.set('account.notWith'); return; }
-    if (!this.token) { this.errorKey.set('passwordReset.invalid'); return; }
+    if (!this.token) { this.errorKey.set('account.passwordReset.invalid'); return; }
     this.busy.set(true);
     this.call.confirmPasswordReset(this.token, password, confirm).pipe(finalize(() => this.busy.set(false))).subscribe({
       next: () => {
-        this.resetForm.reset(); this.completed.set(true); this.notice.set('passwordReset.success');
+        this.resetForm.reset(); this.completed.set(true); this.notice.set('account.passwordReset.success');
         this.auth.logout();
       },
       error: error => this.handleError(error)
@@ -68,7 +68,7 @@ export class ForgotMyPassword {
   }
 
   private handleError(error: HttpErrorResponse): void {
-    this.errorKey.set(error.status === 503 ? 'passwordReset.unavailable' : error.status === 429 ?
-      'passwordReset.tooMany' : error.error?.code === 'reset_invalid' ? 'passwordReset.invalid' : 'notifications.networkError');
+    this.errorKey.set(error.status === 503 ? 'account.passwordReset.unavailable' : error.status === 429 ?
+      'account.passwordReset.tooMany' : error.error?.code === 'reset_invalid' ? 'account.passwordReset.invalid' : 'notifications.networkError');
   }
 }

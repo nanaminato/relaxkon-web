@@ -30,6 +30,11 @@ import {themeOptions} from '../../themes/theme'
 import {selectConfig} from "../../systems/store/configuration/configuration.selectors";
 import {Store} from "@ngrx/store";
 import {NzMessageService} from "ng-zorro-antd/message";
+import {HttpBackend, HttpClient} from '@angular/common/http';
+import {firstValueFrom} from 'rxjs';
+import {MAX_LANGUAGE_PACK_BYTES} from '../../services/normal-services/localization.service';
+import {LanguagePackSync} from '../../services/sync/language-pack-sync.service';
+import {environment} from '../../environments/environment';
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.html',
@@ -50,6 +55,8 @@ export class Settings {
   config: Configuration | null = null;
   store = inject(Store);
   sizeReportService = inject(SizeReportService);
+  private readonly assets = new HttpClient(inject(HttpBackend));
+  private readonly languagePacks = inject(LanguagePackSync);
   constructor(
               private themeSwitcherService: ThemeSwitcherService,
               private configurationService: ConfigurationService,
@@ -138,7 +145,12 @@ export class Settings {
     this.dynamicConfigService.setDynamicConfig(this.config!,this.dynamicConfig!);
   }
 
-  languageChange($event: string) {
+  async languageChange($event: string) {
+    const saveAccount = this.languagePacks.saveAccountLanguage($event);
+    if (saveAccount) {
+      if (!await saveAccount) this.message.error(this.localization.text('workspace.preferenceSaveFailed'));
+      return;
+    }
     this.dynamicConfig!.language = this.localization.use($event);
     this.dynamicConfig!.languageIsSet = true;
     this.dynamicConfigService.setDynamicConfig(this.config!,this.dynamicConfig!);
@@ -146,6 +158,59 @@ export class Settings {
 
   protected get displayLanguages() {
     return this.localization.languages;
+  }
+
+  protected get customLanguages() {
+    return this.localization.customLanguages;
+  }
+
+  protected get selectedLanguage() {
+    return this.localization.selectedLanguage;
+  }
+
+  protected async downloadLanguageTemplate() {
+    try {
+      const translations = await firstValueFrom(this.assets.get(`${environment.assets}zh.json`));
+      const template = JSON.stringify({code: 'fr', name: 'Français', translations}, null, 2);
+      const url = URL.createObjectURL(new Blob([template], {type: 'application/json'}));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'relaxkon-language-template.json';
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch {
+      this.message.error(this.localization.text('settings.languagePacks.templateError'));
+    }
+  }
+
+  protected async importLanguagePack(input: HTMLInputElement) {
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+    if (file.size > MAX_LANGUAGE_PACK_BYTES) {
+      this.message.error(this.localization.text('settings.languagePacks.tooLarge'));
+      return;
+    }
+    try {
+      const result = await this.languagePacks.importPack(file);
+      const text = this.localization.text(`settings.languagePacks.${result}`);
+      if (result === 'imported') this.message.success(text);
+      else this.message.error(text);
+    } catch {
+      this.message.error(this.localization.text('settings.languagePacks.invalidPack'));
+    }
+  }
+
+  protected async removeLanguagePack(code: string) {
+    if (!await this.languagePacks.removePack(code)) {
+      this.message.error(this.localization.text('settings.languagePacks.storageError'));
+      return;
+    }
+    if (this.dynamicConfig?.language === code) {
+      this.dynamicConfig.language = this.localization.normalize(code);
+      this.dynamicConfigService.setDynamicConfig(this.config!, this.dynamicConfig);
+    }
+    this.message.success(this.localization.text('settings.languagePacks.removed'));
   }
   modelCenterVisible: boolean = false;
 
@@ -157,7 +222,7 @@ export class Settings {
       this.dynamicConfig = configDynamic;
     }
     this.themeChange();
-    this.languageChange(this.dynamicConfig.language===undefined?'':this.dynamicConfig.language);
+    this.localization.use(this.dynamicConfig.languageIsSet ? this.dynamicConfig.language : navigator.language);
   }
 
 

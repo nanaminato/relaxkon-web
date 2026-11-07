@@ -4,15 +4,15 @@
     <a class="workspace-brand" routerLink="/chat"><span class="workspace-mark" aria-hidden="true">R</span>RelaxKon</a>
     <p class="nav-caption">{{'workspace.manage' | translate}}</p>
     <nav>
-      <a routerLink="feature-access" routerLinkActive="nav-active" (click)="closeOnMobile()">{{'featureAccess.title' | translate}}</a>
-      <a routerLink="secrets/models" routerLinkActive="nav-active" (click)="closeOnMobile()"><span nz-icon nzType="appstore" aria-hidden="true"></span>{{'management.models' | translate}}</a>
-      <a routerLink="secrets/keys" routerLinkActive="nav-active" (click)="closeOnMobile()"><span nz-icon nzType="key" aria-hidden="true"></span>{{'management.keys' | translate}}</a>
-      <p class="nav-caption">{{'management.accountInfo' | translate}}</p>
-      <a routerLink="accounts/account-management" routerLinkActive="nav-active" (click)="closeOnMobile()"><span nz-icon nzType="user" aria-hidden="true"></span>{{'management.accounts' | translate}}</a>
-      <a routerLink="accounts/roles" routerLinkActive="nav-active" (click)="closeOnMobile()"><span nz-icon nzType="team" aria-hidden="true"></span>{{'management.roles' | translate}}</a>
-      <a routerLink="accounts/account-info" routerLinkActive="nav-active" (click)="closeOnMobile()"><span nz-icon nzType="setting" aria-hidden="true"></span>{{'management.admin' | translate}}</a>
+      <a routerLink="feature-access" routerLinkActive="nav-active" (click)="closeOnMobile()">{{'admin.featureAccess.title' | translate}}</a>
+      <a routerLink="secrets/models" routerLinkActive="nav-active" (click)="closeOnMobile()"><span nz-icon nzType="appstore" aria-hidden="true"></span>{{'admin.management.models' | translate}}</a>
+      <a routerLink="secrets/keys" routerLinkActive="nav-active" (click)="closeOnMobile()"><span nz-icon nzType="key" aria-hidden="true"></span>{{'admin.management.keys' | translate}}</a>
+      <p class="nav-caption">{{'admin.management.accountInfo' | translate}}</p>
+      <a routerLink="accounts/account-management" routerLinkActive="nav-active" (click)="closeOnMobile()"><span nz-icon nzType="user" aria-hidden="true"></span>{{'admin.management.accounts' | translate}}</a>
+      <a routerLink="accounts/roles" routerLinkActive="nav-active" (click)="closeOnMobile()"><span nz-icon nzType="team" aria-hidden="true"></span>{{'admin.management.roles' | translate}}</a>
+      <a routerLink="accounts/account-info" routerLinkActive="nav-active" (click)="closeOnMobile()"><span nz-icon nzType="setting" aria-hidden="true"></span>{{'admin.management.admin' | translate}}</a>
     </nav>
-    <a class="admin-back" routerLink="/chat">← {{'accountUi.backToChat' | translate}}</a>
+    <a class="admin-back" routerLink="/chat">← {{'account.ui.backToChat' | translate}}</a>
   </aside>
   <div class="admin-main">
     <header class="workspace-header">

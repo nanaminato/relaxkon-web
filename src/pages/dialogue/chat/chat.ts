@@ -75,7 +75,7 @@ export class Chat {
   }
 
   getPendingText() {
-    return this.localization.text('mediaStudio.waiting', {seconds: this.time / 10});
+    return this.localization.text('studio.media.waiting', {seconds: this.time / 10});
   }
 
   fallback =

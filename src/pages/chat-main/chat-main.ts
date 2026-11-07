@@ -155,14 +155,14 @@ export class ChatMainComponent implements OnDestroy{
       if (version !== this.draftVersion) return;
       this.answering = false;
       this.finalizeResponse();
-      this.notification.error(this.localization.text('chat-main.responseInterrupted'), '');
+      this.notification.error(this.localization.text('chat.composer.responseInterrupted'), '');
     }
   }
   handleTitleWhenNewResponse(model: ChatModel) {
     const history = this.chatHistoryModel!;
     if (!history.title) {
       history.title = model.content.substring(0, 25) || model.fileList?.[0]?.fileName.substring(0, 25)
-        || this.localization.text('chat-main.untitledConversation');
+        || this.localization.text('chat.composer.untitledConversation');
       const title = {dataId: history.dataId!, title: history.title, userId: history.userId};
       this.store.dispatch(historyTitleActions.newHistoryTitle({title}));
       this.notifyChatHistoryIdentifier = true;
@@ -193,7 +193,7 @@ export class ChatMainComponent implements OnDestroy{
   }
   syncHistorySession(){
     void this.chatDataService.putHistory(this.chatHistoryModel!).catch(() =>
-      this.notification.error(this.localization.text('management.saveFailed'), ''));
+      this.notification.error(this.localization.text('admin.management.saveFailed'), ''));
   }
 
   nextSubscribe(data: boolean) {
@@ -367,7 +367,7 @@ export class ChatMainComponent implements OnDestroy{
       generateModel!.finish = true;
       this.answering = false;
       this.finalizeResponse();
-      this.notification.error(this.localization.text('chat-main.responseInterrupted'), '');
+      this.notification.error(this.localization.text('chat.composer.responseInterrupted'), '');
     }
   }
   @ViewChild('chatPanel') private chatPanel: ElementRef | undefined;
@@ -375,7 +375,7 @@ export class ChatMainComponent implements OnDestroy{
   clearContext() {
     if (this.answering) return;
     this.chatContext.pointer = undefined;
-    this.notification.success(this.localization.text('chat-main.clearContext'), this.localization.text('notifications.contextCleared'));
+    this.notification.success(this.localization.text('chat.composer.clearContext'), this.localization.text('notifications.contextCleared'));
     this.awareContextChange();
   }
 

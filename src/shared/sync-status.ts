@@ -8,8 +8,8 @@ import {SyncService} from '../services/sync/sync.service';
   selector: 'app-sync-status', standalone: true, imports: [AsyncPipe, TranslatePipe],
   template: `@if (sync.status$ | async; as state) {
     @if (state.pending && state.accountId === auth.user?.id) {
-      <aside role="status">{{ (state.error ? 'management.syncRetryPending' : 'management.syncQueued') | translate }}
-        @if (state.error) { <button type="button" (click)="retry()">{{'management.retrySync' | translate}}</button> }
+      <aside role="status">{{ (state.error ? 'admin.management.syncRetryPending' : 'admin.management.syncQueued') | translate }}
+        @if (state.error) { <button type="button" (click)="retry()">{{'admin.management.retrySync' | translate}}</button> }
       </aside>
     }
   }`,

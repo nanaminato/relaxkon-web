@@ -42,7 +42,7 @@ export class HistoryTitleEffect {
           }),
           catchError((err) => {
             // 提取具体的错误信息
-            const errorMessage = err.error?.message || err.message || this.i18n.instant('management.connectionFailed');
+            const errorMessage = err.error?.message || err.message || this.i18n.instant('admin.management.connectionFailed');
             return of(historyTitleActions.loadFailure({ error: errorMessage }));
           })
         );
@@ -82,7 +82,7 @@ export class HistoryTitleEffect {
           }),
           catchError((err) => {
             // 提取具体的错误信息
-            const errorMessage = err.error?.message || err.message || this.i18n.instant('management.connectionFailed');
+            const errorMessage = err.error?.message || err.message || this.i18n.instant('admin.management.connectionFailed');
             return of(historyTitleActions.loadFailure({ error: errorMessage }));
           })
         );
@@ -116,7 +116,7 @@ export class HistoryTitleEffect {
         ofType(historyTitleActions.loadFailure),
         // 使用 tap 执行副作用（弹窗），不改变流
         tap(({ error }) => {
-          this.messageService.error(this.i18n.instant('management.historyLoadFailed', {error}), {
+          this.messageService.error(this.i18n.instant('admin.management.historyLoadFailed', {error}), {
             nzDuration: 3000 // 持续3秒
           });
         })

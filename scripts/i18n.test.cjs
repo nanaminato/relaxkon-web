@@ -66,7 +66,7 @@ test('image parameter option values have translated labels in every language', (
       if (options.has(name) && value && ts.isArrayLiteralExpression(value)) {
         for (const option of value.elements) {
           if (ts.isStringLiteral(option)) for (const lang of Object.keys(dictionaries)) {
-            assert.ok(`imageOptions.${option.text}` in dictionaries[lang], `${relative}: ${lang} missing label for ${option.text}`);
+            assert.ok(`studio.image.options.${option.text}` in dictionaries[lang], `${relative}: ${lang} missing label for ${option.text}`);
           }
         }
       }

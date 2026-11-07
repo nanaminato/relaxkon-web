@@ -61,7 +61,7 @@ export class Register {
       next: response => {
         this.deadlines.set(email, Date.now() + response.resendAfterSeconds * 1000);
         if (this.email !== email) return;
-        this.validateForm.controls.emailCode.reset(); this.updateCooldown(); this.notice.set('registrationEmail.sent');
+        this.validateForm.controls.emailCode.reset(); this.updateCooldown(); this.notice.set('account.registrationEmail.sent');
       },
       error: (failure: HttpErrorResponse) => {
         if (failure.status === 429) {
@@ -69,7 +69,7 @@ export class Register {
           this.deadlines.set(email, Date.now() + (Number.isFinite(retry) && retry > 0 ? retry : 60) * 1000);
         }
         if (this.email !== email) return;
-        this.updateCooldown(); this.error.set(apiErrorMessage(failure, this.localization.text('registrationEmail.unavailable')));
+        this.updateCooldown(); this.error.set(apiErrorMessage(failure, this.localization.text('account.registrationEmail.unavailable')));
       }
     });
   }

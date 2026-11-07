@@ -9,11 +9,14 @@ import {Configuration} from '../models';
 import {Component, inject} from '@angular/core';
 import {TranslatePipe} from '@ngx-translate/core';
 import {LocalizationService} from '../services/normal-services/localization.service';
+import {LanguagePackSync} from '../services/sync/language-pack-sync.service';
 
 @Component({
   selector: 'app-language-switcher', standalone: true, imports: [TranslatePipe],
-  template: `<select [value]="locale.currentLanguage" (change)="change($event)" [attr.aria-label]="'accountUi.language' | translate">
-    <option value="zh">简体中文</option><option value="en">English</option><option value="jp">日本語</option>
+  template: `<select (change)="change($event)" [attr.aria-label]="'account.ui.language' | translate">
+    @for (language of locale.languages; track language.code) {
+      <option [value]="language.code" [selected]="language.code === locale.selectedLanguage">{{ language.name }}</option>
+    }
   </select>`,
   styles: [`select { max-width: 122px; height: 34px; padding: 4px 8px; border: 1px solid var(--app-border); border-radius: 7px; background: var(--app-surface); color: var(--app-text-muted); font-size: 13px; cursor: pointer; }`]
 })
@@ -23,12 +26,18 @@ export class LanguageSwitcher {
   private readonly configuration = inject(ConfigurationService);
   private readonly dynamic = inject(DynamicConfigService);
   private readonly message = inject(NzMessageService);
+  private readonly languagePacks = inject(LanguagePackSync);
 
   private version = 0;
   private pendingSave: Promise<void> = Promise.resolve();
 
   change(event: Event): Promise<void> {
-    const language = this.locale.use((event.target as HTMLSelectElement).value);
+    const choice = (event.target as HTMLSelectElement).value;
+    const saveAccount = this.languagePacks.saveAccountLanguage(choice);
+    if (saveAccount) return saveAccount.then(saved => {
+      if (!saved) this.message.error(this.locale.text('workspace.preferenceSaveFailed'));
+    });
+    const language = this.locale.use(choice);
     const version = ++this.version;
     this.pendingSave = this.pendingSave.then(async () => {
       if (version !== this.version) return;

@@ -2,16 +2,16 @@
   <nz-card class="col-10 col-sm-9 col-lg-9 col-xl-7 border-0">
     <form novalidate [formGroup]="validateForm" (ngSubmit)="submitForm()">
       <div class="form-group">
-        <label>{{'management.username' | translate}}</label>
+        <label>{{'admin.management.username' | translate}}</label>
         <input class="form-control" name="username" formControlName="username" autocomplete="username">
         @if (validateForm.controls['username'].invalid && validateForm.controls['username'].dirty) {
           <li>
-            {{'management.usernameLength' | translate}}
+            {{'admin.management.usernameLength' | translate}}
           </li>
         }
       </div>
       <div class="form-group">
-        <label>{{'management.password' | translate}}</label>
+        <label>{{'admin.management.password' | translate}}</label>
         <div class="password-control">
           <input class="form-control" [type]="passwordVisible ? 'text' : 'password'" name="password"
                  formControlName="password" autocomplete="current-password">
@@ -30,24 +30,24 @@
       <div nz-row class="m-2 d-flex justify-content-between">
         <div >
           <label nz-checkbox formControlName="remember">
-            <span>{{'management.remember' | translate}}</span>
+            <span>{{'admin.management.remember' | translate}}</span>
           </label>
         </div>
         <div>
-          <a class="login-form-forgot" [routerLink]="['/accounts/forgot-me-password']">{{'management.forgot' | translate}}</a>
+          <a class="login-form-forgot" [routerLink]="['/accounts/forgot-me-password']">{{'admin.management.forgot' | translate}}</a>
         </div>
       </div>
       <div class="form-group m-2">
         <nz-row>
           <nz-col class="my-2">
-            <label class="me-2"><img [src]="codeUrl" width="200" height="50" [alt]="'management.captcha' | translate" (click)="generateVerificationCode()"> </label>
+            <label class="me-2"><img [src]="codeUrl" width="200" height="50" [alt]="'admin.management.captcha' | translate" (click)="generateVerificationCode()"> </label>
           </nz-col>
           <nz-col class="d-flex justify-content-center align-items-center my-2">
             <input type="text" #vCode style="height: 40px">
           </nz-col>
         </nz-row>
       </div>
-      <button class="btn btn-primary" >{{'management.login' | translate}}</button>
+      <button class="btn btn-primary" >{{'admin.management.login' | translate}}</button>
       <div class="d-flex flex-row-reverse">
         <a [routerLink]="['../register']" class="login-form-register">{{'account.registerNow' | translate}}</a>
       </div>

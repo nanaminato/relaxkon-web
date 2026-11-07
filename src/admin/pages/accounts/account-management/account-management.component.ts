@@ -52,11 +52,11 @@ export class AccountManagementComponent implements OnInit{
       this.call.deleteAccountById(id)
         .pipe(finalize(() => this.deleting.delete(id))).subscribe({
           next: msg=>{
-            this.message.success(this.i18n.instant('management.deleteSuccess'))
+            this.message.success(this.i18n.instant('admin.management.deleteSuccess'))
             this.refresh();
           },
           error: err=>{
-            this.message.error(this.i18n.instant(roleErrorKey(err, 'management.deleteFailed')))
+            this.message.error(this.i18n.instant(roleErrorKey(err, 'admin.management.deleteFailed')))
           }
         })
     }
@@ -65,11 +65,11 @@ export class AccountManagementComponent implements OnInit{
         next: accounts=>{
           this.accounts = accounts;
           if(refresh){
-            this.message.success(this.i18n.instant('management.refreshSuccess'));
+            this.message.success(this.i18n.instant('admin.management.refreshSuccess'));
           }
         },
         error: err => {
-          this.message.error(this.i18n.instant('management.accountsFailed'))
+          this.message.error(this.i18n.instant('admin.management.accountsFailed'))
         }
       });
     }

@@ -1,18 +1,18 @@
 <nz-modal [(nzVisible)]="viewSourceVisible"
           (nzOnCancel)="viewSourceVisible = false"
           (nzOnOk)="viewSourceVisible = false"
-          [nzTitle]="'mediaStudio.viewSourceResult' | translate">
+          [nzTitle]="'studio.media.viewSourceResult' | translate">
   <ng-container *nzModalContent>
     <app-json-code-viewer [jsonCode]="result"></app-json-code-viewer>
   </ng-container>
 </nz-modal>
-<header class="studio-heading"><button nz-button type="button" (click)="toggleMenu()" [attr.aria-label]="'studioUi.menu' | translate" [attr.aria-expanded]="menuVisible()"><nz-icon nzType="menu-unfold" nzTheme="outline" /></button><div><h1>{{ 'studioUi.sttTitle' | translate }}</h1><p>{{ 'studioUi.sttIntro' | translate }}</p></div></header>
+<header class="studio-heading"><button nz-button type="button" (click)="toggleMenu()" [attr.aria-label]="'studio.shared.menu' | translate" [attr.aria-expanded]="menuVisible()"><nz-icon nzType="menu-unfold" nzTheme="outline" /></button><div><h1>{{ 'studio.media.sttTitle' | translate }}</h1><p>{{ 'studio.media.sttIntro' | translate }}</p></div></header>
 <div class="file-drop rounded-2 border d-flex justify-content-center align-items-center" style="height: 150px;"
      role="button" tabindex="0" (keydown.enter)="fileInput.click()" (keydown.space)="$event.preventDefault(); fileInput.click()" (click)="fileInput.click()"
      (drop)="onFileDrop($event)" (dragover)="onDragOver($event)">
   <div class="drop-message">
     <span nz-icon nzType="cloud-upload" nzTheme="outline"></span>
-    {{ 'mediaStudio.dropSingleAudioFile' | translate }}
+    {{ 'studio.media.dropSingleAudioFile' | translate }}
   </div>
   <input
          accept=".m4a,.ogg,.mp3,.mp4,.mpeg,.wav,.webm,audio/flac, audio/mp3, audio/mpeg, audio/mpga, audio/m4a, audio/ogg, audio/wav, audio/webm, video/mp4"
@@ -21,7 +21,7 @@
 </div>
 <div class="d-flex flex-column m-2">
   @if(fileList.length===0){
-    <div class="m-2">{{ 'mediaStudio.noAudioFileSelected' | translate }}</div>
+    <div class="m-2">{{ 'studio.media.noAudioFileSelected' | translate }}</div>
   }@else{
     @for(audio of fileList; track audio){
       <nz-row class="d-flex justify-content-start align-items-center">
@@ -31,13 +31,13 @@
     }
   }
 </div>
-<nz-card [nzTitle]="'studioUi.settings' | translate">
+<nz-card [nzTitle]="'studio.shared.settings' | translate">
   <nz-row class="align-items-center my-1 bg-theme2 text-theme2">
     <nz-col class="m-2">
-      <nz-col class="m-1">{{ 'mediaStudio.model' | translate }}</nz-col>
+      <nz-col class="m-1">{{ 'studio.media.model' | translate }}</nz-col>
       <nz-col>
         <nz-select class="select big" [(ngModel)]="model">
-          <nz-option-group [nzLabel]="'mediaStudio.speechToTextModels' | translate">
+          <nz-option-group [nzLabel]="'studio.media.speechToTextModels' | translate">
             @for (selection of models; track selection) {
               <nz-option [nzLabel]="selection" [nzValue]="selection"></nz-option>
             }
@@ -46,17 +46,17 @@
       </nz-col>
     </nz-col>
     <nz-row class="m-2">
-      <nz-col class="m-1">{{ 'mediaStudio.temperature' | translate }}</nz-col>
+      <nz-col class="m-1">{{ 'studio.media.temperature' | translate }}</nz-col>
       <nz-row>
         <nz-slider class="slider big" [nzMin]="0" [nzMax]="1" [nzStep]="0.01" [(ngModel)]="temperature"></nz-slider>
         <nz-input-number [nzMin]="0" [nzMax]="1" [nzStep]="0.01" [(ngModel)]="temperature"></nz-input-number>
       </nz-row>
     </nz-row>
     <nz-col class="m-2">
-      <nz-col class="m-1">{{ 'mediaStudio.responseFormat' | translate }}</nz-col>
+      <nz-col class="m-1">{{ 'studio.media.responseFormat' | translate }}</nz-col>
       <nz-col>
         <nz-select class="select big" [(ngModel)]="response_format">
-          <nz-option-group [nzLabel]="'mediaStudio.responseFormat' | translate">
+          <nz-option-group [nzLabel]="'studio.media.responseFormat' | translate">
             @for (selection of response_formats; track selection) {
               <nz-option [nzLabel]="selection" [nzValue]="selection"></nz-option>
             }
@@ -65,10 +65,10 @@
       </nz-col>
     </nz-col>
     <nz-col class="m-2">
-      <nz-col class="m-1">{{ 'mediaStudio.language' | translate }}</nz-col>
+      <nz-col class="m-1">{{ 'studio.media.language' | translate }}</nz-col>
       <nz-col>
         <nz-select class="select big" [(ngModel)]="language">
-          <nz-option-group [nzLabel]="'mediaStudio.language' | translate">
+          <nz-option-group [nzLabel]="'studio.media.language' | translate">
             @for (selection of languages; track selection) {
               <nz-option [nzLabel]="selection" [nzValue]="selection"></nz-option>
             }
@@ -79,10 +79,10 @@
   </nz-row>
 </nz-card>
 <div class="m-2">
-  <div>{{ 'mediaStudio.prompt' | translate }}</div>
+  <div>{{ 'studio.media.prompt' | translate }}</div>
   <div class="d-flex justify-content-center align-items-center p-2 mb-5">
     <textarea [(ngModel)]="prompt"
-              nz-input [placeholder]="'mediaStudio.promptPlaceholder' | translate"
+              nz-input [placeholder]="'studio.media.promptPlaceholder' | translate"
               cdkTextareaAutosize
               cdkAutosizeMinRows="3"
               cdkAutosizeMaxRows="5"
@@ -96,18 +96,18 @@
   </div>
   @if(loading){
     <div>
-      {{ 'mediaStudio.parsing' | translate }}
+      {{ 'studio.media.parsing' | translate }}
     </div>
   }
   <div class="d-flex justify-content-center align-items-center p-2">
-    <textarea [attr.aria-label]="'mediaStudio.outputPlaceholder' | translate" [(ngModel)]="outputText"
-              nz-input [placeholder]="'mediaStudio.outputPlaceholder' | translate"
+    <textarea [attr.aria-label]="'studio.media.outputPlaceholder' | translate" [(ngModel)]="outputText"
+              nz-input [placeholder]="'studio.media.outputPlaceholder' | translate"
               cdkTextareaAutosize
               cdkAutosizeMinRows="3"
               cdkAutosizeMaxRows="20"
     ></textarea>
   </div>
   <div class="justify-content-end d-flex mb-5">
-    <button nz-button (click)="viewSourceVisible = true">{{ 'mediaStudio.viewSourceResult' | translate }}</button>
+    <button nz-button (click)="viewSourceVisible = true">{{ 'studio.media.viewSourceResult' | translate }}</button>
   </div>
 </div>

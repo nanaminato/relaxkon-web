@@ -115,7 +115,7 @@ describe('APIMart accepted task lifecycle', () => {
   it('honors Retry-After with same-task GETs and never repeats image generation', fakeAsync(() => {
     api.watchTask.and.returnValues(throttled('10'), of(status('completed')));
     void page.submit(); flushMicrotasks();
-    expect(page.state).toBe('polling'); expect(page.pollNotice).toBe('apimartStudio.pollRateLimited');
+    expect(page.state).toBe('polling'); expect(page.pollNotice).toBe('studio.image.apimart.pollRateLimited');
     tick(9999); expect(api.watchTask).toHaveBeenCalledTimes(1);
     tick(1); flushMicrotasks();
     expect(api.watchTask).toHaveBeenCalledTimes(2); expect(page.state).toBe('completed');
@@ -140,7 +140,7 @@ describe('APIMart accepted task lifecycle', () => {
       tick(7999); expect(api.watchTask).toHaveBeenCalledTimes(2);
       tick(1); expect(api.watchTask).toHaveBeenCalledTimes(3);
       tick(200000); expect(page.state).toBe('paused'); expect(api.watchTask).toHaveBeenCalledTimes(6);
-      expect(page.error).toBe('apimartStudio.pollRateLimitPaused'); expect(api.generateImage).toHaveBeenCalledTimes(1);
+      expect(page.error).toBe('studio.image.apimart.pollRateLimitPaused'); expect(api.generateImage).toHaveBeenCalledTimes(1);
     }));
   }
 
@@ -148,13 +148,13 @@ describe('APIMart accepted task lifecycle', () => {
     api.watchTask.and.returnValues(throttled('0'), throwError(() => new HttpErrorResponse({status: 403})));
     void page.submit(); flushMicrotasks(); tick(3999); expect(api.watchTask).toHaveBeenCalledTimes(1);
     tick(1); expect(page.state).toBe('paused'); tick(60000); expect(api.watchTask).toHaveBeenCalledTimes(2);
-    expect(page.error).toBe('apimartStudio.queryError');
+    expect(page.error).toBe('studio.image.apimart.queryError');
   }));
 
   it('pauses rather than shortening a long daily cooldown, including manual resume and restored receipts', fakeAsync(() => {
     api.watchTask.and.returnValue(throttled('86400'));
     void page.submit(); flushMicrotasks();
-    expect(page.state).toBe('paused'); expect(page.error).toBe('apimartStudio.pollRateLimitPaused');
+    expect(page.state).toBe('paused'); expect(page.error).toBe('studio.image.apimart.pollRateLimitPaused');
     page.resumePolling(); expect(api.watchTask).toHaveBeenCalledTimes(1);
     page.ngOnDestroy();
     const restored = TestBed.runInInjectionContext(() => new APIMartImage()); restored.ngOnInit(); restored.resumePolling();
@@ -175,7 +175,7 @@ describe('APIMart accepted task lifecycle', () => {
     api.watchTask.and.returnValue(throttled('10'));
     void page.submit(); flushMicrotasks(); auth.user = {id: 8}; tick(10000);
     expect(api.watchTask).toHaveBeenCalledTimes(1); expect(page.state).toBe('paused');
-    expect(page.error).toBe('apimartStudio.accountChanged'); expect(api.generateImage).toHaveBeenCalledTimes(1);
+    expect(page.error).toBe('studio.image.apimart.accountChanged'); expect(api.generateImage).toHaveBeenCalledTimes(1);
     expect(save).not.toHaveBeenCalled();
   }));
 
@@ -183,7 +183,7 @@ describe('APIMart accepted task lifecycle', () => {
     api.generateImage.and.rejectWith(new HttpErrorResponse({status: 429, headers: new HttpHeaders({'Retry-After': '60'})}));
     void page.submit(); flushMicrotasks(); tick(120000);
     expect(page.state).toBe('idle'); expect(page.receipt).toBeUndefined();
-    expect(page.error).toBe('apimartStudio.submitRateLimitedRetryAfter');
+    expect(page.error).toBe('studio.image.apimart.submitRateLimitedRetryAfter');
     expect(api.generateImage).toHaveBeenCalledTimes(1); expect(api.watchTask).not.toHaveBeenCalled();
   }));
 });

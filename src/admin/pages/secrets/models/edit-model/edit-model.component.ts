@@ -70,7 +70,7 @@ export class EditModelComponent {
         })
         .subscribe({
           next: () =>{
-            this.message.success(this.i18n.instant('management.modelUpdated'));
+            this.message.success(this.i18n.instant('admin.management.modelUpdated'));
             this.close.next(true);
           },
           error: (err: any) => {

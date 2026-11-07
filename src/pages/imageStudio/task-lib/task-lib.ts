@@ -273,8 +273,8 @@ export class TaskLib implements OnInit {
     let message: string;
 
     if (failCount === 0 && skipCount === 0) {
-      title = this.localization.text('image.batchDeleteSuccessTitle');
-      message = this.localization.text('image.batchDeleteResult', {
+      title = this.localization.text('studio.image.generation.batchDeleteSuccessTitle');
+      message = this.localization.text('studio.image.generation.batchDeleteResult', {
         success: successCount,
         fail: 0,
         skip: 0,
@@ -286,10 +286,10 @@ export class TaskLib implements OnInit {
     }
 
     // 部分失败 / 跳过
-    title = this.localization.text('image.batchDeletePartialTitle');
+    title = this.localization.text('studio.image.generation.batchDeletePartialTitle');
     const failedIds = failedItems.map(f => `${f.taskId} (${f.reason})`).join('\n');
     const skippedIds = skippedItems.join('\n');
-    message = this.localization.text('image.batchDeleteResult', {
+    message = this.localization.text('studio.image.generation.batchDeleteResult', {
       success: successCount,
       fail: failCount,
       skip: skipCount,

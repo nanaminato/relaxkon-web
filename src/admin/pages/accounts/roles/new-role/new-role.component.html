@@ -1,20 +1,20 @@
 <form [formGroup]="validateForm" (ngSubmit)="submitForm()">
   <fieldset [disabled]="saving">
     <div class="mb-3">
-      <label for="new-role-code">{{'roleManager.code' | translate}}</label>
+      <label for="new-role-code">{{'admin.roles.code' | translate}}</label>
       <input id="new-role-code" class="form-control" formControlName="code"  autocomplete="off">
-      <small>{{'roleManager.codeHint' | translate}}</small>
+      <small>{{'admin.roles.codeHint' | translate}}</small>
     </div>
     <div class="mb-3">
-      <label for="new-role-name">{{'roleManager.displayName' | translate}}</label>
+      <label for="new-role-name">{{'admin.roles.displayName' | translate}}</label>
       <input id="new-role-name" class="form-control" formControlName="name" maxlength="64">
     </div>
     <div class="mb-3">
-      <label for="new-role-description">{{'roleManager.description' | translate}}</label>
+      <label for="new-role-description">{{'admin.roles.description' | translate}}</label>
       <textarea id="new-role-description" class="form-control" formControlName="description" maxlength="256" rows="3"></textarea>
     </div>
-    @if (validateForm.invalid && validateForm.touched) { <p role="alert">{{'roleManager.invalid' | translate}}</p> }
+    @if (validateForm.invalid && validateForm.touched) { <p role="alert">{{'admin.roles.invalid' | translate}}</p> }
 
-    <button class="btn btn-primary" type="submit" [disabled]="saving">{{(saving ? 'featureAccess.saving' : 'featureAccess.save') | translate}}</button>
+    <button class="btn btn-primary" type="submit" [disabled]="saving">{{(saving ? 'admin.featureAccess.saving' : 'admin.featureAccess.save') | translate}}</button>
   </fieldset>
 </form>

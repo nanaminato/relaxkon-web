@@ -8,7 +8,7 @@
   </ng-template>
   @if(visible()){
     @if(isCompact()){
-      <button class="menu-backdrop" type="button" [attr.aria-label]="'studioUi.menu' | translate" (click)="hideMenu()"></button>
+      <button class="menu-backdrop" type="button" [attr.aria-label]="'studio.shared.menu' | translate" (click)="hideMenu()"></button>
     }
     <div class="d-flex flex-column h-100 menu" [class.w-100]="!isCompact()" [class.menu-overlay]="isCompact()"
     >
@@ -19,9 +19,9 @@
         </div>
 
         <div class="d-flex flex-column p-3">
-          <button class="m-2 rounded-2" (click)="closeMenuIfCompact()" nz-button routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/media-studio/openai-text-to-speech']">{{ 'mediaStudio.textToSpeech' | translate }}</button>
-          <button class="m-2 rounded-2" (click)="closeMenuIfCompact()" nz-button routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/media-studio/openai-speech-to-text']">{{ 'mediaStudio.speechToText' | translate }}</button>
-          <button class="m-2 rounded-2" (click)="closeMenuIfCompact()" nz-button routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/media-studio/media-extractor']">{{ 'mediaStudio.fileExtractor' | translate }}</button>
+          <button class="m-2 rounded-2" (click)="closeMenuIfCompact()" nz-button routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/media-studio/openai-text-to-speech']">{{ 'studio.media.textToSpeech' | translate }}</button>
+          <button class="m-2 rounded-2" (click)="closeMenuIfCompact()" nz-button routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/media-studio/openai-speech-to-text']">{{ 'studio.media.speechToText' | translate }}</button>
+          <button class="m-2 rounded-2" (click)="closeMenuIfCompact()" nz-button routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/media-studio/media-extractor']">{{ 'studio.media.fileExtractor' | translate }}</button>
         </div>
       </div>
       <div class="bg-theme sticky-bottom z-0"><div class="studio-locale"><app-language-switcher /></div>

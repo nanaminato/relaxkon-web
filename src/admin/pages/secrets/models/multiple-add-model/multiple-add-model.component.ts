@@ -73,8 +73,8 @@ export class MultipleAddModelComponent {
           this.selects[this.availableModels.indexOf(model)] = false;
         } catch { failed = true; }
       }
-      if (failed) this.message.error(this.i18n.instant('management.batchPartialFailure'));
-      else { this.message.success(this.i18n.instant('management.addSuccess')); this.close.emit(true); }
+      if (failed) this.message.error(this.i18n.instant('admin.management.batchPartialFailure'));
+      else { this.message.success(this.i18n.instant('admin.management.addSuccess')); this.close.emit(true); }
     } finally { this.saving = false; }
   }
 }

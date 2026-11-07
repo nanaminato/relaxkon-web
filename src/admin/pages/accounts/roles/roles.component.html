@@ -1,36 +1,36 @@
-<nz-modal [(nzVisible)]="newRoleVisible" [nzFooter]="null" [nzTitle]="'management.addRole' | translate" (nzOnCancel)="newRoleVisible = false">
+<nz-modal [(nzVisible)]="newRoleVisible" [nzFooter]="null" [nzTitle]="'admin.management.addRole' | translate" (nzOnCancel)="newRoleVisible = false">
   <ng-container *nzModalContent>@if (newRoleVisible) { <app-new-role (close)="tackleClose($event)"></app-new-role> }</ng-container>
 </nz-modal>
-<nz-modal [(nzVisible)]="editRoleVisible" [nzFooter]="null" [nzTitle]="'management.edit' | translate" (nzOnCancel)="editRoleVisible = false">
+<nz-modal [(nzVisible)]="editRoleVisible" [nzFooter]="null" [nzTitle]="'admin.management.edit' | translate" (nzOnCancel)="editRoleVisible = false">
   <ng-container *nzModalContent>@if (editRoleVisible) { <app-edit-role [role]="editRole!" (close)="tackleEditClose($event)"></app-edit-role> }</ng-container>
 </nz-modal>
 <section class="role-page">
-  <header><div><h2>{{'management.roles' | translate}}</h2><p>{{'roleManager.intro' | translate}}</p></div>
+  <header><div><h2>{{'admin.management.roles' | translate}}</h2><p>{{'admin.roles.intro' | translate}}</p></div>
     <div class="role-actions">
-      <a class="btn btn-outline-primary" routerLink="/admin/feature-access">{{'featureAccess.title' | translate}}</a>
-      <button class="btn btn-primary" (click)="newRoleVisible = true">{{'management.addRole' | translate}}</button>
-      <button class="btn btn-outline-secondary" [disabled]="loading" (click)="refresh()">{{'management.refresh' | translate}}</button>
+      <a class="btn btn-outline-primary" routerLink="/admin/feature-access">{{'admin.featureAccess.title' | translate}}</a>
+      <button class="btn btn-primary" (click)="newRoleVisible = true">{{'admin.management.addRole' | translate}}</button>
+      <button class="btn btn-outline-secondary" [disabled]="loading" (click)="refresh()">{{'admin.management.refresh' | translate}}</button>
     </div>
   </header>
-  <label class="search-label" for="role-search">{{'roleManager.search' | translate}}</label>
+  <label class="search-label" for="role-search">{{'admin.roles.search' | translate}}</label>
   <input id="role-search" class="form-control role-search" [(ngModel)]="search" type="search">
-  @if (loading) { <p role="status">{{'featureAccess.loading' | translate}}</p> }
-  @if (failed) { <p role="alert">{{'roleManager.loadError' | translate}}</p> }
+  @if (loading) { <p role="status">{{'admin.featureAccess.loading' | translate}}</p> }
+  @if (failed) { <p role="alert">{{'admin.roles.loadError' | translate}}</p> }
   @if (!loading && !failed) {
-    <p class="role-hint">{{'roleManager.systemHint' | translate}}</p>
+    <p class="role-hint">{{'admin.roles.systemHint' | translate}}</p>
     <div class="role-table"><table class="table">
-      <thead><tr><th>{{'roleManager.displayName' | translate}}</th><th>{{'roleManager.code' | translate}}</th><th>{{'roleManager.members' | translate}}</th><th>{{'management.actions' | translate}}</th></tr></thead>
+      <thead><tr><th>{{'admin.roles.displayName' | translate}}</th><th>{{'admin.roles.code' | translate}}</th><th>{{'admin.roles.members' | translate}}</th><th>{{'admin.management.actions' | translate}}</th></tr></thead>
       <tbody>
         @for (role of filteredRoles; track role.roleId) {
-          <tr><td><strong>{{role.name}}</strong> @if (protectedRole(role)) { <span class="role-badge">{{'roleManager.system' | translate}}</span> }<p class="role-description">{{role.description || '-'}}</p></td>
+          <tr><td><strong>{{role.name}}</strong> @if (protectedRole(role)) { <span class="role-badge">{{'admin.roles.system' | translate}}</span> }<p class="role-description">{{role.description || '-'}}</p></td>
             <td><code>{{role.code}}</code></td><td>{{role.memberCount ?? 0}}</td>
             <td><div class="role-actions">
-              <button class="btn btn-sm btn-outline-primary" (click)="editARole(role)">{{'management.edit' | translate}}</button>
-              <a class="btn btn-sm btn-outline-secondary" [routerLink]="['../account-management']" [queryParams]="{roleId: role.roleId}">{{'management.relatedAccounts' | translate}}</a>
-              <a class="btn btn-sm btn-outline-primary" routerLink="/admin/feature-access" [queryParams]="{role: role.code}">{{'roleManager.permissions' | translate}}</a>
-              <button class="btn btn-sm btn-outline-danger" [disabled]="protectedRole(role) || deleting.has(role.roleId)" nz-popconfirm [nzPopconfirmTitle]="'roleManager.deleteImpact' | translate: {count: role.memberCount ?? 0}" (nzOnConfirm)="delete(role)">{{'management.delete' | translate}}</button>
+              <button class="btn btn-sm btn-outline-primary" (click)="editARole(role)">{{'admin.management.edit' | translate}}</button>
+              <a class="btn btn-sm btn-outline-secondary" [routerLink]="['../account-management']" [queryParams]="{roleId: role.roleId}">{{'admin.management.relatedAccounts' | translate}}</a>
+              <a class="btn btn-sm btn-outline-primary" routerLink="/admin/feature-access" [queryParams]="{role: role.code}">{{'admin.roles.permissions' | translate}}</a>
+              <button class="btn btn-sm btn-outline-danger" [disabled]="protectedRole(role) || deleting.has(role.roleId)" nz-popconfirm [nzPopconfirmTitle]="'admin.roles.deleteImpact' | translate: {count: role.memberCount ?? 0}" (nzOnConfirm)="delete(role)">{{'admin.management.delete' | translate}}</button>
             </div></td></tr>
-        } @empty { <tr><td colspan="4">{{'roleManager.empty' | translate}}</td></tr> }
+        } @empty { <tr><td colspan="4">{{'admin.roles.empty' | translate}}</td></tr> }
       </tbody>
     </table></div>
   }

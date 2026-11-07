@@ -9,8 +9,8 @@ import {TranslatePipe} from '@ngx-translate/core';
 @Component({
   selector: 'app-authenticated-image', standalone: true,
   imports: [NzImageModule, ImagePresentPipe, TranslatePipe],
-  template: `@if(src){<img nz-image class="m-1" style="max-width:260px;max-height:260px;object-fit:contain" [nzSrc]="proxy && src.startsWith('blob:') ? src : (src | imagePresent)" [alt]="'featureAccess.generatedImage' | translate">}
-    @if(failed){<span role="status">{{'featureAccess.imageError' | translate}}</span>}`
+  template: `@if(src){<img nz-image class="m-1" style="max-width:260px;max-height:260px;object-fit:contain" [nzSrc]="proxy && src.startsWith('blob:') ? src : (src | imagePresent)" [alt]="'admin.featureAccess.generatedImage' | translate">}
+    @if(failed){<span role="status">{{'admin.featureAccess.imageError' | translate}}</span>}`
 })
 export class AuthenticatedImage implements OnChanges, OnDestroy {
   @Input({required: true}) url = '';

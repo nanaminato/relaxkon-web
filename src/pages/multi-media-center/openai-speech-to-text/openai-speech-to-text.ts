@@ -168,7 +168,7 @@ export class OpenaiSpeechToText {
   result?: AudioTextResponse;
   viewSourceVisible: boolean = false;
   get suggestion() {
-    return this.localization.text('mediaStudio.generationFailureSuggestion');
+    return this.localization.text('studio.media.generationFailureSuggestion');
   }
   async transcription() {
     let file: TtsFile | undefined;

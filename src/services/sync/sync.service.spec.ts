@@ -3,11 +3,14 @@ import {provideHttpClient} from '@angular/common/http';
 import {HttpTestingController, provideHttpClientTesting, TestRequest} from '@angular/common/http/testing';
 import {Store} from '@ngrx/store';
 import {deleteDB} from 'idb';
+import {BehaviorSubject} from 'rxjs';
 import {AuthService} from '../../auth_module/auth.service';
 import {ServiceProvider} from '../../roots';
 import {CHAT_DB_NAME, DbService} from '../db-services/db.service';
 import {SyncLocalStore} from './sync-local.store';
 import {SyncService} from './sync.service';
+import {LanguagePack, LocalizationService} from '../normal-services/localization.service';
+import {LanguagePackSync} from './language-pack-sync.service';
 
 describe('Durable synchronization', () => {
   let name: string;
@@ -15,13 +18,18 @@ describe('Durable synchronization', () => {
   let local: SyncLocalStore;
   let service: SyncService;
   let http: HttpTestingController;
-  let auth: {user?: {id: number}};
+  let auth: {user?: {id: number}; accountId$: BehaviorSubject<number | undefined>};
+  let replacePacks: jasmine.Spy;
+  let setAccountLanguage: jasmine.Spy;
   beforeEach(() => {
     name = `sync-test-${crypto.randomUUID()}`;
-    auth = {user: {id: 3}};
+    auth = {user: {id: 3}, accountId$: new BehaviorSubject<number | undefined>(3)};
+    replacePacks = jasmine.createSpy('replacePacks');
+    setAccountLanguage = jasmine.createSpy('setAccountLanguage');
     TestBed.configureTestingModule({providers: [provideHttpClient(), provideHttpClientTesting(),
       {provide: Store, useValue: {dispatch: () => undefined}}, {provide: CHAT_DB_NAME, useValue: name},
-      {provide: AuthService, useValue: auth}, {provide: ServiceProvider, useValue: {apiUrl: '/'}}
+      {provide: AuthService, useValue: auth}, {provide: ServiceProvider, useValue: {apiUrl: '/'}},
+      {provide: LocalizationService, useValue: {replacePacks, setAccountLanguage, localPacks: () => []}}
     ]});
     database = TestBed.inject(DbService); local = TestBed.inject(SyncLocalStore);
     service = TestBed.inject(SyncService); http = TestBed.inject(HttpTestingController);
@@ -35,6 +43,56 @@ describe('Durable synchronization', () => {
     }
     throw new Error(`No ${method} sync request`);
   }
+
+  it('makes the account snapshot available after signing in and clears it when the account changes', async () => {
+    const pack: LanguagePack = {code: 'fr', name: 'Français', translations: {account: {username: 'Nom'}}};
+    TestBed.inject(LanguagePackSync);
+    const read = await request('GET');
+    expect(read.request.url).toContain('languagePackSnapshot=true');
+    const shown = new Promise<void>(resolve => {
+      setAccountLanguage.and.callFake((code?: string) => {
+        if (code === 'fr') {
+          expect(replacePacks.calls.mostRecent().args).toEqual([[pack]]);
+          resolve();
+        }
+      });
+    });
+    read.flush({cursor: 1, reset: true, hasMore: false, changes: [], languagePacks: [
+      {version: 1, kind: 'languagePack', action: 'upsert', entityId: 'fr', payload: {document: JSON.stringify(pack)}},
+      {version: 1, kind: 'uiLanguage', action: 'upsert', entityId: 'selected', payload: {code: 'fr'}}
+    ]});
+    await service.synchronize();
+    await shown;
+    expect(replacePacks).toHaveBeenCalledWith([pack]);
+
+    auth.user = {id: 4};
+    auth.accountId$.next(4);
+    expect(replacePacks.calls.mostRecent().args).toEqual([[]]);
+    expect(setAccountLanguage.calls.mostRecent().args).toEqual([undefined]);
+    const other = await request('GET');
+    expect(other.request.headers.get('X-Sync-Account')).toBe('4');
+    other.flush({cursor: 0, reset: true, hasMore: false, changes: [], languagePacks: []});
+    await service.synchronize();
+    expect(replacePacks.calls.mostRecent().args).toEqual([[]]);
+    expect((await local.syncEntities(3)).map(entity => entity.entityId)).toEqual(['fr', 'selected']);
+    expect(await local.syncEntities(4)).toEqual([]);
+  });
+
+  it('imports existing device packs once and keeps the account copy on a code conflict', async () => {
+    const pack = (entityId: string, document: string) => ({
+      operationId: crypto.randomUUID(), kind: 'languagePack' as const, action: 'upsert' as const,
+      entityId, payload: {document}
+    });
+    const cloudPack = pack('fr', 'account copy');
+    await local.applySyncBatch(3, {cursor: 1, reset: true, hasMore: false, changes: [],
+      languagePacks: [{...cloudPack, version: 1}]});
+    const localPacks = [pack('fr', 'device copy'), pack('es', 'device copy')];
+    expect(await local.enqueueSyncBatch(3, localPacks, true)).toBe(1);
+    expect(await local.enqueueSyncBatch(4, localPacks, true)).toBe(0);
+    expect((await local.pendingSync(3)).map(item => item.mutation.entityId)).toEqual(['es']);
+    expect((await local.syncEntities(3)).find(item => item.entityId === 'fr')?.payload).toEqual(cloudPack.payload);
+    expect(await local.syncEntities(4)).toEqual([]);
+  });
 
   it('retains the same operation after a lost acknowledgement and retries safely', async () => {
     await service.enqueue({kind: 'history', action: 'upsert', entityId: '1', payload: {dataId: 1, title: 'saved'}});

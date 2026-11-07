@@ -1,6 +1,6 @@
 <section class="auth-card">
-  <h1>{{'accountUi.createAccount' | translate}}</h1>
-  <p class="auth-intro">{{'accountUi.registerDescription' | translate}}</p>
+  <h1>{{'account.ui.createAccount' | translate}}</h1>
+  <p class="auth-intro">{{'account.ui.registerDescription' | translate}}</p>
   <form novalidate [formGroup]="validateForm" (ngSubmit)="submitForm()">
     <div class="field">
       <label for="register-email">{{'account.email' | translate}}</label>
@@ -8,17 +8,17 @@
       @if (validateForm.controls.email.invalid && validateForm.controls.email.dirty) { <p class="field-error" role="alert">{{'account.pleaseEmail' | translate}}</p> }
     </div>
     <div class="field">
-      <label for="register-email-code">{{'registrationEmail.label' | translate}}</label>
+      <label for="register-email-code">{{'account.registrationEmail.label' | translate}}</label>
       <div class="captcha-row">
-        <input id="register-email-code" class="form-control" formControlName="emailCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" [placeholder]="'registrationEmail.placeholder' | translate">
+        <input id="register-email-code" class="form-control" formControlName="emailCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" [placeholder]="'account.registrationEmail.placeholder' | translate">
         <button class="btn btn-outline-primary" type="button" (click)="sendEmailCode()" [disabled]="sending() || busy() || cooldown() > 0 || validateForm.controls.email.invalid">
-          @if (sending()) { {{'registrationEmail.sending' | translate}} }
-          @else if (cooldown() > 0) { {{'registrationEmail.resend' | translate:{seconds: cooldown()} }} }
-          @else { {{'registrationEmail.send' | translate}} }
+          @if (sending()) { {{'account.registrationEmail.sending' | translate}} }
+          @else if (cooldown() > 0) { {{'account.registrationEmail.resend' | translate:{seconds: cooldown()} }} }
+          @else { {{'account.registrationEmail.send' | translate}} }
         </button>
       </div>
-      <p class="captcha-hint">{{'registrationEmail.hint' | translate}}</p>
-      @if (validateForm.controls.emailCode.invalid && validateForm.controls.emailCode.dirty) { <p class="field-error" role="alert">{{'registrationEmail.placeholder' | translate}}</p> }
+      <p class="captcha-hint">{{'account.registrationEmail.hint' | translate}}</p>
+      @if (validateForm.controls.emailCode.invalid && validateForm.controls.emailCode.dirty) { <p class="field-error" role="alert">{{'account.registrationEmail.placeholder' | translate}}</p> }
       @if (notice()) { <p role="status">{{notice() | translate}}</p> }
       @if (error()) { <p class="field-error" role="alert">{{error()}}</p> }
     </div>
@@ -41,12 +41,12 @@
     <div class="field">
       <label for="register-captcha">{{'account.verificationCode' | translate}}</label>
       <div class="captcha-row">
-        <input id="register-captcha" class="form-control" type="text" #vCode autocomplete="off" maxlength="6" [placeholder]="'accountUi.captchaPlaceholder' | translate">
-        <button class="captcha-refresh" type="button" (click)="generateVerificationCode()" [attr.aria-label]="'accountUi.refreshCaptcha' | translate">
+        <input id="register-captcha" class="form-control" type="text" #vCode autocomplete="off" maxlength="6" [placeholder]="'account.ui.captchaPlaceholder' | translate">
+        <button class="captcha-refresh" type="button" (click)="generateVerificationCode()" [attr.aria-label]="'account.ui.refreshCaptcha' | translate">
           @if (codeUrl) { <img [src]="codeUrl" width="154" height="46" [alt]="'account.verificationCode' | translate"> }
         </button>
       </div>
-      <p class="captcha-hint">{{'accountUi.refreshCaptcha' | translate}}</p>
+      <p class="captcha-hint">{{'account.ui.refreshCaptcha' | translate}}</p>
     </div>
     <button type="submit" class="primary-button" [disabled]="busy() || sending()">{{'account.registerNow' | translate}}</button>
     <p class="auth-alternative"><a routerLink="../sign-in">{{'account.haveAccount' | translate}}</a></p>

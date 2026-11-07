@@ -94,7 +94,7 @@ export class APIMartImage implements OnInit, OnDestroy {
         this.images = saved.urls.map(url => ({image_url: url, image_type: saved.format}));
         if (!saved.historySaved) this.prepareHistory();
       }
-    } catch { this.notice = this.text('apimartStudio.storageWarning'); }
+    } catch { this.notice = this.text('studio.image.apimart.storageWarning'); }
   }
   modelChange() {
     if (this.locked) return;
@@ -115,18 +115,18 @@ export class APIMartImage implements OnInit, OnDestroy {
   private persist() {
     if (!this.receipt) return;
     try { sessionStorage.setItem(this.storageKey(this.receipt.accountId), JSON.stringify(this.receipt)); }
-    catch { this.notice = this.text('apimartStudio.storageWarning'); }
+    catch { this.notice = this.text('studio.image.apimart.storageWarning'); }
   }
   private sameAccount() { return this.receipt?.accountId === this.auth.user?.id; }
   async upload(event: Event, target: 'references' | 'overlay') {
     const input = event.target as HTMLInputElement;
     const files = Array.from(input.files ?? []); input.value = '';
     if (!files.length || this.locked || this.uploading) return;
-    if (this.auth.user?.id == null) { this.error = this.text('apimartStudio.signIn'); return; }
-    if (target === 'references' && this.refs.length + files.length > 16) { this.error = this.text('apimartStudio.invalidReferences'); return; }
+    if (this.auth.user?.id == null) { this.error = this.text('studio.image.apimart.signIn'); return; }
+    if (target === 'references' && this.refs.length + files.length > 16) { this.error = this.text('studio.image.apimart.invalidReferences'); return; }
     const max = target === 'overlay' && this.overlayKind === 'mask' ? 4 * 1024 * 1024 : 20 * 1024 * 1024;
     if (files.some(file => file.size > max || !['image/png', 'image/jpeg', 'image/webp', 'image/gif'].includes(file.type) || target === 'overlay' && file.type !== 'image/png')) {
-      this.error = this.text(target === 'overlay' ? 'apimartStudio.overlayFileError' : 'apimartStudio.fileError'); return;
+      this.error = this.text(target === 'overlay' ? 'studio.image.apimart.overlayFileError' : 'studio.image.apimart.fileError'); return;
     }
     const accountId = this.auth.user?.id;
     this.uploading = true; this.error = '';
@@ -134,21 +134,21 @@ export class APIMartImage implements OnInit, OnDestroy {
       for (const file of files) {
         const response = await this.api.uploadImage(file);
         if (this.destroyed || this.auth.user?.id !== accountId) return;
-        if (!publicImageUrl(response.url)) throw new Error('apimartStudio.uploadError');
+        if (!publicImageUrl(response.url)) throw new Error('studio.image.apimart.uploadError');
         if (target === 'references') this.references = [...this.refs, response.url].join('\n');
         else { this.overlayUrl = response.url; this.overlayConfirmed = false; }
       }
-    } catch { this.error = this.text('apimartStudio.uploadError'); }
+    } catch { this.error = this.text('studio.image.apimart.uploadError'); }
     finally { this.uploading = false; }
   }
   async submit() {
     if (!this.canSubmit) return;
     const accountId = this.auth.user?.id;
-    if (accountId == null) { this.error = this.text('apimartStudio.signIn'); return; }
+    if (accountId == null) { this.error = this.text('studio.image.apimart.signIn'); return; }
     let request: APIMartImageGenerationRequest;
     const operationId = crypto.randomUUID();
     try {
-      if (this.overlayKind !== 'none' && (!this.overlayUrl.trim() || !this.overlayConfirmed)) throw new Error('apimartStudio.confirmOverlay');
+      if (this.overlayKind !== 'none' && (!this.overlayUrl.trim() || !this.overlayConfirmed)) throw new Error('studio.image.apimart.confirmOverlay');
       request = apimartRequest({
         model: this.model, version: this.version, prompt: this.prompt, n: this.count, idempotency_key: operationId,
         size: this.size === 'source' ? undefined : this.size === 'custom' ? this.width + 'x' + this.height : this.size,
@@ -160,7 +160,7 @@ export class APIMartImage implements OnInit, OnDestroy {
         frame_count: this.frameCount, frame_duration_ms: this.frameDuration,
         svg: this.svgModel.trim() ? {model: this.svgModel.trim()} : undefined
       });
-    } catch (error) { this.error = this.text(error instanceof Error ? error.message : 'apimartStudio.invalidOptions'); return; }
+    } catch (error) { this.error = this.text(error instanceof Error ? error.message : 'studio.image.apimart.invalidOptions'); return; }
     this.receipt = {accountId, operationId, model: request.model, format: request.output_format ?? 'png', created: new Date().toISOString()};
     this.state = 'submitting'; this.error = ''; this.notice = ''; this.historyWarning = '';
     this.images = []; this.pendingHistory = undefined; this.localSaved = false; this.progress = 0;
@@ -177,13 +177,13 @@ export class APIMartImage implements OnInit, OnDestroy {
         this.receipt.taskIds = failure.error.task_ids; this.receipt.taskId = failure.error.task_ids?.[0]; this.state = 'receiptPending'; this.persist();
       } else if (failure.status != null && failure.status >= 400 && failure.status < 500 && failure.status !== 408) {
         const code = failure.error?.code;
-        const keys: Record<string, string> = {invalid_image_option: 'apimartStudio.invalidOptions', image_provider_busy: 'imageWorkspace.providerBusy', image_provider_rejected: 'imageWorkspace.providerRejected', image_model_unavailable: 'apimartStudio.unavailable'};
+        const keys: Record<string, string> = {invalid_image_option: 'studio.image.apimart.invalidOptions', image_provider_busy: 'studio.image.workspace.providerBusy', image_provider_rejected: 'studio.image.workspace.providerRejected', image_model_unavailable: 'studio.image.apimart.unavailable'};
         const delay = failure.status === 429 ? retryAfterMs(failure.headers?.get('Retry-After')) : undefined;
         this.error = failure.status === 429
-          ? this.text(delay == null ? 'apimartStudio.submitRateLimited' : 'apimartStudio.submitRateLimitedRetryAfter', {seconds: retryAfterSeconds(delay ?? 0)})
-          : this.text(code && keys[code] ? keys[code] : 'apimartStudio.submitRejected');
+          ? this.text(delay == null ? 'studio.image.apimart.submitRateLimited' : 'studio.image.apimart.submitRateLimitedRetryAfter', {seconds: retryAfterSeconds(delay ?? 0)})
+          : this.text(code && keys[code] ? keys[code] : 'studio.image.apimart.submitRejected');
         this.removeReceipt(); this.state = 'idle';
-      } else { this.state = 'unknown'; this.error = this.text('apimartStudio.submitUnknown'); this.persist(); }
+      } else { this.state = 'unknown'; this.error = this.text('studio.image.apimart.submitUnknown'); this.persist(); }
     }
   }
   async recoverReceipt() {
@@ -193,11 +193,11 @@ export class APIMartImage implements OnInit, OnDestroy {
       const result = await this.api.recoverReceipt(this.receipt.recoveryToken);
       this.receipt.taskIds = submissionTaskIds(result); this.receipt.taskId = this.receipt.taskIds[0]; this.receipt.recoveryToken = undefined; this.persist();
       if (!this.destroyed && this.sameAccount()) this.resumePolling();
-    } catch { this.state = 'receiptPending'; this.error = this.text('apimartStudio.receiptError'); }
+    } catch { this.state = 'receiptPending'; this.error = this.text('studio.image.apimart.receiptError'); }
   }
   resumePolling() {
     if (!this.receipt?.taskId || this.receipt.recoveryToken || this.destroyed || this.state === 'polling') return;
-    if (!this.sameAccount()) { this.error = this.text('apimartStudio.accountChanged'); return; }
+    if (!this.sameAccount()) { this.error = this.text('studio.image.apimart.accountChanged'); return; }
     this.stopTimer(); this.state = 'polling'; this.error = ''; this.pollNotice = ''; this.attempts = 0; this.rateLimitRetries = 0; this.deadline = Date.now() + 300000;
     this.poll();
   }
@@ -208,10 +208,10 @@ export class APIMartImage implements OnInit, OnDestroy {
   }
   private poll() {
     if (this.destroyed || this.state !== 'polling' || !this.receipt?.taskId) return;
-    if (!this.sameAccount()) { this.pause(); this.error = this.text('apimartStudio.accountChanged'); return; }
+    if (!this.sameAccount()) { this.pause(); this.error = this.text('studio.image.apimart.accountChanged'); return; }
     const remaining = (this.receipt.pollRetryAt ?? 0) - Date.now();
     if (remaining > 0) { this.scheduleRateLimitedPoll(remaining); return; }
-    if (++this.attempts > 75 || Date.now() >= this.deadline) { this.pause(); this.error = this.text('apimartStudio.pollTimeout'); return; }
+    if (++this.attempts > 75 || Date.now() >= this.deadline) { this.pause(); this.error = this.text('studio.image.apimart.pollTimeout'); return; }
     this.pollNotice = '';
     const id = this.receipt.taskId;
     this.query = this.api.watchTask(id, this.localization.requestLanguage).subscribe({
@@ -223,7 +223,7 @@ export class APIMartImage implements OnInit, OnDestroy {
           this.progress = Number.isFinite(task.progress) ? Math.max(0, Math.min(100, task.progress)) : 0;
           if (task.status === 'completed') {
             const urls = taskImages(task);
-            if (!urls.length) { this.pause(); this.error = this.text('imageWorkspace.noImages'); return; }
+            if (!urls.length) { this.pause(); this.error = this.text('studio.image.workspace.noImages'); return; }
             this.receipt!.terminalIds = [...new Set([...(this.receipt!.terminalIds ?? []), id])];
             this.receipt!.urls = urls; this.receipt!.state = 'completed'; this.state = 'completed'; this.progress = 100;
             this.images = urls.map(url => ({image_url: url, image_type: this.receipt!.format})); this.persist();
@@ -232,14 +232,14 @@ export class APIMartImage implements OnInit, OnDestroy {
             const terminal = task.status === 'cancelled' || task.error?.code === 'image_task_cancelled' ? 'cancelled' : 'failed';
             this.state = terminal; this.receipt!.state = terminal;
             this.receipt!.terminalIds = [...new Set([...(this.receipt!.terminalIds ?? []), id])]; this.persist();
-            this.error = this.text(this.state === 'failed' ? 'apimartStudio.taskFailed' : 'apimartStudio.taskCancelled');
+            this.error = this.text(this.state === 'failed' ? 'studio.image.apimart.taskFailed' : 'studio.image.apimart.taskCancelled');
           } else this.timer = setTimeout(() => this.poll(), 4000);
-        } catch { this.pause(); this.error = this.text('apimartStudio.queryError'); }
+        } catch { this.pause(); this.error = this.text('studio.image.apimart.queryError'); }
       },
       error: (failure: {status?: number; headers?: {get(name: string): string | null}}) => {
         if (this.destroyed || this.state !== 'polling') return;
-        if (!this.sameAccount()) { this.pause(); this.error = this.text('apimartStudio.accountChanged'); return; }
-        if (failure?.status !== 429) { this.pause(); this.error = this.text('apimartStudio.queryError'); return; }
+        if (!this.sameAccount()) { this.pause(); this.error = this.text('studio.image.apimart.accountChanged'); return; }
+        if (failure?.status !== 429) { this.pause(); this.error = this.text('studio.image.apimart.queryError'); return; }
         const delay = Math.max(4000, retryAfterMs(failure.headers?.get('Retry-After')) ?? Math.min(60000, 4000 * 2 ** this.rateLimitRetries));
         this.receipt!.pollRetryAt = Date.now() + delay; this.persist(); this.rateLimitRetries++;
         this.scheduleRateLimitedPoll(delay);
@@ -250,9 +250,9 @@ export class APIMartImage implements OnInit, OnDestroy {
     const params = {seconds: retryAfterSeconds(delay)};
     // Long daily quotas and repeated throttling pause instead of hiding an unbounded timer.
     if (this.rateLimitRetries > 5 || Date.now() + delay >= this.deadline) {
-      this.pause(); this.error = this.text('apimartStudio.pollRateLimitPaused', params); return;
+      this.pause(); this.error = this.text('studio.image.apimart.pollRateLimitPaused', params); return;
     }
-    this.pollNotice = this.text('apimartStudio.pollRateLimited', params);
+    this.pollNotice = this.text('studio.image.apimart.pollRateLimited', params);
     this.timer = setTimeout(() => this.poll(), delay);
   }
   resumeById() {
@@ -271,15 +271,15 @@ export class APIMartImage implements OnInit, OnDestroy {
   }
   async retrySave() {
     if (!this.pendingHistory || this.savingHistory) return;
-    if (this.pendingHistory.account_id !== this.auth.user?.id) { this.historyWarning = this.text('apimartStudio.accountChanged'); return; }
+    if (this.pendingHistory.account_id !== this.auth.user?.id) { this.historyWarning = this.text('studio.image.apimart.accountChanged'); return; }
     this.savingHistory = true; const snapshot = structuredClone(this.pendingHistory);
     try {
       if (!this.localSaved) { await this.history.addOrUpdateGenerateTask(snapshot); this.localSaved = true; }
-      if (snapshot.account_id !== this.auth.user?.id) { this.historyWarning = this.text('apimartStudio.accountChanged'); return; }
+      if (snapshot.account_id !== this.auth.user?.id) { this.historyWarning = this.text('studio.image.apimart.accountChanged'); return; }
       await this.sync.sendTask(snapshot);
       this.pendingHistory = undefined; this.historyWarning = '';
       if (this.receipt && this.receipt.taskId === snapshot.task_id) { this.receipt.historySaved = true; this.persist(); }
-    } catch { this.historyWarning = this.text(this.localSaved ? 'imageWorkspace.syncWarning' : 'imageWorkspace.saveWarning'); }
+    } catch { this.historyWarning = this.text(this.localSaved ? 'studio.image.workspace.syncWarning' : 'studio.image.workspace.saveWarning'); }
     finally { this.savingHistory = false; }
   }
   startNew() {

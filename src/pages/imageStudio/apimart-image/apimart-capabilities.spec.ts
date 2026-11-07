@@ -19,7 +19,7 @@ describe('APIMart capability protocol', () => {
     expect(request.background).toBeUndefined(); expect(request.output_compression).toBeUndefined();
   });
   it('distinguishes required standard SVG author model from optional Ext configuration', () => {
-    expect(() => apimartRequest({...base(), model: 'gpt-image-2.6-flare', output_format: 'svg'})).toThrowError('apimartStudio.svgRequired');
+    expect(() => apimartRequest({...base(), model: 'gpt-image-2.6-flare', output_format: 'svg'})).toThrowError('studio.image.apimart.svgRequired');
     const svg = apimartRequest({...base(), model: 'gpt-image-2.6-flare', output_format: 'svg', svg: {model: 'gpt-5.4-mini'}, background: 'transparent'});
     expect(svg.svg).toEqual({model: 'gpt-5.4-mini'}); expect(svg.background).toBeUndefined();
     expect(apimartRequest({...base(), model: 'gpt-image-2.6-ext', output_format: 'svg'}).svg).toBeUndefined();
@@ -45,7 +45,7 @@ describe('APIMart capability protocol', () => {
   });
   it('requires HTTPS for markup while preserving HTTP reference and mask compatibility', () => {
     const edited = {...base(), model: 'gpt-image-2.6-flare' as const, image_urls: ['http://example.invalid/reference.png']};
-    expect(() => apimartRequest({...edited, markup_url: 'http://example.invalid/markup.png'})).toThrowError('apimartStudio.invalidOverlay');
+    expect(() => apimartRequest({...edited, markup_url: 'http://example.invalid/markup.png'})).toThrowError('studio.image.apimart.invalidOverlay');
     expect(apimartRequest({...edited, markup_url: 'https://example.invalid/markup.png'}).markup_url).toContain('https://');
     expect(apimartRequest({...edited, mask_url: 'http://example.invalid/mask.png'}).mask_url).toContain('http://');
   });

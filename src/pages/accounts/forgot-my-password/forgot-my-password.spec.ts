@@ -31,7 +31,7 @@ describe('Email password reset', () => {
     page.request(); page.request();
     expect(call.requestPasswordReset).toHaveBeenCalledOnceWith('admin', 'admin@example.com');
     pending.next({code: 'reset_requested', message: ''}); pending.complete();
-    expect(page.notice()).toBe('passwordReset.requested'); expect(page.busy()).toBeFalse();
+    expect(page.notice()).toBe('account.passwordReset.requested'); expect(page.busy()).toBeFalse();
   });
   it('removes the token from history and never sends mismatched passwords', () => {
     const page = create('token=test-token');
@@ -50,8 +50,8 @@ describe('Email password reset', () => {
     expect(page.completed()).toBeTrue(); expect(auth.logout).toHaveBeenCalledTimes(1);
     expect(page.resetForm.getRawValue().password).toBe('');
   });
-  for (const [status, code, key] of [[503, '', 'passwordReset.unavailable'], [429, '', 'passwordReset.tooMany'],
-    [400, 'reset_invalid', 'passwordReset.invalid']] as const) {
+  for (const [status, code, key] of [[503, '', 'account.passwordReset.unavailable'], [429, '', 'account.passwordReset.tooMany'],
+    [400, 'reset_invalid', 'account.passwordReset.invalid']] as const) {
     it(`handles ${status} without exposing a server error`, () => {
       call.confirmPasswordReset.and.returnValue(throwError(() => new HttpErrorResponse({status, error: {code}})));
       const page = create('token=test-token');

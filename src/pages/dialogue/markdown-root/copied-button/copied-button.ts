@@ -18,11 +18,11 @@ export class CopiedButton {
   buttonElement: ElementRef | undefined;
   onCopyToClipboard() {
     if(!this.buttonElement) return;
-    this.buttonElement.nativeElement.textContent = this.localization.text('dialog.copySuccess');
+    this.buttonElement.nativeElement.textContent = this.localization.text('chat.message.copySuccess');
 
     setTimeout(() =>
       {
-        this.buttonElement!.nativeElement.textContent = this.localization.text('dialog.copyCode');
+        this.buttonElement!.nativeElement.textContent = this.localization.text('chat.message.copyCode');
         }
       , 2000);
   }

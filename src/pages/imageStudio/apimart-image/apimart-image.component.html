@@ -1,84 +1,84 @@
 <div class="apimart-workspace">
-  <header class="page-heading"><button type="button" (click)="sizeReport.toggleMenu()" [attr.aria-label]="'studioUi.menu' | translate" [attr.aria-expanded]="sizeReport.menuVisible">☰</button><div><p class="eyebrow">APIMART</p><h1>{{'apimartStudio.title' | translate}}</h1><p>{{'apimartStudio.intro' | translate}}</p></div><a routerLink="/image-studio/task-lib">{{'imageWorkspace.history' | translate}} ↗</a></header>
+  <header class="page-heading"><button type="button" (click)="sizeReport.toggleMenu()" [attr.aria-label]="'studio.shared.menu' | translate" [attr.aria-expanded]="sizeReport.menuVisible">☰</button><div><p class="eyebrow">APIMART</p><h1>{{'studio.image.apimart.title' | translate}}</h1><p>{{'studio.image.apimart.intro' | translate}}</p></div><a routerLink="/image-studio/task-lib">{{'studio.image.workspace.history' | translate}} ↗</a></header>
   <div class="workspace-grid">
     <section class="composer">
-      <h2>{{'imageWorkspace.compose' | translate}}</h2>
+      <h2>{{'studio.image.workspace.compose' | translate}}</h2>
       <form (ngSubmit)="submit()">
         <fieldset [disabled]="locked || uploading">
-          <label for="am-model">{{'imageStudio.model' | translate}}</label>
+          <label for="am-model">{{'studio.image.model' | translate}}</label>
           <select id="am-model" name="model" [(ngModel)]="model" (ngModelChange)="modelChange()">@for (item of models; track item) { <option [value]="item">{{item}}</option> }</select>
-          <p class="hint">{{'apimartStudio.modelHint' | translate}}</p>
-          @if (caps.v26) { <p class="availability">{{'apimartStudio.availability26' | translate}}</p> }
-          @if (caps.ext) { <label for="am-version">{{'apimartStudio.version' | translate}}</label><select id="am-version" name="version" [(ngModel)]="version"><option value="flare">Flare</option><option value="sunburst">Sunburst</option></select> }
-          @if (caps.ext && caps.v26) { <p class="hint">{{'apimartStudio.ext26Limit' | translate}}</p> }
-          <label for="am-prompt">{{'imageStudio.prompt' | translate}}</label>
-          <textarea id="am-prompt" name="prompt" [(ngModel)]="prompt" rows="5" maxlength="32000" [placeholder]="'imageWorkspace.promptPlaceholder' | translate"></textarea>
+          <p class="hint">{{'studio.image.apimart.modelHint' | translate}}</p>
+          @if (caps.v26) { <p class="availability">{{'studio.image.apimart.availability26' | translate}}</p> }
+          @if (caps.ext) { <label for="am-version">{{'studio.image.apimart.version' | translate}}</label><select id="am-version" name="version" [(ngModel)]="version"><option value="flare">Flare</option><option value="sunburst">Sunburst</option></select> }
+          @if (caps.ext && caps.v26) { <p class="hint">{{'studio.image.apimart.ext26Limit' | translate}}</p> }
+          <label for="am-prompt">{{'studio.image.prompt' | translate}}</label>
+          <textarea id="am-prompt" name="prompt" [(ngModel)]="prompt" rows="5" maxlength="32000" [placeholder]="'studio.image.workspace.promptPlaceholder' | translate"></textarea>
           <div class="field-grid">
-            <div><label for="am-size">{{'apimartStudio.ratio' | translate}}</label><select id="am-size" name="size" [(ngModel)]="size">@for (item of sizes; track item) { <option [value]="item">{{item === 'auto' ? ('imageOptions.auto' | translate) : item === 'custom' ? ('apimartStudio.customSize' | translate) : item === 'source' ? ('apimartStudio.sourceSize' | translate) : item}}</option> }</select></div>
-            <div><label for="am-resolution">{{'apimartStudio.resolution' | translate}}</label><select id="am-resolution" name="resolution" [(ngModel)]="resolution" [disabled]="format === 'gif' || size === 'custom'">@for (item of caps.resolutions; track item) { <option [value]="item">{{item.toUpperCase()}}</option> }</select></div>
-            @if (size === 'custom') { <div><label for="am-width">{{'apimartStudio.width' | translate}}</label><input id="am-width" name="width" type="number" min="16" max="3840" step="16" [(ngModel)]="width"></div><div><label for="am-height">{{'apimartStudio.height' | translate}}</label><input id="am-height" name="height" type="number" min="16" max="3840" step="16" [(ngModel)]="height"></div> }
-            <div><label for="am-count">{{'imageStudio.quantity' | translate}}</label><input id="am-count" name="count" type="number" min="1" [max]="maxCount" step="1" [(ngModel)]="count" [readOnly]="maxCount === 1"></div>
-            @if (caps.quality) { <div><label for="am-quality">{{'imageStudio.quality' | translate}}</label><select id="am-quality" name="quality" [(ngModel)]="quality">@for (item of qualities; track item) { <option [value]="item">{{('imageOptions.' + item) | translate}}</option> }</select></div> }
-            @if (!caps.ext || caps.v26) { <div><label for="am-format">{{'imageStudio.imageFormat' | translate}}</label><select id="am-format" name="format" [(ngModel)]="format" (ngModelChange)="formatChange()">@for (item of formats; track item) { <option [value]="item" [disabled]="(item === 'gif' || item === 'svg') && refs.length > 0">{{item.toUpperCase()}}</option> }</select></div> }
+            <div><label for="am-size">{{'studio.image.apimart.ratio' | translate}}</label><select id="am-size" name="size" [(ngModel)]="size">@for (item of sizes; track item) { <option [value]="item">{{item === 'auto' ? ('studio.image.options.auto' | translate) : item === 'custom' ? ('studio.image.apimart.customSize' | translate) : item === 'source' ? ('studio.image.apimart.sourceSize' | translate) : item}}</option> }</select></div>
+            <div><label for="am-resolution">{{'studio.image.apimart.resolution' | translate}}</label><select id="am-resolution" name="resolution" [(ngModel)]="resolution" [disabled]="format === 'gif' || size === 'custom'">@for (item of caps.resolutions; track item) { <option [value]="item">{{item.toUpperCase()}}</option> }</select></div>
+            @if (size === 'custom') { <div><label for="am-width">{{'studio.image.apimart.width' | translate}}</label><input id="am-width" name="width" type="number" min="16" max="3840" step="16" [(ngModel)]="width"></div><div><label for="am-height">{{'studio.image.apimart.height' | translate}}</label><input id="am-height" name="height" type="number" min="16" max="3840" step="16" [(ngModel)]="height"></div> }
+            <div><label for="am-count">{{'studio.image.quantity' | translate}}</label><input id="am-count" name="count" type="number" min="1" [max]="maxCount" step="1" [(ngModel)]="count" [readOnly]="maxCount === 1"></div>
+            @if (caps.quality) { <div><label for="am-quality">{{'studio.image.quality' | translate}}</label><select id="am-quality" name="quality" [(ngModel)]="quality">@for (item of qualities; track item) { <option [value]="item">{{('studio.image.options.' + item) | translate}}</option> }</select></div> }
+            @if (!caps.ext || caps.v26) { <div><label for="am-format">{{'studio.image.imageFormat' | translate}}</label><select id="am-format" name="format" [(ngModel)]="format" (ngModelChange)="formatChange()">@for (item of formats; track item) { <option [value]="item" [disabled]="(item === 'gif' || item === 'svg') && refs.length > 0">{{item.toUpperCase()}}</option> }</select></div> }
           </div>
-          @if (size === 'custom') { <p class="hint">{{'apimartStudio.sizeHint' | translate}}</p> }
-          @if (format === 'gif' || format === 'svg') { <p class="hint">{{'apimartStudio.textOnlyHint' | translate}}</p> }
-          @if (format === 'svg') { <label for="am-svg">{{'apimartStudio.svgModel' | translate}}</label><input id="am-svg" name="svgModel" [(ngModel)]="svgModel" maxlength="128" [required]="!caps.ext" placeholder="gpt-5.4-mini"><p class="hint">{{(caps.ext ? 'apimartStudio.svgExtHint' : 'apimartStudio.svgHint') | translate}}</p> }
+          @if (size === 'custom') { <p class="hint">{{'studio.image.apimart.sizeHint' | translate}}</p> }
+          @if (format === 'gif' || format === 'svg') { <p class="hint">{{'studio.image.apimart.textOnlyHint' | translate}}</p> }
+          @if (format === 'svg') { <label for="am-svg">{{'studio.image.apimart.svgModel' | translate}}</label><input id="am-svg" name="svgModel" [(ngModel)]="svgModel" maxlength="128" [required]="!caps.ext" placeholder="gpt-5.4-mini"><p class="hint">{{(caps.ext ? 'studio.image.apimart.svgExtHint' : 'studio.image.apimart.svgHint') | translate}}</p> }
           <details>
-            <summary>{{'apimartStudio.references' | translate}} <span>{{refs.length}} / 16</span></summary>
-            @if (format === 'gif' || format === 'svg') { <p class="hint">{{'apimartStudio.textOnlyHint' | translate}}</p> }
+            <summary>{{'studio.image.apimart.references' | translate}} <span>{{refs.length}} / 16</span></summary>
+            @if (format === 'gif' || format === 'svg') { <p class="hint">{{'studio.image.apimart.textOnlyHint' | translate}}</p> }
             @else {
-              <label for="am-refs">{{'apimartStudio.referenceUrls' | translate}}</label><textarea id="am-refs" name="references" [(ngModel)]="references" rows="3" placeholder="https://…"></textarea>
-              <label class="upload-control" for="am-files">{{'apimartStudio.uploadReferences' | translate}}<input id="am-files" type="file" multiple accept="image/png,image/jpeg,image/webp,image/gif" (change)="upload($event, 'references')"></label>
-              <p class="hint">{{'apimartStudio.referenceHint' | translate}}</p>
+              <label for="am-refs">{{'studio.image.apimart.referenceUrls' | translate}}</label><textarea id="am-refs" name="references" [(ngModel)]="references" rows="3" placeholder="https://…"></textarea>
+              <label class="upload-control" for="am-files">{{'studio.image.apimart.uploadReferences' | translate}}<input id="am-files" type="file" multiple accept="image/png,image/jpeg,image/webp,image/gif" (change)="upload($event, 'references')"></label>
+              <p class="hint">{{'studio.image.apimart.referenceHint' | translate}}</p>
               @if (caps.mask || caps.markup) {
-                <label for="am-overlay">{{'apimartStudio.overlay' | translate}}</label><select id="am-overlay" name="overlayKind" [(ngModel)]="overlayKind" (ngModelChange)="overlayConfirmed = false"><option value="none">{{'apimartStudio.noOverlay' | translate}}</option>@if (caps.mask) { <option value="mask">{{'apimartStudio.mask' | translate}}</option> }@if (caps.markup) { <option value="markup">{{'apimartStudio.markup' | translate}}</option> }</select>
+                <label for="am-overlay">{{'studio.image.apimart.overlay' | translate}}</label><select id="am-overlay" name="overlayKind" [(ngModel)]="overlayKind" (ngModelChange)="overlayConfirmed = false"><option value="none">{{'studio.image.apimart.noOverlay' | translate}}</option>@if (caps.mask) { <option value="mask">{{'studio.image.apimart.mask' | translate}}</option> }@if (caps.markup) { <option value="markup">{{'studio.image.apimart.markup' | translate}}</option> }</select>
                 @if (overlayKind !== 'none') {
-                  <label for="am-overlay-url">{{'apimartStudio.overlayUrl' | translate}}</label><input id="am-overlay-url" name="overlayUrl" [(ngModel)]="overlayUrl" (ngModelChange)="overlayConfirmed = false" placeholder="https://…">
-                  <label class="upload-control" for="am-overlay-file">{{'apimartStudio.uploadOverlay' | translate}}<input id="am-overlay-file" type="file" accept="image/png" (change)="upload($event, 'overlay')"></label>
-                  <p class="hint">{{(overlayKind === 'mask' ? 'apimartStudio.maskHint' : 'apimartStudio.markupHint') | translate}}</p>
-                  <label class="check-label"><input type="checkbox" name="overlayConfirmed" [(ngModel)]="overlayConfirmed">{{'apimartStudio.confirmOverlayLabel' | translate}}</label>
+                  <label for="am-overlay-url">{{'studio.image.apimart.overlayUrl' | translate}}</label><input id="am-overlay-url" name="overlayUrl" [(ngModel)]="overlayUrl" (ngModelChange)="overlayConfirmed = false" placeholder="https://…">
+                  <label class="upload-control" for="am-overlay-file">{{'studio.image.apimart.uploadOverlay' | translate}}<input id="am-overlay-file" type="file" accept="image/png" (change)="upload($event, 'overlay')"></label>
+                  <p class="hint">{{(overlayKind === 'mask' ? 'studio.image.apimart.maskHint' : 'studio.image.apimart.markupHint') | translate}}</p>
+                  <label class="check-label"><input type="checkbox" name="overlayConfirmed" [(ngModel)]="overlayConfirmed">{{'studio.image.apimart.confirmOverlayLabel' | translate}}</label>
                 }
               }
             }
           </details>
-          <details><summary>{{'imageWorkspace.advanced' | translate}}</summary><div class="field-grid">
-            @if (caps.v26) { <div><label for="am-complexity">{{'imageWorkspace.complexity' | translate}}</label><select id="am-complexity" name="complexity" [(ngModel)]="complexity">@for (item of complexityOptions; track item) { <option [value]="item">{{item ? (('imageOptions.' + item) | translate) : ('imageOptions.auto' | translate)}}</option> }</select></div> }
+          <details><summary>{{'studio.image.workspace.advanced' | translate}}</summary><div class="field-grid">
+            @if (caps.v26) { <div><label for="am-complexity">{{'studio.image.workspace.complexity' | translate}}</label><select id="am-complexity" name="complexity" [(ngModel)]="complexity">@for (item of complexityOptions; track item) { <option [value]="item">{{item ? (('studio.image.options.' + item) | translate) : ('studio.image.options.auto' | translate)}}</option> }</select></div> }
             @if (!caps.ext) {
-              @if (format !== 'svg') { <div><label for="am-background">{{'imageStudio.background' | translate}}</label><select id="am-background" name="background" [(ngModel)]="background">@for (item of backgroundOptions; track item) { <option [value]="item" [disabled]="item === 'transparent' && format !== 'png' && format !== 'webp'">{{('imageOptions.' + item) | translate}}</option> }</select></div> }
-              <div><label for="am-moderation">{{'imageStudio.moderation' | translate}}</label><select id="am-moderation" name="moderation" [(ngModel)]="moderation">@for (item of moderationOptions; track item) { <option [value]="item">{{('imageOptions.' + item) | translate}}</option> }</select></div>
-              @if (format === 'jpeg' || format === 'webp') { <div><label for="am-compression">{{'imageWorkspace.compression' | translate}}</label><input id="am-compression" name="compression" type="number" min="0" max="100" step="1" [(ngModel)]="compression"></div> }
-              @if (format === 'gif') { <div><label for="am-frames">{{'imageWorkspace.frames' | translate}}</label><input id="am-frames" name="frames" type="number" min="2" max="16" step="1" [(ngModel)]="frameCount"></div><div><label for="am-duration">{{'imageWorkspace.duration' | translate}}</label><input id="am-duration" name="duration" type="number" min="20" max="2000" step="10" [(ngModel)]="frameDuration"></div> }
+              @if (format !== 'svg') { <div><label for="am-background">{{'studio.image.background' | translate}}</label><select id="am-background" name="background" [(ngModel)]="background">@for (item of backgroundOptions; track item) { <option [value]="item" [disabled]="item === 'transparent' && format !== 'png' && format !== 'webp'">{{('studio.image.options.' + item) | translate}}</option> }</select></div> }
+              <div><label for="am-moderation">{{'studio.image.moderation' | translate}}</label><select id="am-moderation" name="moderation" [(ngModel)]="moderation">@for (item of moderationOptions; track item) { <option [value]="item">{{('studio.image.options.' + item) | translate}}</option> }</select></div>
+              @if (format === 'jpeg' || format === 'webp') { <div><label for="am-compression">{{'studio.image.workspace.compression' | translate}}</label><input id="am-compression" name="compression" type="number" min="0" max="100" step="1" [(ngModel)]="compression"></div> }
+              @if (format === 'gif') { <div><label for="am-frames">{{'studio.image.workspace.frames' | translate}}</label><input id="am-frames" name="frames" type="number" min="2" max="16" step="1" [(ngModel)]="frameCount"></div><div><label for="am-duration">{{'studio.image.workspace.duration' | translate}}</label><input id="am-duration" name="duration" type="number" min="20" max="2000" step="10" [(ngModel)]="frameDuration"></div> }
             }
-          </div><p class="hint">{{'apimartStudio.billingHint' | translate}}</p></details>
+          </div><p class="hint">{{'studio.image.apimart.billingHint' | translate}}</p></details>
         </fieldset>
-        @if (uploading) { <p role="status">{{'apimartStudio.uploading' | translate}}</p> }
-        <button class="primary generate" type="submit" [disabled]="!canSubmit">{{(state === 'submitting' ? 'apimartStudio.submitting' : 'universal.generate') | translate}}</button>
-        <p class="hint">{{'apimartStudio.asyncHint' | translate}}</p>
+        @if (uploading) { <p role="status">{{'studio.image.apimart.uploading' | translate}}</p> }
+        <button class="primary generate" type="submit" [disabled]="!canSubmit">{{(state === 'submitting' ? 'studio.image.apimart.submitting' : 'universal.generate') | translate}}</button>
+        <p class="hint">{{'studio.image.apimart.asyncHint' | translate}}</p>
       </form>
     </section>
     <section class="results">
-      <header class="result-heading"><div><p class="eyebrow">APIMART</p><h2>{{'studioUi.results' | translate}}</h2></div><span>{{('apimartStudio.state.' + state) | translate}}</span></header>
+      <header class="result-heading"><div><p class="eyebrow">APIMART</p><h2>{{'studio.shared.results' | translate}}</h2></div><span>{{('studio.image.apimart.state.' + state) | translate}}</span></header>
       @if (receipt) {
         <div class="task-receipt">
-          @if (receipt.taskId) { <label for="am-task-id">{{'apimartStudio.taskId' | translate}}</label><input id="am-task-id" readonly [value]="receipt.taskId"><p class="hint">{{receipt.model}}</p> }
-          @if (acceptedIds.length > 1) { <p class="hint">{{'apimartStudio.multipleIds' | translate}}</p>@for (id of acceptedIds; track id) { <button type="button" [disabled]="busy || canSave || !!receipt.recoveryToken" (click)="selectTask(id)">{{id}}</button> } }
-          @if (state === 'polling') { <progress max="100" [value]="progress" [attr.aria-label]="'apimartStudio.progress' | translate"></progress><p role="status">{{'apimartStudio.pollingHint' | translate}}</p><button type="button" (click)="pause()">{{'apimartStudio.pause' | translate}}</button> }
-          @if (canPoll) { <button type="button" (click)="resumePolling()">{{'apimartStudio.resume' | translate}}</button> }
-          @if (state === 'receiptPending') { <p>{{'apimartStudio.receiptPending' | translate}}</p><button type="button" (click)="recoverReceipt()">{{'apimartStudio.recoverReceipt' | translate}}</button> }
-          @if (canStartNew) { <button type="button" (click)="startNew()">{{'apimartStudio.startNew' | translate}}</button> }
+          @if (receipt.taskId) { <label for="am-task-id">{{'studio.image.apimart.taskId' | translate}}</label><input id="am-task-id" readonly [value]="receipt.taskId"><p class="hint">{{receipt.model}}</p> }
+          @if (acceptedIds.length > 1) { <p class="hint">{{'studio.image.apimart.multipleIds' | translate}}</p>@for (id of acceptedIds; track id) { <button type="button" [disabled]="busy || canSave || !!receipt.recoveryToken" (click)="selectTask(id)">{{id}}</button> } }
+          @if (state === 'polling') { <progress max="100" [value]="progress" [attr.aria-label]="'studio.image.apimart.progress' | translate"></progress><p role="status">{{'studio.image.apimart.pollingHint' | translate}}</p><button type="button" (click)="pause()">{{'studio.image.apimart.pause' | translate}}</button> }
+          @if (canPoll) { <button type="button" (click)="resumePolling()">{{'studio.image.apimart.resume' | translate}}</button> }
+          @if (state === 'receiptPending') { <p>{{'studio.image.apimart.receiptPending' | translate}}</p><button type="button" (click)="recoverReceipt()">{{'studio.image.apimart.recoverReceipt' | translate}}</button> }
+          @if (canStartNew) { <button type="button" (click)="startNew()">{{'studio.image.apimart.startNew' | translate}}</button> }
         </div>
       }
       @if (error) { <p class="message error" role="alert">{{error}}</p> }
       @if (notice) { <p class="message" role="status">{{notice}}</p> }
       @if (pollNotice) { <p class="message" role="status">{{pollNotice}}</p> }
-      @if (historyWarning) { <div class="message" role="status"><p>{{historyWarning}}</p>@if (canSave) { <button type="button" (click)="retrySave()">{{'imageWorkspace.retrySave' | translate}}</button> }</div> }
-      @if (savingHistory) { <p class="message" role="status">{{'imageWorkspace.saving' | translate}}</p> }
+      @if (historyWarning) { <div class="message" role="status"><p>{{historyWarning}}</p>@if (canSave) { <button type="button" (click)="retrySave()">{{'studio.image.workspace.retrySave' | translate}}</button> }</div> }
+      @if (savingHistory) { <p class="message" role="status">{{'studio.image.workspace.saving' | translate}}</p> }
       @if ((!receipt || state === 'unknown') && !busy) {
-        <details class="resume-task"><summary>{{'apimartStudio.resumeExisting' | translate}}</summary><label for="am-resume-id">{{'apimartStudio.taskId' | translate}}</label><input id="am-resume-id" [(ngModel)]="resumeId" maxlength="255"><button type="button" (click)="resumeById()" [disabled]="!resumeId.trim()">{{'apimartStudio.resume' | translate}}</button></details>
+        <details class="resume-task"><summary>{{'studio.image.apimart.resumeExisting' | translate}}</summary><label for="am-resume-id">{{'studio.image.apimart.taskId' | translate}}</label><input id="am-resume-id" [(ngModel)]="resumeId" maxlength="255"><button type="button" (click)="resumeById()" [disabled]="!resumeId.trim()">{{'studio.image.apimart.resume' | translate}}</button></details>
       }
-      @if (state === 'unknown') { <div class="message"><p>{{'apimartStudio.unknownHint' | translate}}</p><label class="check-label"><input type="checkbox" [(ngModel)]="acknowledgeUnknown">{{'apimartStudio.acknowledgeUnknown' | translate}}</label><button type="button" [disabled]="!acknowledgeUnknown" (click)="startNew()">{{'apimartStudio.startNew' | translate}}</button></div> }
-      @if (images.length) { <p class="expiry-note">{{'apimartStudio.expiryHint' | translate}}</p> }
+      @if (state === 'unknown') { <div class="message"><p>{{'studio.image.apimart.unknownHint' | translate}}</p><label class="check-label"><input type="checkbox" [(ngModel)]="acknowledgeUnknown">{{'studio.image.apimart.acknowledgeUnknown' | translate}}</label><button type="button" [disabled]="!acknowledgeUnknown" (click)="startNew()">{{'studio.image.apimart.startNew' | translate}}</button></div> }
+      @if (images.length) { <p class="expiry-note">{{'studio.image.apimart.expiryHint' | translate}}</p> }
       <app-gallery [loading]="state === 'polling' || state === 'submitting' || state === 'recovering'" [images]="images"></app-gallery>
     </section>
   </div>

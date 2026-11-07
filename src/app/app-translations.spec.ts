@@ -8,15 +8,24 @@ import {localizationInterceptor} from '../systems/interceptors/localization.inte
 import {LocalizationService} from '../services/normal-services/localization.service';
 
 describe('Application translation loading', () => {
+  const frenchPackKey = 'relaxkon.languagePack.fr';
   let http: HttpTestingController;
+  let savedFrenchPack: string | null;
   beforeEach(() => {
+    savedFrenchPack = localStorage.getItem(frenchPackKey);
+    localStorage.removeItem(frenchPackKey);
     TestBed.configureTestingModule({providers: [
       provideHttpClient(withInterceptors([localizationInterceptor])), provideHttpClientTesting(),
       provideAppTranslations(), {provide: NzI18nService, useValue: {setLocale: () => {}}}
     ]});
     http = TestBed.inject(HttpTestingController);
   });
-  afterEach(() => http.verify());
+  afterEach(() => {
+    if (savedFrenchPack === null) localStorage.removeItem(frenchPackKey);
+    else localStorage.setItem(frenchPackKey, savedFrenchPack);
+    document.documentElement.lang = 'en';
+    http.verify();
+  });
   it('loads the initial dictionary without entering the locale interceptor during service construction', () => {
     const translate = TestBed.inject(TranslateService);
     const request = http.expectOne('/assets/i18n/zh.json');
@@ -34,5 +43,55 @@ describe('Application translation loading', () => {
     const api = http.expectOne('/api/models');
     expect(api.request.headers.get('Accept-Language')).toBe('ja');
     api.flush([]);
+  });
+
+  it('installs, updates and removes a partial language pack without loading a remote dictionary', () => {
+    const localization = TestBed.inject(LocalizationService);
+    http.expectOne('/assets/i18n/zh.json').flush({account: {username: '用户名', password: '密码'}});
+    const pack = {code: 'FR', name: 'Français', translations: {account: {username: 'Identifiant'}}};
+    expect(localization.importPack(JSON.stringify(pack))).toBe('imported');
+    expect(localization.use('fr')).toBe('fr');
+    expect(localization.text('account.username')).toBe('Identifiant');
+    expect(localization.text('account.password')).toBe('密码');
+    expect(document.documentElement.lang).toBe('fr');
+    expect(localization.requestLanguage).toBe('zh');
+
+    pack.translations.account.username = 'Nom';
+    expect(localization.importPack(JSON.stringify(pack))).toBe('imported');
+    expect(localization.text('account.username')).toBe('Nom');
+    expect(localization.customLanguages.length).toBe(1);
+
+    expect(localization.removePack('fr')).toBeTrue();
+    expect(localization.currentLanguage).toBe('zh');
+    expect(localization.text('account.username')).toBe('用户名');
+    expect(localStorage.getItem(frenchPackKey)).toBeNull();
+  });
+
+  it('restores a saved pack before applying the saved language preference', () => {
+    localStorage.setItem(frenchPackKey, JSON.stringify({
+      code: 'fr', name: 'Français', translations: {account: {username: 'Nom'}},
+    }));
+    const localization = TestBed.inject(LocalizationService);
+    http.expectOne('/assets/i18n/zh.json').flush({account: {username: '用户名'}});
+    expect(localization.use('fr')).toBe('fr');
+    expect(localization.text('account.username')).toBe('Nom');
+    expect(localization.importPack('{"code":"en","name":"English","translations":{"account":{"username":"User"}}}'))
+      .toBe('invalidPack');
+    expect(localization.importPack('{"code":"fr","name":"French","translations":{"__proto__":{"invalid":"text"}}}'))
+      .toBe('invalidPack');
+    expect(localization.text('account.username')).toBe('Nom');
+  });
+
+  it('uses the account language after local configuration loads and restores the device language on sign-out', () => {
+    const localization = TestBed.inject(LocalizationService);
+    http.expectOne('/assets/i18n/zh.json').flush({account: {username: '用户名'}});
+    localization.replacePacks([{code: 'fr', name: 'Français', translations: {account: {username: 'Nom'}}}]);
+    localization.setAccountLanguage('fr');
+    localization.use('en');
+    expect(localization.text('account.username')).toBe('Nom');
+    expect(localization.selectedLanguage).toBe('fr');
+    localization.setAccountLanguage(undefined);
+    http.expectOne('/assets/i18n/en.json').flush({account: {username: 'Username'}});
+    expect(localization.text('account.username')).toBe('Username');
   });
 });
