@@ -7,7 +7,7 @@
     </app-tts-file-editor>
   </ng-container>
 </nz-modal>
-<header class="studio-heading"><button nz-button type="button" (click)="toggleMenu()" [attr.aria-label]="'studio.shared.menu' | translate" [attr.aria-expanded]="menuVisible()"><nz-icon nzType="menu-unfold" nzTheme="outline" /></button><div><h1>{{ 'studio.media.extractTitle' | translate }}</h1><p>{{ 'studio.media.extractIntro' | translate }}</p></div></header>
+<header class="studio-heading"><button nz-button class="workspace-icon-button" type="button" (click)="toggleMenu()" [attr.aria-label]="'studio.shared.menu' | translate" [attr.aria-expanded]="menuVisible()"><span nz-icon [nzType]="menuVisible() ? 'menu-fold' : 'menu-unfold'" aria-hidden="true"></span></button><div><h1>{{ 'studio.media.extractTitle' | translate }}</h1><p>{{ 'studio.media.extractIntro' | translate }}</p></div></header>
 <div class="border rounded-2 d-flex justify-content-end">
   <button nz-button (click)="reparseAll()" class="m-2">{{ 'studio.media.parseAllFiles' | translate }}</button>
 </div>

@@ -7,17 +7,18 @@
       >{{'admin.management.refresh' | translate}}</button>
     </div>
   </div>
+  <div class="table-responsive" tabindex="0" role="region" [attr.aria-label]="'admin.management.accounts' | translate">
   <table class="table table-sm table-striped table-bordered">
-    <thead>
+    <thead><tr>
     <th scope="col">{{'admin.management.accountId' | translate}}</th>
     <th scope="col">{{'admin.management.username' | translate}}</th>
     <th scope="col">{{'admin.management.email' | translate}}</th>
     <th scope="col">{{'admin.management.roles' | translate}}</th>
     <th>{{'admin.management.actions' | translate}}</th>
-    </thead>
+    </tr></thead>
 
     @if(accounts===undefined){
-      <nz-skeleton></nz-skeleton>
+      <tbody><tr><td colspan="5"><nz-skeleton></nz-skeleton></td></tr></tbody>
     }@else{
       <tbody>
         @for(account of accounts!; track account.accountId){
@@ -52,5 +53,6 @@
     }
 
   </table>
+  </div>
 
 </div>

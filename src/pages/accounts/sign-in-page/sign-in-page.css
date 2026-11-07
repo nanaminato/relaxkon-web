@@ -1,7 +1,7 @@
 .password-control { position: relative; }
 .password-control input { padding-right: 44px; }
-.password-visibility-toggle { position: absolute; inset: 4px 4px 4px auto; width: 36px; border: 0; border-radius: 5px; background: transparent; color: #7a879a; cursor: pointer; }
-.password-visibility-toggle:hover { color: #2463cf; background: #f3f6fb; }
+.password-visibility-toggle { position: absolute; display: grid; place-items: center; padding: 0; inset: 4px 4px 4px auto; width: 36px; border: 0; border-radius: 5px; background: transparent; color: var(--app-text-muted); cursor: pointer; }
+.password-visibility-toggle:hover { color: var(--app-accent); background: var(--app-hover); }
 .login-options { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 17px; font-size: 13px; }
-.remember { display: inline-flex; align-items: center; gap: 7px; margin: 0; font-weight: 400; color: #67768b; cursor: pointer; }
+.remember { display: inline-flex; align-items: center; gap: 7px; margin: 0; font-weight: 400; color: var(--app-text-muted); cursor: pointer; }
 .remember input { accent-color: #2463cf; width: 14px; height: 14px; }

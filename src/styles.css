@@ -95,7 +95,7 @@ button, [role="button"] {
 }
 
 :focus-visible {
-  outline: 2px solid var(--ion-color-primary, #1677ff);
+  outline: 2px solid var(--app-accent, #2463cf);
   outline-offset: 2px;
 }
 
@@ -157,10 +157,15 @@ button, [role="button"] {
 .ant-modal-footer { padding:16px 24px; border-top:1px solid var(--app-border, #e2e8f0); }
 .ant-modal .ant-btn, .ant-modal .btn { min-height:36px; height:auto; padding:7px 16px; border-radius:9px; box-shadow:none; font-size:13px; }
 .ant-modal .ant-btn-default { border-color:var(--app-border, #e2e8f0); background:var(--app-surface, #fff); color:var(--app-text, #172033); }
-.ant-modal .ant-btn-primary, .ant-modal .btn-primary { background:#2463cf; border-color:#2463cf; color:#fff; }
-.ant-modal .ant-btn-primary:hover, .ant-modal .btn-primary:hover { background:#1c52b0; border-color:#1c52b0; }
+.ant-modal .ant-btn-primary:not(.ant-btn-dangerous), .ant-modal .btn-primary { background:var(--app-primary); border-color:var(--app-primary); color:#fff; }
+.ant-modal .ant-btn-primary:not(.ant-btn-dangerous):hover, .ant-modal .btn-primary:hover { background:var(--app-primary-hover); border-color:var(--app-primary-hover); }
+.ant-btn.ant-btn-dangerous { border-radius:var(--app-control-radius); }
+.ant-btn.ant-btn-dangerous:not(.ant-btn-primary):not(:disabled) { border-color:var(--app-danger-text); color:var(--app-danger-text); background:var(--app-surface); }
+.ant-btn.ant-btn-dangerous:not(.ant-btn-primary):hover:not(:disabled) { background:var(--app-danger-surface); }
+.ant-btn.ant-btn-primary.ant-btn-dangerous:not(:disabled) { background:var(--app-danger); border-color:var(--app-danger); color:#fff; }
+.ant-btn.ant-btn-primary.ant-btn-dangerous:hover:not(:disabled) { filter:brightness(.88); }
 .ant-modal .form-group { margin-bottom:18px; }
-.ant-modal label { display:inline-block; margin-bottom:8px; font-size:13px; color:var(--app-text, #172033); }
+.ant-modal label:not(.ant-checkbox-wrapper):not(.ant-radio-wrapper) { display:inline-block; margin-bottom:8px; font-size:13px; color:var(--app-text, #172033); }
 .ant-modal .form-control, .ant-modal .ant-input { min-height:40px; border-radius:9px; border-color:var(--app-border, #e2e8f0); background:var(--app-surface, #fff); color:var(--app-text, #172033); }
 .ant-modal .form-control:focus { border-color:var(--app-accent, #2463cf); box-shadow:0 0 0 3px var(--app-selection, #eef4ff); }
 .ant-modal-confirm-title, .ant-modal-confirm-content { color:var(--app-text, #172033) !important; }

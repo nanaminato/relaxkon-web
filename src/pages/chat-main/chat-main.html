@@ -10,7 +10,7 @@
 }
 <ng-template #logo>
   <section class="welcome">
-    <span class="empty-mark" aria-hidden="true">T</span>
+    <span class="empty-mark" aria-hidden="true">R</span>
     <h1>{{'workspace.chatWelcome' | translate}}</h1>
     <p>{{'workspace.chatDescription' | translate}}</p>
     <div class="starters">
@@ -22,8 +22,8 @@
 </ng-template>
 <div class="chat-main w-100 h-100 bg-theme2 text-theme">
   <!-- 顶部菜单切换按钮（独立、低 z-index，不放在 sticky-top 容器中） -->
-  <div class="topbar px-2 py-2">
-    <button nz-button class="bg-theme2 text-theme2 border-0 rounded-2" type="button" (click)="toggleMenu()"
+  <header class="workspace-page-header topbar">
+    <button nz-button class="workspace-icon-button" type="button" (click)="toggleMenu()" [attr.aria-expanded]="menuVisible()"
             [attr.aria-label]="(menuVisible() ? 'workspace.closeNavigation' : 'workspace.openNavigation') | translate">
       @if(menuVisible()){
         <nz-icon nzType="menu-fold" nzTheme="outline" />
@@ -33,7 +33,7 @@
     </button>
     <div class="chat-title"><strong>{{'universal.aiChat' | translate}}</strong><span>{{'workspace.chatSubtitle' | translate}}</span></div>
     <app-language-switcher></app-language-switcher>
-  </div>
+  </header>
   <div class="messages" #chatPanel (scroll)="onPanelScroll()">
     @if (showLogo()) {
       <ng-container *ngTemplateOutlet="logo"></ng-container>
@@ -57,7 +57,7 @@
           @defer (on immediate) {
             <app-model-selector [disabled]="answering"></app-model-selector>
           } @placeholder (minimum 100ms){
-            <select></select>
+            <span class="model-placeholder" aria-hidden="true"></span>
           }
         </div>
         <div class="select-box rounded-4">
@@ -76,7 +76,7 @@
           <button type="button" class="text-theme2 border-1 border-theme2 bg-theme2 rounded-2"
                   (click)="clearContext()" [disabled]="answering"
                   nz-tooltip [nzTooltipTitle]="'chat.composer.clearContext' | translate" [attr.aria-label]="'chat.composer.clearContext' | translate">
-            <img src="assets/svgs/clear.svg" width="30" height="20" [alt]="'chat.composer.clear' | translate ">
+            <img src="assets/svgs/clear.svg" width="18" height="18" [alt]="'chat.composer.clear' | translate ">
           </button>
           <button type="button" class="text-theme2 border-1 border-theme2 bg-theme2 rounded-2"
                   (click)="insertInlineCodeFlags()"

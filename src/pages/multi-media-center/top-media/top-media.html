@@ -1,31 +1,21 @@
 <div class="d-flex flex-row w-100 h-100" style="position: relative;">
-  <ng-template #studios>
-    <div class="w-100 d-flex flex-column">
-      <button nz-button class="rounded-2 bg-light text-dark mx-2 my-1 d-flex flex-row" (click)="closeMenuIfCompact()" routerLink="/chat"><span class="studio-nav-symbol" aria-hidden="true">↗</span>{{'universal.aiChat' | translate}}</button>
-      <button nz-button class="rounded-2 bg-light text-dark mx-2 my-1 d-flex flex-row" (click)="closeMenuIfCompact()" routerLink="/image-studio"><span class="studio-nav-symbol" aria-hidden="true">✧</span>{{'universal.aiPainting' | translate}}</button>
-      <button nz-button class="rounded-2 bg-light text-dark mx-2 my-1 d-flex flex-row" (click)="closeMenuIfCompact()" routerLink="/media-studio"><span nz-icon nzType="node-index" nzTheme="outline"></span>{{ 'universal.mediaStudio' | translate }}</button>
-    </div>
-  </ng-template>
   @if(visible()){
     @if(isCompact()){
       <button class="menu-backdrop" type="button" [attr.aria-label]="'studio.shared.menu' | translate" (click)="hideMenu()"></button>
     }
     <div class="d-flex flex-column h-100 menu" [class.w-100]="!isCompact()" [class.menu-overlay]="isCompact()"
     >
-      <div class="bg-theme overflow-y-scroll scrollbar-y-none flex-grow-1">
-        <div class="d-flex flex-row justify-content-start pt-3 px-3 align-items-center">
-          <span nz-icon nzType="node-index" nzTheme="outline"></span>
-          <div>{{ 'universal.mediaStudio' | translate }}</div>
-        </div>
-
-        <div class="d-flex flex-column p-3">
-          <button class="m-2 rounded-2" (click)="closeMenuIfCompact()" nz-button routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/media-studio/openai-text-to-speech']">{{ 'studio.media.textToSpeech' | translate }}</button>
-          <button class="m-2 rounded-2" (click)="closeMenuIfCompact()" nz-button routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/media-studio/openai-speech-to-text']">{{ 'studio.media.speechToText' | translate }}</button>
-          <button class="m-2 rounded-2" (click)="closeMenuIfCompact()" nz-button routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/media-studio/media-extractor']">{{ 'studio.media.fileExtractor' | translate }}</button>
-        </div>
+      <div class="bg-theme overflow-y-auto flex-grow-1">
+        <a class="workspace-brand-link" routerLink="/chat" (click)="closeMenuIfCompact()"><span class="workspace-brand-mark" aria-hidden="true">R</span>RelaxKon</a>
+        <nav class="workspace-links studio-section-nav" [attr.aria-label]="'universal.mediaStudio' | translate">
+          <p class="workspace-nav-caption">{{'universal.mediaStudio' | translate}}</p>
+          <a (click)="closeMenuIfCompact()" routerLinkActive="nav-active" ariaCurrentWhenActive="page" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/media-studio/openai-text-to-speech']">{{ 'studio.media.textToSpeech' | translate }}</a>
+          <a (click)="closeMenuIfCompact()" routerLinkActive="nav-active" ariaCurrentWhenActive="page" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/media-studio/openai-speech-to-text']">{{ 'studio.media.speechToText' | translate }}</a>
+          <a (click)="closeMenuIfCompact()" routerLinkActive="nav-active" ariaCurrentWhenActive="page" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/media-studio/media-extractor']">{{ 'studio.media.fileExtractor' | translate }}</a>
+        </nav>
       </div>
-      <div class="bg-theme sticky-bottom z-0"><div class="studio-locale"><app-language-switcher /></div>
-        <ng-container *ngTemplateOutlet="studios"></ng-container>
+      <div class="studio-footer"><div class="studio-locale"><app-language-switcher /></div>
+        <app-workspace-links />
         @defer (on viewport) {
           <app-account-label></app-account-label>
         } @placeholder {

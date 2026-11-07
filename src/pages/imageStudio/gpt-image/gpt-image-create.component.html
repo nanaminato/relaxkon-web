@@ -1,6 +1,6 @@
 <div class="image-workspace">
   <header class="workspace-heading">
-    <button class="menu-button" type="button" (click)="toggleMenu()" [attr.aria-label]="'studio.shared.menu' | translate" [attr.aria-expanded]="menuVisible()">☰</button>
+    <button class="workspace-icon-button" type="button" (click)="toggleMenu()" [attr.aria-label]="'studio.shared.menu' | translate" [attr.aria-expanded]="menuVisible()"><span nz-icon [nzType]="menuVisible() ? 'menu-fold' : 'menu-unfold'" aria-hidden="true"></span></button>
     <div><p class="eyebrow">{{'studio.image.workspace.eyebrow' | translate}}</p><h1>{{'studio.image.imageTitle' | translate}}</h1><p class="heading-description">{{'studio.image.workspace.intro' | translate}}</p></div>
     <a class="history-link" routerLink="/image-studio/task-lib">{{'studio.image.workspace.history' | translate}} ↗</a>
   </header>

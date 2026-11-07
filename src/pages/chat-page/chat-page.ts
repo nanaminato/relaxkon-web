@@ -1,5 +1,6 @@
+import {WorkspaceLinks} from '../../shared/workspace-links';
 import {Component, HostListener, inject} from '@angular/core';
-import {Router, RouterLink, RouterLinkActive, RouterOutlet} from "@angular/router";
+import {Router, RouterLink, RouterOutlet} from "@angular/router";
 import {MenuAbleService} from "../../services/normal-services/menu-able.service";
 import {AccountLabel} from "../accounts/account-label/account-label";
 import {ChatHistory} from "../chat-history/chat-history";
@@ -24,7 +25,7 @@ import {Store} from "@ngrx/store";
     NzIconDirective,
     NzSkeletonComponent,
     RouterLink,
-    RouterLinkActive,
+    WorkspaceLinks,
     TranslatePipe
   ],
   providers: [

@@ -1,3 +1,4 @@
+import {NzIconDirective} from 'ng-zorro-antd/icon';
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {RouterLink} from '@angular/router';
@@ -23,7 +24,7 @@ interface Receipt {
   pollRetryAt?: number;
 }
 @Component({
-  selector: 'app-apimart-image', standalone: true, imports: [FormsModule, RouterLink, TranslateModule, Gallery],
+  selector: 'app-apimart-image', standalone: true, imports: [NzIconDirective, FormsModule, RouterLink, TranslateModule, Gallery],
   templateUrl: './apimart-image.component.html', styleUrls: ['./apimart-image.component.scss']
 })
 export class APIMartImage implements OnInit, OnDestroy {

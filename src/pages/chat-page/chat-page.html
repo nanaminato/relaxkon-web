@@ -2,20 +2,16 @@
   @if (visible()) {
     @if (isCompact()) { <button class="menu-backdrop" (click)="hideMenu()" [attr.aria-label]="'workspace.closeNavigation' | translate"></button> }
     <aside class="app-sidebar d-flex flex-column h-100" [attr.aria-label]="'workspace.conversationNavigation' | translate">
-      <a class="sidebar-brand" routerLink="/chat" (click)="closeMenuIfCompact()"><span class="brand-mark" aria-hidden="true">R</span>RelaxKon</a>
+      <a class="workspace-brand-link" routerLink="/chat" (click)="closeMenuIfCompact()"><span class="workspace-brand-mark" aria-hidden="true">R</span>RelaxKon</a>
       <div class="history-area">
         @defer (on immediate) { <app-chat-history></app-chat-history> } @placeholder { <nz-skeleton></nz-skeleton> }
       </div>
-      <nav class="sidebar-navigation">
-        <p class="nav-caption">{{'workspace.workspace' | translate}}</p>
-        <a routerLink="/chat" routerLinkActive="nav-active" [routerLinkActiveOptions]="{exact: true}" (click)="closeMenuIfCompact()"><span nz-icon nzType="message" aria-hidden="true"></span>{{'universal.aiChat' | translate}}</a>
-        <a routerLink="/image-studio" (click)="closeMenuIfCompact()"><span nz-icon nzType="picture" aria-hidden="true"></span>{{'universal.image-studio' | translate}}</a>
-        <a routerLink="/media-studio" (click)="closeMenuIfCompact()"><span nz-icon nzType="sound" aria-hidden="true"></span>{{'universal.mediaStudio' | translate}}</a>
+      <app-workspace-links>
         <div class="sidebar-utilities">
           <button (click)="openSettingPage()"><span nz-icon nzType="setting" aria-hidden="true"></span>{{'chat.history.settings' | translate}}</button>
           <button (click)="openPromptPage()"><span nz-icon nzType="appstore" aria-hidden="true"></span>{{'chat.history.prompts' | translate}}</button>
         </div>
-      </nav>
+      </app-workspace-links>
       <app-account-label></app-account-label>
     </aside>
   }

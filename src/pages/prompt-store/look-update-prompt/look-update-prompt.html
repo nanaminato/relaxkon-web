@@ -1,14 +1,14 @@
-<form nz-form [formGroup]="validateForm"
+<form nz-form nzLayout="vertical" [formGroup]="validateForm"
       (ngSubmit)="submitForm()">
   <nz-form-item>
-    <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="title">{{'prompts.systemPromptTitle' | translate}}</nz-form-label>
-    <nz-form-control [nzSm]="14" [nzXs]="24" [nzErrorTip]="'prompts.oneChatAtLeast' | translate">
+    <nz-form-label nzFor="title">{{'prompts.systemPromptTitle' | translate}}</nz-form-label>
+    <nz-form-control [nzErrorTip]="'prompts.oneChatAtLeast' | translate">
       <input nz-input formControlName="title" id="title" />
     </nz-form-control>
   </nz-form-item>
   <nz-form-item>
-    <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="content">{{'prompts.systemPromptContent' | translate}}</nz-form-label>
-    <nz-form-control [nzSm]="14" [nzXs]="24" [nzErrorTip]="'prompts.twoCharAtLeast' | translate">
+    <nz-form-label nzFor="content">{{'prompts.systemPromptContent' | translate}}</nz-form-label>
+    <nz-form-control [nzErrorTip]="'prompts.twoCharAtLeast' | translate">
       <textarea nz-input
                 [nzAutosize]="{ minRows: 3, maxRows: 5 }"
                 formControlName="content" id="content"></textarea>

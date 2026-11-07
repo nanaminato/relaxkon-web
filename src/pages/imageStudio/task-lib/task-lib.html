@@ -1,6 +1,6 @@
 <div class="library-page">
   <header class="library-heading">
-    <div class="heading-main"><button nz-button class="menu-toggle" type="button" (click)="toggleMenu()" [attr.aria-label]="'studio.shared.menu' | translate" [attr.aria-expanded]="menuVisible()"><nz-icon nzType="menu-unfold" nzTheme="outline" /></button><div><span class="eyebrow">{{'studio.library.eyebrow' | translate}}</span><h1>{{'universal.storeHouse' | translate}}</h1><p>{{'studio.library.libraryIntro' | translate}}</p></div></div>
+    <div class="heading-main"><button nz-button class="workspace-icon-button" type="button" (click)="toggleMenu()" [attr.aria-label]="'studio.shared.menu' | translate" [attr.aria-expanded]="menuVisible()"><span nz-icon [nzType]="menuVisible() ? 'menu-fold' : 'menu-unfold'" aria-hidden="true"></span></button><div><span class="eyebrow">{{'studio.library.eyebrow' | translate}}</span><h1>{{'universal.storeHouse' | translate}}</h1><p>{{'studio.library.libraryIntro' | translate}}</p></div></div>
     <a class="create-link" routerLink="/image-studio/APIMart-image">+ {{'studio.library.create' | translate}}</a>
   </header>
   <div class="library-stats"><span><strong>{{generateTasks.length}}</strong> {{'studio.library.total' | translate}}</span><span><strong>{{imageCount}}</strong> {{'studio.library.images' | translate}}</span><span class="stats-note">{{'studio.library.collectionHint' | translate}}</span></div>

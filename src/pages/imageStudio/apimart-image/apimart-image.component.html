@@ -1,5 +1,5 @@
 <div class="apimart-workspace">
-  <header class="page-heading"><button type="button" (click)="sizeReport.toggleMenu()" [attr.aria-label]="'studio.shared.menu' | translate" [attr.aria-expanded]="sizeReport.menuVisible">☰</button><div><p class="eyebrow">APIMART</p><h1>{{'studio.image.apimart.title' | translate}}</h1><p>{{'studio.image.apimart.intro' | translate}}</p></div><a routerLink="/image-studio/task-lib">{{'studio.image.workspace.history' | translate}} ↗</a></header>
+  <header class="page-heading"><button class="workspace-icon-button" type="button" (click)="sizeReport.toggleMenu()" [attr.aria-label]="'studio.shared.menu' | translate" [attr.aria-expanded]="sizeReport.menuVisible"><span nz-icon [nzType]="sizeReport.menuVisible ? 'menu-fold' : 'menu-unfold'" aria-hidden="true"></span></button><div><p class="eyebrow">APIMART</p><h1>{{'studio.image.apimart.title' | translate}}</h1><p>{{'studio.image.apimart.intro' | translate}}</p></div><a routerLink="/image-studio/task-lib">{{'studio.image.workspace.history' | translate}} ↗</a></header>
   <div class="workspace-grid">
     <section class="composer">
       <h2>{{'studio.image.workspace.compose' | translate}}</h2>

@@ -1,3 +1,4 @@
+import {NzIconDirective} from 'ng-zorro-antd/icon';
 import type {ImageGenerationRequest, ImageResultResponse, ImageOutputFormat, ImageQuality} from '../../../contracts/media';
 import {imageSource} from '../../../services/media-results';
 import {apiErrorMessage} from '../../../contracts/common';
@@ -16,7 +17,7 @@ import {GenerateTask} from '../../../models/media';
 import {imageCapabilities, imageModels, normalizeImageRequest} from './image-capabilities';
 
 @Component({
-  selector: 'app-dalle', standalone: true, imports: [Gallery, TranslateModule, FormsModule, RouterLink],
+  selector: 'app-dalle', standalone: true, imports: [NzIconDirective, Gallery, TranslateModule, FormsModule, RouterLink],
   templateUrl: './gpt-image-create.component.html', styleUrls: ['./gpt-image-create.component.scss']
 })
 export class GptImageCreate {

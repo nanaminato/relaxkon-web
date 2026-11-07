@@ -1,42 +1,32 @@
 <div class="d-flex flex-column w-100 h-100 bg-theme2 text-theme2">
-  <div class="d-flex flex-row justify-content-between p-2 align-items-center" #settingPanel>
-    <button nz-button class="mx-2" (click)="toggleMenu()" [attr.aria-label]="(menuVisible() ? 'workspace.closeNavigation' : 'workspace.openNavigation') | translate">
-      @if(menuVisible()){
-        <nz-icon nzType="menu-fold" nzTheme="outline"/>
-      }@else{
-        <nz-icon nzType="menu-unfold" nzTheme="outline" />
-      }
+  <header class="workspace-page-header">
+    <button nz-button type="button" class="workspace-icon-button" (click)="toggleMenu()" [attr.aria-expanded]="menuVisible()" [attr.aria-label]="(menuVisible() ? 'workspace.closeNavigation' : 'workspace.openNavigation') | translate">
+      <span nz-icon [nzType]="menuVisible() ? 'menu-fold' : 'menu-unfold'" aria-hidden="true"></span>
     </button>
-    <div class="d-flex flex-column pt-2 mx-2">
-      <div style="font-size: 20px;font-weight: bold;">
-        {{ 'settings.self' | translate }}
-      </div>
-    </div>
-    <div class="py-2 my-auto pe-4 ms-5 ms-sm-0">
-      <button nz-button class="border-1 rounded-2" [routerLink]="['/chat']" [attr.aria-label]="'account.ui.backToChat' | translate">
-        <span nz-icon nzType="close" nzTheme="outline"></span>
-      </button>
-    </div>
-  </div>
-  <div class="w-100 d-flex flex-column flex-grow-1 overflow-y-auto">
-    <button class="back-to-top text-center"
+    <h1>{{ 'settings.self' | translate }}</h1>
+    <button nz-button type="button" class="workspace-icon-button workspace-header-end" [routerLink]="['/chat']" [attr.aria-label]="'account.ui.backToChat' | translate">
+      <span nz-icon nzType="close" aria-hidden="true"></span>
+    </button>
+  </header>
+  <div class="settings-content" #settingPanel>
+    <button class="back-to-top workspace-icon-button"
             nz-button
             (click)="scrollToTop()"
             nz-tooltip [nzTooltipTitle]="'settings.backToTop' | translate" [attr.aria-label]="'settings.backToTop' | translate"
     ><span nz-icon nzType="arrow-up" nzTheme="outline"></span>
     </button>
-    <nz-card class="m-2 rounded-4">
+    <nz-card>
       <div class="py-2">
         <span class="title">{{ 'settings.self' | translate }}</span>
       </div>
-      <div class="d-flex flex-row-reverse setting-action">
+      <div class="setting-action">
         <button nz-button nzType="primary"
                 (click)="applyChangeRightNow()"
         >
           <span nz-icon nzType="fall" nzTheme="outline"></span>
           {{ 'settings.applySettings' | translate }}
         </button>
-        <button nz-button nzType="primary"
+        <button nz-button
                 (click)="resetConfiguration()"
         >
           <span nz-icon nzType="undo" nzTheme="outline"></span>
@@ -45,7 +35,7 @@
 
       </div>
     </nz-card>
-    <nz-card class="m-2 rounded-4">
+    <nz-card>
       <div class="py-2">
         <div class="d-flex justify-content-between m-1">
           <nz-row>
@@ -57,7 +47,7 @@
         </div>
       </div>
     </nz-card>
-    <nz-card class="m-2 rounded-4">
+    <nz-card>
       <div class="py-2">
         <span class="title">{{ 'settings.quickConfig' | translate }}</span>
       </div>
@@ -100,7 +90,7 @@
         </nz-row>
       </div>
     </nz-card>
-    <nz-card class="m-2 rounded-4">
+    <nz-card>
       <div class="py-2">
         <span class="title">{{ 'settings.displayOptions' | translate }}</span>
       </div>
@@ -126,7 +116,7 @@
           </nz-col>
         </nz-row>
       </div>
-      <div class="d-flex align-items-center justify-content-center m-1">
+      <div class="font-preview">
         <div [style]="'font-size: '+config!.displayConfiguration.fontSize+'px;'">
           {{ 'settings.fontPreview' | translate }} AaBbCc
         </div>
@@ -184,7 +174,7 @@
         }
       </div>
     </nz-card>
-    <nz-card class="m-2 rounded-4">
+    <nz-card>
       <div class="py-2">
         <span class="title">{{ 'settings.chatModelManagement' | translate }}</span>
       </div>
@@ -205,7 +195,7 @@
         <button nz-button class="rounded-3" (click)="modelCenterVisible = true">{{ 'settings.modelManagement' | translate }}</button>
       </div>
     </nz-card>
-    <nz-card class="m-2 rounded-4">
+    <nz-card>
       <div class="py-2">
         <span class="title">{{ 'settings.resetDataBase' | translate }}</span>
       </div>
@@ -221,7 +211,7 @@
         </button>
       </div>
     </nz-card>
-    <nz-card class="m-2 rounded-4">
+    <nz-card>
       <div class="py-2">
         <span class="title">{{ 'settings.providerCatalog' | translate }}</span>
       </div>
@@ -230,7 +220,7 @@
       </div>
       <div class="d-flex flex-wrap m-1">
         @for (provider of providerCatalog; track provider.type) {
-          <button class="c-dark mx-2 my-1 p-1 rounded-2"
+          <button class="provider-chip"
                   nz-popover
                   [nzPopoverTitle]="provider.displayName"
                   nzPopoverPlacement="bottom"

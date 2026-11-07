@@ -6,13 +6,26 @@ html, html[data-theme='next-light'] {
   --app-surface: #ffffff;
   --app-surface-muted: #f0f4f9;
   --app-text: #182539;
-  --app-text-muted: #748095;
+  --app-text-muted: #59677d;
   --app-border: #e2e8f1;
   --app-hover: #edf2f9;
   --app-selection: #e8f0ff;
   --app-control-background: #ffffff;
   --app-control-text: #182539;
   --app-accent: #2463cf;
+  --app-primary: #2463cf;
+  --app-primary-hover: #1c52b0;
+  --app-danger: #b42336;
+  --app-danger-text: #b42336;
+  --app-danger-surface: #fdf0f2;
+}
+
+:root {
+  --app-control-radius: 8px;
+  --app-card-radius: 12px;
+  --app-icon-size: 36px;
+  --app-page-gutter: 24px;
+  --app-header-height: 74px;
 }
 
 html[data-theme='next-dark'] {
@@ -27,6 +40,16 @@ html[data-theme='next-dark'] {
   --app-control-background: #182234;
   --app-control-text: #e7edf7;
   --app-accent: #7aa7fa;
+  --app-danger-text: #ff9caa;
+  --app-danger-surface: #442733;
+}
+
+@media (max-width: 600px) {
+  :root {
+    --app-page-gutter: 16px;
+    --app-header-height: 64px;
+    --app-icon-size: 40px;
+  }
 }
 
 html,
@@ -64,27 +87,39 @@ body {
   background-color: var(--app-hover) !important;
 }
 
-// NG-ZORRO overlays are appended to body, so dark-theme overrides must be global.
-// Light mode deliberately keeps NG-ZORRO's native component styling.
 html[data-theme='next-dark'] {
-  .ant-modal-content,
-  .ant-modal-header,
-  .ant-modal-title,
-  .ant-modal-close,
-  .ant-modal-footer,
-  .ant-modal-body,
   .ant-card,
   .ant-select-dropdown,
-  .ant-select,
   .ant-select-item,
-  .ant-select-selection-item,
   .ant-select-selector,
-  .ant-btn,
-  input,
-  textarea,
-  label {
+  .ant-input,
+  .ant-input-number,
+  .ant-input-number-input,
+  .ant-input-affix-wrapper,
+  .ant-input-group-addon,
+  .ant-btn-default:not(.ant-btn-dangerous),
+  .ant-popover-inner,
+  .ant-popover-title,
+  .ant-popover-inner-content,
+  .ant-dropdown-menu,
+  .ant-dropdown-menu-item {
     background-color: var(--app-control-background) !important;
     color: var(--app-control-text) !important;
     border-color: var(--app-border) !important;
+  }
+
+  .ant-select-item-option-active:not(.ant-select-item-option-disabled),
+  .ant-dropdown-menu-item:hover {
+    background-color: var(--app-hover) !important;
+  }
+
+  .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+    background-color: var(--app-selection) !important;
+    color: var(--app-accent) !important;
+  }
+
+  .ant-select-disabled .ant-select-selector {
+    background-color: var(--app-surface-muted) !important;
+    color: var(--app-text-muted) !important;
   }
 }

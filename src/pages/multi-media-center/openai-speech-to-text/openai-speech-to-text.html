@@ -6,7 +6,7 @@
     <app-json-code-viewer [jsonCode]="result"></app-json-code-viewer>
   </ng-container>
 </nz-modal>
-<header class="studio-heading"><button nz-button type="button" (click)="toggleMenu()" [attr.aria-label]="'studio.shared.menu' | translate" [attr.aria-expanded]="menuVisible()"><nz-icon nzType="menu-unfold" nzTheme="outline" /></button><div><h1>{{ 'studio.media.sttTitle' | translate }}</h1><p>{{ 'studio.media.sttIntro' | translate }}</p></div></header>
+<header class="studio-heading"><button nz-button class="workspace-icon-button" type="button" (click)="toggleMenu()" [attr.aria-label]="'studio.shared.menu' | translate" [attr.aria-expanded]="menuVisible()"><span nz-icon [nzType]="menuVisible() ? 'menu-fold' : 'menu-unfold'" aria-hidden="true"></span></button><div><h1>{{ 'studio.media.sttTitle' | translate }}</h1><p>{{ 'studio.media.sttIntro' | translate }}</p></div></header>
 <div class="file-drop rounded-2 border d-flex justify-content-center align-items-center" style="height: 150px;"
      role="button" tabindex="0" (keydown.enter)="fileInput.click()" (keydown.space)="$event.preventDefault(); fileInput.click()" (click)="fileInput.click()"
      (drop)="onFileDrop($event)" (dragover)="onDragOver($event)">
@@ -32,55 +32,49 @@
   }
 </div>
 <nz-card [nzTitle]="'studio.shared.settings' | translate">
-  <nz-row class="align-items-center my-1 bg-theme2 text-theme2">
-    <nz-col class="m-2">
-      <nz-col class="m-1">{{ 'studio.media.model' | translate }}</nz-col>
-      <nz-col>
-        <nz-select class="select big" [(ngModel)]="model">
-          <nz-option-group [nzLabel]="'studio.media.speechToTextModels' | translate">
-            @for (selection of models; track selection) {
-              <nz-option [nzLabel]="selection" [nzValue]="selection"></nz-option>
-            }
-          </nz-option-group>
-        </nz-select>
-      </nz-col>
-    </nz-col>
-    <nz-row class="m-2">
-      <nz-col class="m-1">{{ 'studio.media.temperature' | translate }}</nz-col>
-      <nz-row>
-        <nz-slider class="slider big" [nzMin]="0" [nzMax]="1" [nzStep]="0.01" [(ngModel)]="temperature"></nz-slider>
-        <nz-input-number [nzMin]="0" [nzMax]="1" [nzStep]="0.01" [(ngModel)]="temperature"></nz-input-number>
-      </nz-row>
-    </nz-row>
-    <nz-col class="m-2">
-      <nz-col class="m-1">{{ 'studio.media.responseFormat' | translate }}</nz-col>
-      <nz-col>
-        <nz-select class="select big" [(ngModel)]="response_format">
-          <nz-option-group [nzLabel]="'studio.media.responseFormat' | translate">
-            @for (selection of response_formats; track selection) {
-              <nz-option [nzLabel]="selection" [nzValue]="selection"></nz-option>
-            }
-          </nz-option-group>
-        </nz-select>
-      </nz-col>
-    </nz-col>
-    <nz-col class="m-2">
-      <nz-col class="m-1">{{ 'studio.media.language' | translate }}</nz-col>
-      <nz-col>
-        <nz-select class="select big" [(ngModel)]="language">
-          <nz-option-group [nzLabel]="'studio.media.language' | translate">
-            @for (selection of languages; track selection) {
-              <nz-option [nzLabel]="selection" [nzValue]="selection"></nz-option>
-            }
-          </nz-option-group>
-        </nz-select>
-      </nz-col>
-    </nz-col>
-  </nz-row>
+  <div class="studio-controls">
+    <div class="studio-control">
+      <span>{{ 'studio.media.model' | translate }}</span>
+      <nz-select [attr.aria-label]="'studio.media.model' | translate" [(ngModel)]="model">
+        <nz-option-group [nzLabel]="'studio.media.speechToTextModels' | translate">
+          @for (selection of models; track selection) {
+            <nz-option [nzLabel]="selection" [nzValue]="selection"></nz-option>
+          }
+        </nz-option-group>
+      </nz-select>
+    </div>
+    <div class="studio-control">
+      <span>{{ 'studio.media.temperature' | translate }}</span>
+      <div class="studio-range">
+        <nz-slider [nzMin]="0" [nzMax]="1" [nzStep]="0.01" [(ngModel)]="temperature"></nz-slider>
+        <nz-input-number [attr.aria-label]="'studio.media.temperature' | translate" [nzMin]="0" [nzMax]="1" [nzStep]="0.01" [(ngModel)]="temperature"></nz-input-number>
+      </div>
+    </div>
+    <div class="studio-control">
+      <span>{{ 'studio.media.responseFormat' | translate }}</span>
+      <nz-select [attr.aria-label]="'studio.media.responseFormat' | translate" [(ngModel)]="response_format">
+        <nz-option-group [nzLabel]="'studio.media.responseFormat' | translate">
+          @for (selection of response_formats; track selection) {
+            <nz-option [nzLabel]="selection" [nzValue]="selection"></nz-option>
+          }
+        </nz-option-group>
+      </nz-select>
+    </div>
+    <div class="studio-control">
+      <span>{{ 'studio.media.language' | translate }}</span>
+      <nz-select [attr.aria-label]="'studio.media.language' | translate" [(ngModel)]="language">
+        <nz-option-group [nzLabel]="'studio.media.language' | translate">
+          @for (selection of languages; track selection) {
+            <nz-option [nzLabel]="selection" [nzValue]="selection"></nz-option>
+          }
+        </nz-option-group>
+      </nz-select>
+    </div>
+  </div>
 </nz-card>
 <div class="m-2">
   <div>{{ 'studio.media.prompt' | translate }}</div>
-  <div class="d-flex justify-content-center align-items-center p-2 mb-5">
+  <div class="studio-field">
     <textarea [(ngModel)]="prompt"
               nz-input [placeholder]="'studio.media.promptPlaceholder' | translate"
               cdkTextareaAutosize
@@ -99,7 +93,7 @@
       {{ 'studio.media.parsing' | translate }}
     </div>
   }
-  <div class="d-flex justify-content-center align-items-center p-2">
+  <div class="studio-field">
     <textarea [attr.aria-label]="'studio.media.outputPlaceholder' | translate" [(ngModel)]="outputText"
               nz-input [placeholder]="'studio.media.outputPlaceholder' | translate"
               cdkTextareaAutosize
