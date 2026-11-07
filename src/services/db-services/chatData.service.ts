@@ -45,7 +45,7 @@ export class ChatDataService{
       throw error; // Propagate the error or handle it according to your needs
     }
   }
-  async deleteHistoriesByTitleId(titleId: number, userId = this.auth.user?.id) {
+  async deleteHistoriesByTitleId(titleId: number, userId?: number) {
     await this.dbService.deleteSession(titleId, userId);
   }
 
@@ -59,7 +59,7 @@ export class ChatDataService{
     await this.dbService.saveSession({
       title: history.title, dataId: history.dataId!,
       chatList: messages.map(chat => chat.dataId), userId: history.userId
-    }, messages);
+    }, messages, this.auth.user?.id);
   }
 
   deleteChatModel(id: number, historyId: number, userId?: number) {

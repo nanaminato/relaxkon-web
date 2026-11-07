@@ -32,6 +32,21 @@ describe('Local session transactions', () => {
     expect(await service.getChatInterface(2, 1)).toBeUndefined();
     expect(await service.getChatInterface(3, 1)).toBeUndefined();
   });
+  it('keeps an open legacy draft from recreating a guest copy or overwriting merged messages', async () => {
+    await service.saveSession({dataId: 1, title: 'account title', chatList: [2, 3], userId: 3}, [
+      {dataId: 2, role: 'user', finish: true, content: 'server version'},
+      {dataId: 3, role: 'assistant', finish: true, content: 'recovered reply'}
+    ]);
+    await service.saveSession({dataId: 1, title: 'old title', chatList: [2, 4]}, [
+      {dataId: 2, role: 'user', finish: true, content: 'stale version'},
+      {dataId: 4, role: 'user', finish: true, content: 'new message'}
+    ], 3);
+    expect(await service.getHistory(1)).toBeUndefined();
+    expect((await service.getHistory(1, 3))?.chatList).toEqual([2, 3, 4]);
+    expect((await service.getChatInterface(2, 1, 3))?.content).toBe('server version');
+    expect((await service.getChatInterface(3, 1, 3))?.content).toBe('recovered reply');
+    expect((await service.getChatInterface(4, 1, 3))?.content).toBe('new message');
+  });
 });
 
 

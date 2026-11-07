@@ -147,11 +147,25 @@ export class DbService{
   async deleteGenerateTask(generateTask: GenerateTask){
     return (await this.ready).delete("generateTask",generateTask.task_id!);
   }
-  async saveSession(history: ChatHistory, messages: ChatInterface[]) {
+  async saveSession(history: ChatHistory, messages: ChatInterface[], activeAccountId?: number) {
     const database = await this.ready;
     const tx = database.transaction(['sessionHistories', 'sessionMessages', 'sessionTitles'], 'readwrite');
     const writes: Promise<unknown>[] = [];
     try {
+      // A draft opened before reconciliation can still carry the old guest owner.
+      const owned = history.userId == null && activeAccountId != null
+        ? await tx.objectStore('sessionHistories').get(historyKey(history.dataId, activeAccountId)) : undefined;
+      if (owned) {
+        const existingIds = new Set(owned.chatList);
+        const additions: ChatInterface[] = [];
+        for (const message of messages) {
+          const existing = existingIds.has(message.dataId) && await tx.objectStore('sessionMessages')
+            .get(messageKey(history.dataId, message.dataId, owned.userId));
+          if (!existing || (message.finish && !existing.finish)) additions.push(message);
+        }
+        messages = additions;
+        history = {...owned, chatList: [...new Set([...owned.chatList, ...history.chatList])].sort((a, b) => a - b)};
+      }
       for (const message of messages) writes.push(tx.objectStore('sessionMessages').put({...message,
         historyId: history.dataId, userId: history.userId, localKey: messageKey(history.dataId, message.dataId, history.userId)}));
       writes.push(tx.objectStore('sessionHistories').put({...history, localKey: historyKey(history.dataId, history.userId)}));

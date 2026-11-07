@@ -86,7 +86,7 @@ export class SyncService {
       if (!applied) continue;
       if (response.uiLanguageSupported) this.uiLanguageSupport.add(accountId);
       if (batch.languagePacks) this.languagePackSnapshots.add(accountId);
-      changed ||= batch.reset || batch.changes.length > 0 || !!batch.languagePacks;
+      changed ||= batch.reset || batch.changes.length > 0 || !!batch.languagePacks || applied.mergedLegacySessions;
       if (batch.hasMore) continue;
       if ((await this.database.pendingSync(accountId)).length) continue;
       this.status$.next({accountId, pending: false});

@@ -80,7 +80,7 @@ export class SyncLocalStore {
     }
   }
 
-  async applySyncBatch(accountId: number, batch: SyncBatch, expectedCursor?: number): Promise<boolean> {
+  async applySyncBatch(accountId: number, batch: SyncBatch, expectedCursor?: number): Promise<false | {mergedLegacySessions: boolean}> {
     const tx = (await this.database.connection()).transaction(SYNC_STORES, 'readwrite');
     try {
       const currentCursor = (await tx.objectStore('syncState').get(accountId)) ?? 0;
@@ -110,14 +110,55 @@ export class SyncLocalStore {
           if (item.accountId === accountId && (item.kind === 'languagePack' || item.kind === 'uiLanguage')) await entities.delete(item.key);
         for (const pack of batch.languagePacks) await this.applySyncEvent(tx, accountId, pack);
       }
+      const mergedLegacySessions = !batch.hasMore && await this.mergeLegacySessions(tx, accountId);
       await tx.objectStore('syncState').put(batch.cursor, accountId);
       await tx.done;
-      return true;
+      return {mergedLegacySessions};
     } catch (error) {
       try { tx.abort(); } catch { /* already aborted */ }
       await tx.done.catch(() => undefined); throw error;
     }
   }
+
+  private async mergeLegacySessions(tx: SyncTransaction, accountId: number): Promise<boolean> {
+    const histories = tx.objectStore('sessionHistories');
+    const titles = tx.objectStore('sessionTitles');
+    const messages = tx.objectStore('sessionMessages');
+    const entities = tx.objectStore('syncEntities');
+    const guestRange = IDBKeyRange.bound('guest:', 'guest:\uffff');
+    const guests = new Map((await histories.getAll(guestRange)).map(history => [history.dataId, history]));
+    const ids = new Set([...guests.keys(), ...(await titles.getAll(guestRange)).map(title => title.dataId)]);
+    let merged = false;
+    for (const historyId of ids) {
+      const history = await histories.get(historyKey(historyId, accountId));
+      // Only adopt an unowned copy once this account's copy is known to the server.
+      if (!history || !await entities.get(syncEntityKey(accountId, {kind: 'history', entityId: String(historyId)}))) continue;
+
+      for (const id of new Set([...history.chatList, ...(guests.get(historyId)?.chatList ?? [])])) {
+        const guestMessageKey = messageKey(historyId, id);
+        const guestMessage = await messages.get(guestMessageKey);
+        const ownedMessage = await messages.get(messageKey(historyId, id, accountId));
+        const identity = {kind: 'message' as const, entityId: String(id), historyId};
+        const synced = (await entities.get(syncEntityKey(accountId, identity)))?.payload as ChatInterface | undefined;
+        const message = guestMessage?.finish && !ownedMessage?.finish ? guestMessage : ownedMessage ?? guestMessage;
+        if (message && (!synced || (message.finish && !synced.finish))) {
+          const {dataId, role, content, fileList, finish, model} = message;
+          const mutation: SyncMutation = {...identity, operationId: crypto.randomUUID(), action: 'upsert',
+            payload: {dataId, role, content, fileList, finish, model}};
+          await tx.objectStore('syncOutbox').add({accountId, mutation});
+          await this.applySyncEvent(tx, accountId, mutation);
+        } else if (synced && (!ownedMessage || !history.chatList.includes(id))) {
+          await this.applySyncEvent(tx, accountId, {...identity, version: 0, action: 'upsert', payload: synced});
+        }
+        if (guestMessage) await messages.delete(guestMessageKey);
+      }
+      await histories.delete(historyKey(historyId));
+      await titles.delete(historyKey(historyId));
+      merged = true;
+    }
+    return merged;
+  }
+
   private async applySyncEvent(tx: SyncTransaction, accountId: number, change: SyncMutation | SyncEvent) {
     const key = syncEntityKey(accountId, change);
     if (change.action === 'delete') await tx.objectStore('syncEntities').delete(key);
@@ -126,11 +167,20 @@ export class SyncLocalStore {
     const id = Number(change.entityId);
     if (change.kind === 'history') {
       if (change.action === 'delete') {
-        const history = await tx.objectStore('sessionHistories').get(historyKey(id, accountId));
-        if (history?.userId === accountId) {
-          for (const messageId of history.chatList) await tx.objectStore('sessionMessages').delete(messageKey(id, messageId, accountId));
-          await tx.objectStore('sessionHistories').delete(historyKey(id, accountId));
-          await tx.objectStore('sessionTitles').delete(historyKey(id, accountId));
+        const histories = tx.objectStore('sessionHistories');
+        const titles = tx.objectStore('sessionTitles');
+        const ownedKey = historyKey(id, accountId);
+        const owners = (await histories.get(ownedKey) || await titles.get(ownedKey))
+          ? [accountId, undefined] : [accountId];
+        // Older clients could save this same session under both the account and guest keys.
+        for (const owner of owners) {
+          const localKey = historyKey(id, owner);
+          const history = await histories.get(localKey);
+          for (const messageId of history?.chatList ?? []) {
+            await tx.objectStore('sessionMessages').delete(messageKey(id, messageId, owner));
+          }
+          await histories.delete(localKey);
+          await titles.delete(localKey);
         }
         for (const entity of await tx.objectStore('syncEntities').getAll())
           if (entity.accountId === accountId && entity.kind === 'message' && entity.historyId === id)
@@ -150,6 +200,12 @@ export class SyncLocalStore {
       if (change.action === 'delete') {
         history.chatList = history.chatList.filter(messageId => messageId !== id);
         await tx.objectStore('sessionMessages').delete(messageKey(change.historyId!, id, accountId));
+        const guest = await tx.objectStore('sessionHistories').get(historyKey(change.historyId!));
+        if (guest?.chatList.includes(id)) {
+          guest.chatList = guest.chatList.filter(messageId => messageId !== id);
+          await tx.objectStore('sessionMessages').delete(messageKey(change.historyId!, id));
+          await tx.objectStore('sessionHistories').put(guest);
+        }
       } else {
         await tx.objectStore('sessionMessages').put({...change.payload as ChatInterface, dataId: id,
           historyId: change.historyId!, userId: accountId, localKey: messageKey(change.historyId!, id, accountId)});

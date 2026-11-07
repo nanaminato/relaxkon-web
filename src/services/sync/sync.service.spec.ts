@@ -9,6 +9,8 @@ import {ServiceProvider} from '../../roots';
 import {CHAT_DB_NAME, DbService} from '../db-services/db.service';
 import {SyncLocalStore} from './sync-local.store';
 import {SyncService} from './sync.service';
+import {historyTitleActions} from '../../systems/store/history-title/history-title.actions';
+import {historyTitleReducers} from '../../systems/store/history-title/history-title.reducers';
 import {LanguagePack, LocalizationService} from '../normal-services/localization.service';
 import {LanguagePackSync} from './language-pack-sync.service';
 
@@ -160,6 +162,72 @@ describe('Durable synchronization', () => {
     expect(await local.applySyncBatch(3, {cursor: 7, reset: true, hasMore: false, changes: []})).toBeFalse();
     expect(await local.syncCursor(3)).toBe(0);
     expect((await database.getHistory(1, 3))?.title).toBe('local');
+  });
+
+  it('shows a legacy guest copy and its synced session once and removes both on deletion', async () => {
+    await local.applySyncBatch(3, {cursor: 1, reset: false, hasMore: false, changes: [
+      {version: 1, kind: 'history', action: 'upsert', entityId: '1', payload: {title: 'hello'}}
+    ]});
+    await database.saveSession({dataId: 1, title: 'hello', chatList: [2]}, [
+      {dataId: 2, role: 'user', content: 'hello', finish: true}
+    ]);
+    await database.saveSession({dataId: 9, title: 'hello', chatList: []}, []);
+
+    const titles = () => database.getHistoryTitles().then(historyTitles =>
+      historyTitleReducers(undefined, historyTitleActions.loadSuccess({historyTitles})).historyTitles);
+    expect((await titles()).map(({dataId, userId}) => [dataId, userId])).toEqual([[9, undefined], [1, 3]]);
+
+    await local.enqueueSync(3, {operationId: crypto.randomUUID(), kind: 'history', action: 'delete', entityId: '1'});
+    expect(await database.getHistory(1, 3)).toBeUndefined();
+    expect(await database.getHistory(1)).toBeUndefined();
+    expect(await database.getChatInterface(2, 1)).toBeUndefined();
+    expect((await titles()).map(({dataId}) => dataId)).toEqual([9]);
+
+    const [deletion] = await local.pendingSync(3);
+    await local.acknowledgeSync(deletion.order!);
+    expect(await local.applySyncBatch(3, {cursor: 2, reset: false, hasMore: false, changes: [
+      {version: 2, kind: 'history', action: 'delete', entityId: '1'}
+    ]})).toEqual({mergedLegacySessions: false});
+    expect((await titles()).map(({dataId}) => dataId)).toEqual([9]);
+  });
+
+  it('reconciles legacy duplicates on an empty delta and retries unsynced messages safely', async () => {
+    await local.applySyncBatch(3, {cursor: 2, reset: false, hasMore: false, changes: [
+      {version: 1, kind: 'history', action: 'upsert', entityId: '1', payload: {title: 'account title'}},
+      {version: 2, kind: 'message', action: 'upsert', entityId: '2', historyId: 1,
+        payload: {dataId: 2, role: 'user', content: 'server version', finish: true}}
+    ]});
+    await database.saveSession({dataId: 1, title: 'legacy title', chatList: [2, 3]}, [
+      {dataId: 2, role: 'user', content: 'legacy version', finish: true},
+      {dataId: 3, role: 'assistant', content: 'unsynced reply', finish: true}
+    ]);
+    await database.saveSession({dataId: 9, title: 'guest only', chatList: []}, []);
+
+    const run = service.synchronize();
+    (await request('GET')).flush({cursor: 2, reset: false, hasMore: false, changes: []});
+    const write = await request('POST');
+    expect(write.request.body).toEqual(jasmine.objectContaining({kind: 'message', entityId: '3', historyId: 1}));
+    expect((await database.getHistory(1, 3))?.chatList).toEqual([2, 3]);
+    expect((await database.getChatInterface(2, 1, 3))?.content).toBe('server version');
+    expect((await database.getChatInterface(3, 1, 3))?.content).toBe('unsynced reply');
+    expect(await database.getHistory(1)).toBeUndefined();
+    expect(await database.getChatInterface(3, 1)).toBeUndefined();
+    expect((await database.getHistoryTitles()).filter(title => title.dataId === 1).map(title => title.title))
+      .toEqual(['account title']);
+    expect(await database.getHistory(9)).toBeDefined();
+
+    write.flush({}, {status: 500, statusText: 'upload failed'});
+    await expectAsync(run).toBeRejected();
+    const retry = service.synchronize();
+    const queued = await request('POST');
+    expect(queued.request.body).toEqual(write.request.body);
+    queued.flush({version: 3});
+    (await request('GET')).flush({cursor: 3, reset: false, hasMore: false, changes: [
+      {version: 3, ...queued.request.body}
+    ]});
+    await retry;
+    expect(await local.pendingSync(3)).toEqual([]);
+    expect((await database.getHistory(1, 3))?.chatList).toEqual([2, 3]);
   });
 
   it('rejects stale batches from another tab without moving the cursor backwards', async () => {

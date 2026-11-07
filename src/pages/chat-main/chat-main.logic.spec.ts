@@ -5,7 +5,7 @@ import {Subject, of} from 'rxjs';
 import {ChatMainComponent} from './chat-main';
 import {ChatSessionFacade} from '../../services/chat/chat-session.facade';
 import {ChatDataService} from '../../services/db-services';
-import {SendManagerService} from '../../auth_module';
+import {AuthService, SendManagerService} from '../../auth_module';
 import {MenuAbleService} from '../../services/normal-services/menu-able.service';
 import {Bs64Handler, ChatContextHandler} from '../../services/handlers';
 import {ContextMemoryService, LocalizationService, ModelFetchService, SizeReportService} from '../../services/normal-services';
@@ -30,6 +30,7 @@ describe('Chat interaction lifecycle', () => {
       {provide: ChatSessionFacade, useValue: {saveUser: async () => undefined, response: (source: any) => source}},
       {provide: ChatDataService, useValue: {putHistory: async () => undefined}},
       {provide: SendManagerService, useValue: {updateMessage: async () => undefined}},
+      {provide: AuthService, useValue: {user: {id: 3}}},
       {provide: MenuAbleService, useValue: {enableChat: () => undefined}},
       {provide: Bs64Handler, useValue: {}},
       {provide: ChatContextHandler, useValue: {handler: () => [], handlerBefore: () => undefined}},
@@ -71,6 +72,7 @@ describe('Chat interaction lifecycle', () => {
     component.inputText = 'next question'; component.config!.model.modelValue = 'two';
     finish({fileName: 'file'}); await pending;
     expect(component.chatModels[0].content).toBe('submitted');
+    expect(component.chatHistoryModel?.userId).toBe(3);
     expect(fetch.calls.mostRecent().args[1]).toBe('one');
     component.fileList = [{uid: 'next', name: 'next-file'}];
     stream.complete();

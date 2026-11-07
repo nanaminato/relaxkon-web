@@ -39,7 +39,7 @@ import {
 import {ChatDataService} from "../../services/db-services";
 import {TaskType, UserTask} from "../../models/operations";
 import {ParseService} from "../../services/fetch_services";
-import {SendManagerService} from "../../auth_module";
+import {AuthService, SendManagerService} from "../../auth_module";
 import {MenuAbleService} from "../../services/normal-services/menu-able.service";
 import {Bs64Handler, ChatContextHandler} from "../../services/handlers";
 import {RequestType} from "../../models/enumerates";
@@ -130,6 +130,9 @@ export class ChatMainComponent implements OnDestroy{
         return;
       }
       if (version !== this.draftVersion) return;
+      if (!this.chatHistoryModel!.title && this.chatModels.length === 0) {
+        this.chatHistoryModel!.userId ??= this.auth.user?.id;
+      }
       this.chatModels.push(userModel);
       if (this.chatContext.pointer === undefined) {
         this.chatContext.pointer = userModel.dataId;
@@ -416,6 +419,7 @@ export class ChatMainComponent implements OnDestroy{
   private modelFetchService: ModelFetchService = inject(ModelFetchService);
   private parseService: ParseService = inject(ParseService);
   private sendManagerService: SendManagerService = inject(SendManagerService);
+  private readonly auth = inject(AuthService);
   private bs64Handler: Bs64Handler = inject(Bs64Handler);
   store = inject(Store);
   constructor() {

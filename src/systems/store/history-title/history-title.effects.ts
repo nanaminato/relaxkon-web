@@ -2,12 +2,11 @@ import {TranslateService} from '@ngx-translate/core';
 import {Actions, createEffect, ofType} from "@ngrx/effects";
 import {inject, Injectable} from "@angular/core";
 import {historyTitleActions} from "./history-title.actions";
-import {catchError, concatMap, from, map, mergeMap, of, switchMap, take, tap, withLatestFrom} from "rxjs";
+import {catchError, concatMap, filter, from, map, mergeMap, of, switchMap, take, tap} from "rxjs";
 import {Store} from "@ngrx/store";
-import {addWithMerge} from "./addWithMerge";
 import {ChatDataService, HistoryTitleService} from "../../../services/db-services";
-import {AuthService, RequestService, SendManagerService} from "../../../auth_module";
-import {ChatHistoryTitle} from "../../../models";
+import {AuthService, SendManagerService} from "../../../auth_module";
+import {SyncService} from "../../../services/sync/sync.service";
 import {selectHistoryTitle} from "./history-title.selectors";
 import {authActions} from "../system.actions";
 import {NzMessageService} from "ng-zorro-antd/message";
@@ -21,30 +20,16 @@ export class HistoryTitleEffect {
   private sendService = inject(SendManagerService);
   private chatDataService: ChatDataService = inject(ChatDataService);
   authService = inject(AuthService)
+  private readonly sync = inject(SyncService);
   loadHistoryFromDb$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(historyTitleActions.loadFromDb),
-      withLatestFrom(
-        this.store.select(selectHistoryTitle),
-      ),
-      mergeMap(([action, historyTitles]) => {
-        let userId = this.authService.user?.id;
-        if (!userId) {
-          // 用户未登录，直接返回已有historyTitles
-          return of(historyTitleActions.loadSuccess({ historyTitles }));
-        }
+      ofType(historyTitleActions.loadFromDb, historyTitleActions.deleteSuccess),
+      switchMap(() => {
+        const userId = this.authService.user?.id;
         return from(this.historyTitleService.getHistoryTitles(userId)).pipe(
-          map(dbHistoryTitles => {
-            // 如果接口返回 undefined，保证赋予空数组，避免报错
-            const safeDbTitles = dbHistoryTitles ?? [];
-            const merged = addWithMerge(historyTitles.filter(item => item.userId === undefined), safeDbTitles);
-            return historyTitleActions.loadSuccess({ historyTitles: merged });
-          }),
-          catchError((err) => {
-            // 提取具体的错误信息
-            const errorMessage = err.error?.message || err.message || this.i18n.instant('admin.management.connectionFailed');
-            return of(historyTitleActions.loadFailure({ error: errorMessage }));
-          })
+          filter(() => this.authService.user?.id === userId),
+          map(historyTitles => historyTitleActions.loadSuccess({historyTitles})),
+          catchError(error => of(this.loadError(error)))
         );
       })
     )
@@ -57,34 +42,15 @@ export class HistoryTitleEffect {
       ])
     )
   );
-  requestService = inject(RequestService)
   loadHistoryFromHttp$ = createEffect(() =>
     this.actions$.pipe(
       ofType(historyTitleActions.loadFromHttp),
-      withLatestFrom(
-        this.store.select(selectHistoryTitle)
-      ),
-      mergeMap(([action,historyTitles]) => {
-        let userId = this.authService.user?.id;
-        if (!userId) {
-          return of(historyTitleActions.loadSuccess({ historyTitles }));
-        }
-
-        const ids: number[] = (historyTitles && historyTitles.length > 0)
-          ? historyTitles.map((item: ChatHistoryTitle) => item.dataId)
-          : [];
-
-        return this.requestService.requestHistories(ids).pipe(
-          map(responseHistoryTitles => {
-            const safeResponse = responseHistoryTitles ?? [];
-            const merged = addWithMerge(historyTitles.filter(item => item.userId === undefined), safeResponse);
-            return historyTitleActions.loadSuccess({ historyTitles: merged });
-          }),
-          catchError((err) => {
-            // 提取具体的错误信息
-            const errorMessage = err.error?.message || err.message || this.i18n.instant('admin.management.connectionFailed');
-            return of(historyTitleActions.loadFailure({ error: errorMessage }));
-          })
+      switchMap(() => {
+        const userId = this.authService.user?.id;
+        return from(this.sync.synchronize()).pipe(
+          filter(() => this.authService.user?.id === userId),
+          map(() => historyTitleActions.loadFromDb()),
+          catchError(error => of(this.loadError(error)))
         );
       })
     )
@@ -100,9 +66,7 @@ export class HistoryTitleEffect {
             // 标题不存在，直接失败或跳过
             return of(historyTitleActions.deleteFailure({error: 'HistoryTitle not found'}));
           }
-          // 串行执行多个异步请求
-          return from(this.sendService.deleteHistory(historyTitle.dataId)).pipe(
-            mergeMap(() => from(this.chatDataService.deleteHistoriesByTitleId(historyTitle.dataId, historyTitle.userId))),
+          return from(this.deleteSession(dataId, historyTitle.userId)).pipe(
             map(() => historyTitleActions.deleteSuccess({ dataId })),
             catchError(error => of(historyTitleActions.deleteFailure({error})))
           )
@@ -110,6 +74,21 @@ export class HistoryTitleEffect {
       )
     })
   ));
+  private async deleteSession(dataId: number, owner?: number) {
+    if (owner != null) {
+      if (this.authService.user?.id !== owner) throw new Error('Account changed before deletion');
+      await this.sendService.deleteHistory(dataId);
+    } else {
+      if (this.authService.user) await this.sendService.deleteHistory(dataId);
+      await this.chatDataService.deleteHistoriesByTitleId(dataId);
+    }
+  }
+
+  private loadError(error: any) {
+    return historyTitleActions.loadFailure({error: error?.error?.message || error?.message
+      || this.i18n.instant('admin.management.connectionFailed')});
+  }
+
   messageService: NzMessageService = inject(NzMessageService);
   loadFailure$ = createEffect(() =>
       this.actions$.pipe(
