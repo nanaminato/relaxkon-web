@@ -2,7 +2,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Component, HostListener, inject,} from '@angular/core';
 import {NzButtonModule} from "ng-zorro-antd/button";
 import {NzIconModule} from "ng-zorro-antd/icon";
-import {NzModalService} from "ng-zorro-antd/modal";
+import {NzModalModule, NzModalService} from "ng-zorro-antd/modal";
 import {TranslateModule, TranslateService} from "@ngx-translate/core";
 import {ChatHistoryTitle, } from "../../models";
 import {SizeReportService} from "../../services/normal-services";
@@ -21,6 +21,7 @@ import {SwipeDeleteDirective} from "../../directives/SwipeDeleteDirective";
   imports: [
     NzButtonModule,
     NzIconModule,
+    NzModalModule,
     TranslateModule,
     NgStyle,
     SwipeDeleteDirective
