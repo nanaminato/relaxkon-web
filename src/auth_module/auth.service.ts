@@ -7,6 +7,7 @@ import {User} from "../models/accounts";
 import {AuthCallService} from "./auth-call.service";
 import {Store} from "@ngrx/store";
 
+import {loginRetrySeconds} from './login-errors';
 import type {TokenResponse} from '../contracts/auth';
 export type AuthTokenResponse = TokenResponse;
 
@@ -47,7 +48,9 @@ export class AuthService {
     return this.call.login({ username, password, deviceName: this.deviceName() }).pipe(
       catchError((error: unknown) => {
         if (error instanceof HttpErrorResponse) {
-          this.message.create("error", error.status === 401 || error.status === 403
+          this.message.create("error", error.status === 429
+            ? this.localization.text('notifications.loginThrottled', {seconds: loginRetrySeconds(error)})
+            : error.status === 401 || error.status === 403
             ? this.localization.text('notifications.invalidCredentials')
             : this.localization.text('notifications.networkError'));
         }
@@ -83,7 +86,8 @@ export class AuthService {
         return accessToken;
       }),
       catchError(error => {
-        this.clearLocalSession();
+        // A temporary throttle or outage does not invalidate the refresh token.
+        if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) this.clearLocalSession();
         return throwError(() => error);
       }),
       finalize(() => this.refreshRequest = undefined),

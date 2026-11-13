@@ -1,0 +1,58 @@
+<section class="security-page" [attr.aria-busy]="busy">
+  <header class="page-heading"><div><h1>{{'admin.authSecurity.title' | translate}}</h1><p>{{'admin.authSecurity.description' | translate}}</p></div></header>
+  <div class="toolbar">
+    <span role="status">{{(dirty ? 'admin.featureAccess.unsaved' : 'admin.featureAccess.upToDate') | translate}}</span>
+    <div class="actions">
+      <button class="btn btn-outline-primary" [disabled]="busy || refreshing" (click)="reload()">{{(dirty ? 'admin.featureAccess.discardReload' : 'universal.reload') | translate}}</button>
+      <button class="btn btn-primary" [disabled]="!valid || !dirty || busy || conflict" (click)="save()">{{(saving ? 'admin.featureAccess.saving' : 'admin.featureAccess.save') | translate}}</button>
+    </div>
+  </div>
+  @if (status) { <p class="status" role="status">{{status | translate}}</p> }
+  @if (loading) { <p role="status">{{'admin.featureAccess.loading' | translate}}</p> }
+  @if (settings; as config) {
+    <fieldset [disabled]="busy">
+      <legend class="visually-hidden">{{'admin.authSecurity.title' | translate}}</legend>
+      <div class="card enabled-card"><label><input type="checkbox" [(ngModel)]="config.enabled" (ngModelChange)="changed()"> {{'admin.authSecurity.enabled' | translate}}</label>
+        <p class="hint">{{'admin.authSecurity.enabledHint' | translate}}</p>
+        @if (!config.enabled) { <p class="warning">{{'admin.authSecurity.disabledWarning' | translate}}</p> }
+      </div>
+      @for (group of groups; track group.key) {
+        <section class="card"><h2>{{('admin.authSecurity.groups.' + group.key) | translate}}</h2>
+          <div class="fields">
+            @for (key of group.fields; track key) {
+              <label [for]="key"><span>{{('admin.authSecurity.fields.' + key) | translate}}</span>
+                <input [id]="key" type="number" [min]="minimum(key)" [max]="maximum(key)" step="1" [(ngModel)]="config[key]" (ngModelChange)="changed()" [attr.aria-invalid]="!validNumber(key, config[key])">
+              </label>
+            }
+          </div>
+        </section>
+      }
+    </fieldset>
+    @if (!valid) { <p class="warning" role="alert">{{'admin.authSecurity.invalid' | translate}}</p> }
+    <p class="hint">{{'admin.authSecurity.accountHint' | translate}}</p>
+  }
+  <section class="card monitor" [attr.aria-busy]="refreshing || clearing">
+    <header class="monitor-heading"><div><h2>{{'admin.authSecurity.monitor' | translate}}</h2><p class="hint">{{'admin.authSecurity.monitorHint' | translate}}</p></div>
+      <button class="btn btn-outline-primary" [disabled]="busy || refreshing" (click)="refreshStatus()">{{'admin.authSecurity.refreshStatus' | translate}}</button></header>
+    @if (monitorStatus) { <p class="status" role="status">{{monitorStatus | translate}}</p> }
+    @if (snapshot; as state) {
+      <p class="hint">{{'admin.authSecurity.capacity' | translate: {used: state.entryCount, capacity: state.capacity} }}</p>
+      <h3>{{'admin.authSecurity.restrictions' | translate}}</h3>
+      <div class="table-scroll"><table><thead><tr><th>{{'admin.authSecurity.dimension' | translate}}</th><th>{{'admin.authSecurity.key' | translate}}</th><th>{{'admin.authSecurity.count' | translate}}</th><th>{{'admin.authSecurity.retryAt' | translate}}</th><th>{{'admin.authSecurity.expiresAt' | translate}}</th><th>{{'admin.authSecurity.action' | translate}}</th></tr></thead>
+        <tbody>@for (item of state.restrictions; track item.id) {
+          <tr><td>{{item.dimension}}</td><td><code>{{item.id}}</code></td><td>{{item.count}}</td><td>{{item.retryAt ? (item.retryAt | date:'yyyy-MM-dd HH:mm:ss') : '—'}}</td><td>{{item.expiresAt | date:'yyyy-MM-dd HH:mm:ss'}}</td><td><button class="btn btn-outline-danger" [disabled]="busy || refreshing" (click)="requestClear(item)">{{'admin.authSecurity.clear' | translate}}</button></td></tr>
+        } @empty { <tr><td colspan="6">{{'admin.authSecurity.noRestrictions' | translate}}</td></tr> }</tbody></table></div>
+      @if (confirmClear; as target) {
+        <div class="confirmation" role="group" [attr.aria-label]="'admin.authSecurity.confirmClearTitle' | translate">
+          <h3>{{'admin.authSecurity.confirmClearTitle' | translate}}</h3><p>{{'admin.authSecurity.confirmClear' | translate}}</p><code>{{target.id}}</code>
+          <div class="actions"><button class="btn btn-outline-secondary" [disabled]="clearing" (click)="cancelClear()">{{'admin.authSecurity.cancel' | translate}}</button><button class="btn btn-danger" [disabled]="busy || refreshing" (click)="clear()">{{'admin.authSecurity.clear' | translate}}</button></div>
+        </div>
+      }
+      <h3>{{'admin.authSecurity.events' | translate}}</h3>
+      <div class="table-scroll"><table><thead><tr><th>{{'admin.authSecurity.at' | translate}}</th><th>{{'admin.authSecurity.kind' | translate}}</th><th>{{'admin.authSecurity.ip' | translate}}</th><th>{{'admin.authSecurity.accountKey' | translate}}</th><th>{{'admin.authSecurity.retrySeconds' | translate}}</th><th>{{'admin.authSecurity.actor' | translate}}</th></tr></thead>
+        <tbody>@for (event of state.events; track $index) {
+          <tr><td>{{event.at | date:'yyyy-MM-dd HH:mm:ss'}}</td><td>{{event.kind}}</td><td>{{event.ip || '—'}}</td><td><code>{{event.accountKey || '—'}}</code></td><td>{{event.retryAfterSeconds}}</td><td>{{event.actorId ?? '—'}}</td></tr>
+        } @empty { <tr><td colspan="6">{{'admin.authSecurity.noEvents' | translate}}</td></tr> }</tbody></table></div>
+    }
+  </section>
+</section>

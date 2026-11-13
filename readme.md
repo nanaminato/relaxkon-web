@@ -42,3 +42,7 @@ npm start
 - 本仓库不保存供应商 API 密钥、数据库密码或生产令牌。
 - 生产环境将前端部署到后端站点根目录，使用同源根路径 `/` 调用 API。
 - 文档中的接口、角色和服务端配置以 RelaxKon Server 的 Swagger 与服务端文档为准。
+
+## Authentication security
+
+See [authentication security administration](docs/auth-security.md) for the admin editor, live permissions, default limits and login throttling behavior.
