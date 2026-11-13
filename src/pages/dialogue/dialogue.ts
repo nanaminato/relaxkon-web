@@ -8,10 +8,9 @@ import {NzIconModule} from "ng-zorro-antd/icon";
 import {NgOptimizedImage} from "@angular/common";
 import {Chat} from "./chat/chat";
 import {NzButtonModule} from "ng-zorro-antd/button";
-import {NzSkeletonModule} from "ng-zorro-antd/skeleton";
 import {TranslateModule} from "@ngx-translate/core";
 import {ChatModel, Configuration, UserRole} from "../../models";
-import {LocalizationService, SizeReportService} from "../../services/normal-services";
+import {LocalizationService} from "../../services/normal-services";
 import {TaskType, UserTask} from "../../models/operations";
 import {Store} from "@ngrx/store";
 import {selectConfig} from "../../systems/store/configuration/configuration.selectors";
@@ -27,14 +26,12 @@ import {selectConfig} from "../../systems/store/configuration/configuration.sele
     NgOptimizedImage,
     Chat,
     NzButtonModule,
-    NzSkeletonModule,
     TranslateModule,
   ],
   standalone: true
 })
 export class Dialogue {
   private _chatModel: ChatModel | undefined;
-  private sizeReportService: SizeReportService = inject(SizeReportService);
   private clipboard: ClipboardService = inject(ClipboardService);
   private notification: NzNotificationService = inject(NzNotificationService);
   private localization = inject(LocalizationService);
@@ -46,12 +43,9 @@ export class Dialogue {
     });
   }
   getFontSize() {
-    return `font-size: ${this.config?.displayConfiguration.fontSize}px !important;`
+    return `font-size: ${this.config?.displayConfiguration?.fontSize}px !important;`
   }
-  @Input()
-  set content(value: string | undefined) {
-
-  }
+  @Input() busy = false;
   @Input()
   active: boolean = false;
 
@@ -63,8 +57,8 @@ export class Dialogue {
   @Output()
   userTask = new EventEmitter<UserTask>();
 
-  isMiniView(){
-    return this.sizeReportService.miniPhoneView();
+  get isUser(): boolean {
+    return this.chatModel?.role === UserRole;
   }
   get chatModel(): ChatModel | undefined {
     return this._chatModel;
@@ -76,20 +70,7 @@ export class Dialogue {
     }
     return "assets/svgs/chat-gpt_11zon.jpg";
   }
-  isHover = signal(false);
   actionsExpanded = signal(false);
-
-  onMouseEnter() {
-    this.isHover.update(() => true);
-  }
-
-  onMouseLeave() {
-    this.isHover.update(() => false);
-  }
-
-  showActions() {
-    return this.isHover() || this.actionsExpanded() || this.isMiniView();
-  }
 
   toggleActions() {
     this.actionsExpanded.update(value => !value);

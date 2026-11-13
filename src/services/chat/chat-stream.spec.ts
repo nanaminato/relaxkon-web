@@ -1,3 +1,4 @@
+import {ChatChunk} from '../../contracts/chat';
 import {readChatStream} from './chat-stream';
 
 describe('Chat event protocol', () => {
@@ -7,7 +8,7 @@ describe('Chat event protocol', () => {
       for (const byte of bytes) controller.enqueue(Uint8Array.of(byte));
       controller.close();
     }});
-    const result: string[] = [];
+    const result: ChatChunk[] = [];
     for await (const text of readChatStream(body)) result.push(text);
     return result;
   }
@@ -17,6 +18,12 @@ describe('Chat event protocol', () => {
   });
   it('accepts the nullable text/code fields emitted by the backend response DTO', async () => {
     expect(await collect('data: {"type":"delta","text":"reply","code":null}\n\ndata: {"type":"completed","text":null,"code":null}\n\n')).toEqual(['reply']);
+  });
+  it('delivers a generated attachment beside streamed text', async () => {
+    const attachment = {fileName: 'report.csv', fileType: 'text/csv', fileSize: 3, fileContent: 'YSxi'};
+    expect(await collect('data: {"type":"delta","text":"Ready"}\n\n' +
+      'data: ' + JSON.stringify({type: 'attachment', attachment}) + '\n\n' +
+      'data: {"type":"completed"}\n\n')).toEqual(['Ready', {attachment}]);
   });
   it('rejects malformed discriminated event fields', async () => {
     await expectAsync(collect('data: {"type":"delta","text":null,"code":null}\n\n')).toBeRejected();

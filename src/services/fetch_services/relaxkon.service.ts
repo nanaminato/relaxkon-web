@@ -1,4 +1,4 @@
-import {chatRole, type ChatCompletionRequest} from '../../contracts/chat';
+import {chatRole, type ChatChunk, type ChatCompletionRequest} from '../../contracts/chat';
 import {throwError} from 'rxjs';
 import {readChatStream} from '../chat/chat-stream';
 import {LocalizationService} from '../normal-services/localization.service';
@@ -30,8 +30,8 @@ export class RelaxKonService {
       this.config = config;
     });
   }
-  fetchChat(mp: ChatPacket, model?: string): Observable<string> {
-    const messages: Message[] | VisionMessage[] = mp.messages;
+  fetchChat(mp: ChatPacket, model?: string): Observable<ChatChunk> {
+    const messages: (Message | VisionMessage)[] = mp.messages;
     let config = this.config!;
     let url = this.baseUrl + "/chat";
     const modelValue = model ?? config?.model.modelValue;
@@ -46,8 +46,8 @@ export class RelaxKonService {
     return this.fetchChatBase(url, requestBody);
   }
 
-  fetchChatBase(url: string, requestBody: ChatCompletionRequest): Observable<string> {
-    return new Observable<string>(observer => {
+  fetchChatBase(url: string, requestBody: ChatCompletionRequest): Observable<ChatChunk> {
+    return new Observable<ChatChunk>(observer => {
       const abortController = new AbortController();
       const accountId = this.authService.user?.id;
       const cooldownKey = JSON.stringify([accountId, url]);
@@ -100,10 +100,10 @@ export class RelaxKonService {
         if (!response.body) throw {type: ErrorType.NoContent};
         if (!response.headers.get('Content-Type')?.startsWith('text/event-stream'))
           throw {type: ErrorType.Other, error: 'Unsupported chat stream protocol'};
-        for await (const text of readChatStream(response.body)) {
+        for await (const chunk of readChatStream(response.body)) {
           if (abortController.signal.aborted) return;
           assertAccount();
-          observer.next(text);
+          observer.next(chunk);
         }
         observer.complete();
       };

@@ -1,0 +1,43 @@
+:host { display: block; min-width: 0; }
+.sent-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sent-files:has(+ app-markdown-root) { margin-bottom: 8px; }
+.sent-files li { min-width: 0; max-width: 100%; }
+.sent-file {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 270px;
+  padding: 7px 10px;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  background: var(--app-surface);
+}
+.sent-file-label { display: grid; min-width: 0; }
+.sent-file-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sent-file-size, .pending { color: var(--app-text-muted); font-size: 12px; }
+.sent-image {
+  display: block;
+  max-width: min(100%, 420px);
+  max-height: 280px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+.pending { display: flex; align-items: center; gap: 8px; }
+
+.download-file {
+  margin-top: 4px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--app-accent);
+  cursor: pointer;
+}
+.download-file:hover { background: var(--app-hover); }

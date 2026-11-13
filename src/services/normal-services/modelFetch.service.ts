@@ -1,7 +1,7 @@
 import {inject, Injectable} from "@angular/core";
 import {Observable} from "rxjs";
 import {RelaxKonService} from "../fetch_services";
-import {AuthService} from "../../auth_module";
+import {ChatChunk} from '../../contracts/chat';
 import {ChatPacket} from "../../models";
 
 @Injectable({
@@ -12,7 +12,7 @@ export class ModelFetchService{
   public getFetchResponse(
                           param:  ChatPacket,
                           model?: string){
-    let subject: Observable<string>;
+    let subject: Observable<ChatChunk>;
     subject = this.relaxKonService.fetchChat(param as ChatPacket,model);
     return subject!;
   }

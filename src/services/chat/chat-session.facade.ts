@@ -1,3 +1,4 @@
+import {ChatChunk} from '../../contracts/chat';
 import {inject, Injectable} from '@angular/core';
 import {finalize, Observable, tap} from 'rxjs';
 import {ChatHistoryModel, ChatListModel, ChatModel} from '../../models';
@@ -21,28 +22,41 @@ export class ChatSessionFacade {
         new ChatModel(), structuredClone(item)))), snapshot.dataId, snapshot.userId);
   }
 
-  response(source: Observable<string>, history: ChatHistoryModel, message: ChatModel): Observable<string> {
+  response(source: Observable<ChatChunk>, history: ChatHistoryModel, message: ChatModel): Observable<ChatChunk> {
     // These references belong to this request, even if the visible session changes.
     message.content = '';
+    message.fileList = undefined;
     return source.pipe(
       tap({
-        next: chunk => message.content += chunk,
+        next: chunk => {
+          if (typeof chunk === 'string') message.content += chunk;
+          else (message.fileList ??= []).push(chunk.attachment);
+        },
         error: (error: ResponseError) => {
           const limited = error?.status === 429 || error?.type === ErrorType.Busy;
-          const key = error?.code === 'account_changed' ? 'accountChanged'
+          const attachmentErrors: Record<string, string> = {
+            chat_image_unsupported: 'imageUnsupported',
+            chat_pdf_unsupported: 'pdfUnsupported',
+            chat_attachment_unsupported: 'attachmentUnsupported',
+            chat_attachment_invalid: 'attachmentInvalid',
+            chat_attachment_size: 'attachmentSize',
+            chat_attachment_rejected: 'attachmentRejected',
+            chat_output_size: 'outputAttachmentSize',
+          };
+          const key = (error?.code && attachmentErrors[error.code]) || (error?.code === 'account_changed'  ? 'accountChanged'
             : limited && error?.retryAfterSeconds != null ? 'rateLimitedRetryAfter'
             : error?.code === 'feature_disabled' ? 'featureDisabled'
             : error?.code === 'feature_limit_exceeded' ? 'featureLimitExceeded'
             : error?.code === 'feature_access_unavailable' ? 'featureAccessUnavailable'
             : error?.status === 403 ? 'accessDenied'
             : error?.type === ErrorType.NotAuthorize ? 'authorizationRequired'
-            : limited ? 'rateLimited' : 'responseInterrupted';
+            : limited ? 'rateLimited' : 'responseInterrupted');
           message.content += this.locale.text(`chat.composer.${key}`, {seconds: error?.retryAfterSeconds});
         }
       }),
       finalize(() => {
         message.finish = true;
-        if (!message.content) message.content = this.locale.text('chat.composer.responseStopped');
+        if (!message.content && !message.fileList?.length) message.content = this.locale.text('chat.composer.responseStopped');
         void this.save(history, message);
       })
     );

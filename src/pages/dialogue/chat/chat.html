@@ -1,47 +1,37 @@
-<ng-template #indicatorTemplate><span nz-icon nzType="loading"></span></ng-template>
-<div class="w-100 my-2">
-  @for(file of chatModel?.fileList;track file){
-    @if(!file.fileType!.startsWith("image")){
-      <nz-card  class="rounded-4">
-        <div class="d-flex flex-column">
-          <nz-row>
-            <nz-col class="mx-2">
-              <img width="40" height="40" nz-image [nzSrc]="getIcon(file.fileType!,file.fileName!)" [nzFallback]="'assets/svgs/file.svg'" [alt]="'universal.icon' | translate">
-            </nz-col>
-            <nz-col>
-              <nz-row>
-                <nz-col class="mx-2">
-                  <div>{{ 'studio.media.file' | translate }}: </div>
-                </nz-col>
-                <nz-col class="mx-2">
-                  <div>{{ 'studio.media.type' | translate }}: {{file.fileType}}</div>
-                </nz-col>
-                <nz-col class="mx-2">
-                  <div>{{ 'studio.media.size' | translate }}: {{file.fileSize}}</div>
-                </nz-col>
-              </nz-row>
-              <nz-row>
-                <nz-col class="mx-2">
-                  <div>{{file.fileName}}</div>
-                </nz-col>
-              </nz-row>
-            </nz-col>
-          </nz-row>
-        </div>
-      </nz-card>
-    }@else{
-      <img nz-image class="show"
-           [nzFallback]="fallback"
-           [nzSrc]="file.fileContent!" [alt]="'universal.image' | translate"/>
+@if (chatModel?.fileList?.length) {
+  <ul class="sent-files">
+    @for (file of chatModel?.fileList; track file) {
+      <li>
+        @if (imageSource(file); as source) {
+          <img nz-image class="sent-image" [nzFallback]="fallback"
+               [nzSrc]="source" [alt]="file.fileName || ('universal.image' | translate)"/>
+        } @else {
+          <div class="sent-file">
+            <img [src]="getIcon(file.fileType ?? '', file.fileName)" width="24" height="24" alt=""/>
+            <div class="sent-file-label">
+              <span class="sent-file-name" [title]="file.fileName">{{file.fileName}}</span>
+              @if (file.fileSize != null) {
+                <span class="sent-file-size">{{file.fileSize / 1024 | number:'1.0-1'}} KB</span>
+              }
+            </div>
+          </div>
+        }
+        @if (chatModel?.role === 'assistant' && file.fileContent) {
+          <button type="button" class="download-file" (click)="download(file)"
+                  [attr.aria-label]="'chat.composer.downloadAttachment' | translate:{name: file.fileName}">
+            {{'chat.composer.downloadFile' | translate}}
+          </button>
+        }
+      </li>
     }
-  }
-</div>
+  </ul>
+}
 
-@if(pending){
-  <div>
-    <nz-spin nzSimple [nzIndicator]="indicatorTemplate"></nz-spin>
-    {{getPendingText()}}
+@if (pending && !chatModel?.finish) {
+  <div class="pending" role="status">
+    <nz-spin nzSimple></nz-spin>
+    {{'chat.composer.generating' | translate}}
   </div>
-}@else{
+} @else if (chatModel?.content) {
   <app-markdown-root [chatModel]="chatModel"></app-markdown-root>
 }

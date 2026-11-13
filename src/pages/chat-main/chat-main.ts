@@ -1,16 +1,17 @@
+import {ChatChunk} from '../../contracts/chat';
 import {ChatSessionFacade} from '../../services/chat/chat-session.facade';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {LanguageSwitcher} from '../../shared/language-switcher';
 import {Component, ElementRef, inject, OnDestroy, Renderer2, ViewChild} from '@angular/core';
 import {NzUploadFile, NzUploadModule} from "ng-zorro-antd/upload";
-import {firstValueFrom, forkJoin, map, Observable, Subject, Subscription} from "rxjs";
+import {Observable, Subject, Subscription} from "rxjs";
 import {NzNotificationService} from "ng-zorro-antd/notification";
 import {NzModalModule} from "ng-zorro-antd/modal";
 import {ModelEditor} from "./model-editor/model-editor";
 import {NzIconModule} from "ng-zorro-antd/icon";
 import {NzButtonModule} from "ng-zorro-antd/button";
 import {NzFormModule} from "ng-zorro-antd/form";
-import {NgTemplateOutlet} from "@angular/common";
+import {DecimalPipe, NgTemplateOutlet} from "@angular/common";
 import {ModelSelector} from "./model-selector/model-selector";
 import {Dialogue} from "../dialogue/dialogue";
 import {NzInputModule} from "ng-zorro-antd/input";
@@ -37,7 +38,6 @@ import {
 } from "../../models";
 import {ChatDataService} from "../../services/db-services";
 import {TaskType, UserTask} from "../../models/operations";
-import {ParseService} from "../../services/fetch_services";
 import {AuthService, SendManagerService} from "../../auth_module";
 import {MenuAbleService} from "../../services/normal-services/menu-able.service";
 import {Bs64Handler, ChatContextHandler} from "../../services/handlers";
@@ -63,6 +63,7 @@ import {historyTitleActions} from "../../systems/store/history-title/history-tit
     NzFormModule,
     ModelSelector,
     NgTemplateOutlet,
+    DecimalPipe,
     Dialogue,
     NzUploadModule,
     NzTooltipModule,
@@ -78,33 +79,59 @@ export class ChatMainComponent implements OnDestroy{
   private localization = inject(LocalizationService);
   private readonly session = inject(ChatSessionFacade);
   private draftVersion = 0;
+  readonly attachmentPreviews = new Map<File | NzUploadFile, string>();
+  draggingFiles = false;
+  private dragDepth = 0;
 
-  async parseAllFile(userModel: ChatModel): Promise<boolean> {
-    if (!userModel.fileList || userModel.fileList.length === 0) return true;
-
-    let sendList = userModel.fileList.filter(f => !f.fileType?.startsWith("image"));
-    if (sendList.length === 0) return true;
-
-    const parseObservables = sendList.map(f => this.parseService.parse(f));
-
-    try {
-      const parsedContents = await firstValueFrom(
-        forkJoin(parseObservables).pipe(
-          map(results => {
-            for (let i = 0; i < sendList.length; i++) {
-              sendList[i].parsedContent = results[i].content;
-            }
-            return true;
-          })
-        )
-      );
-
-      return parsedContents;
-    } catch (error) {
-      console.error('发生错误：', error);
-      return false;
+  private addFiles(files: (File | NzUploadFile)[]): void {
+    if (this.answering || !files.length) return;
+    for (const file of files) {
+      if (file instanceof Blob && file.type.startsWith('image/')) {
+        this.attachmentPreviews.set(file, URL.createObjectURL(file));
+      }
     }
+    this.fileList = [...this.fileList, ...files];
   }
+
+  removeAttachments(files: (File | NzUploadFile)[]): void {
+    for (const file of files) {
+      const preview = this.attachmentPreviews.get(file);
+      if (preview) URL.revokeObjectURL(preview);
+      this.attachmentPreviews.delete(file);
+    }
+    this.fileList = this.fileList.filter(file => !files.includes(file));
+  }
+
+  pasteFiles(event: ClipboardEvent): void {
+    const clipboard = event.clipboardData;
+    if (this.answering || !clipboard?.files.length) return;
+    if (!clipboard.getData('text/plain')) event.preventDefault();
+    this.addFiles(Array.from(clipboard.files));
+  }
+
+  dragFiles(event: DragEvent, entering = false): void {
+    const transfer = event.dataTransfer;
+    if (!transfer?.types.includes('Files')) return;
+    event.preventDefault();
+    transfer.dropEffect = this.answering ? 'none' : 'copy';
+    if (entering) this.dragDepth++;
+    this.draggingFiles = !this.answering;
+  }
+
+  leaveFiles(): void {
+    this.dragDepth = Math.max(0, this.dragDepth - 1);
+    if (!this.dragDepth) this.draggingFiles = false;
+  }
+
+  dropFiles(event: DragEvent): void {
+    const transfer = event.dataTransfer;
+    if (!transfer?.types.includes('Files')) return;
+    event.preventDefault();
+    this.dragDepth = 0;
+    this.draggingFiles = false;
+    this.addFiles(Array.from(transfer.files));
+  }
+
   async askGPT() {
     if (this.answering || (!this.inputText.trim() && !this.fileList.length)) return;
     const selectedModel = this.config?.model?.modelValue;
@@ -121,14 +148,6 @@ export class ChatMainComponent implements OnDestroy{
       const files = await Promise.all(uploads.map(file => this.readFile(file)));
       if (version !== this.draftVersion) return;
       const userModel = new ChatModel(UserRole, prompt, files, undefined, true, selectedModel);
-      if (!await this.parseAllFile(userModel)) {
-        if (version === this.draftVersion) {
-          this.answering = false;
-          this.notification.error(this.localization.text('notifications.fileParseFailed'), '');
-        }
-        return;
-      }
-      if (version !== this.draftVersion) return;
       if (!this.chatHistoryModel!.title && this.chatModels.length === 0) {
         this.chatHistoryModel!.userId ??= this.auth.user?.id;
       }
@@ -148,7 +167,7 @@ export class ChatMainComponent implements OnDestroy{
       this.handleTitleWhenNewResponse(userModel);
       // Consume only the submitted draft, preserving anything typed during preparation.
       if (this.inputText === prompt) this.inputText = '';
-      this.fileList = this.fileList.filter(file => !uploads.includes(file));
+      this.removeAttachments(uploads);
       this.chatFileList = [];
       this.animalModel = assistant;
       this.responseSubscription = this.subscriptionResponse(
@@ -171,7 +190,7 @@ export class ChatMainComponent implements OnDestroy{
     }
     void this.session.saveUser(history, model);
   }
-  subscriptionResponse(subject: Observable<string>, model: ChatModel): Subscription{
+  subscriptionResponse(subject: Observable<ChatChunk>, model: ChatModel): Subscription{
     const history = this.chatHistoryModel!;
     return this.session.response(subject, history, model).subscribe({
       next: () => this.nextSubscribe(true),
@@ -213,6 +232,7 @@ export class ChatMainComponent implements OnDestroy{
   }
 
   ngOnDestroy(): void {
+    this.removeAttachments([...this.attachmentPreviews.keys()]);
     if (this.scrollTimer) clearTimeout(this.scrollTimer);
     this.draftVersion++;
     this.finalizeResponse();
@@ -254,7 +274,7 @@ export class ChatMainComponent implements OnDestroy{
   }
 
   config: Configuration | undefined;
-  fileList: NzUploadFile[] = [];
+  fileList: (File | NzUploadFile)[] = [];
   useStarter(key: string): void {
     this.inputText = this.localization.text(key);
   }
@@ -304,7 +324,6 @@ export class ChatMainComponent implements OnDestroy{
 
   async reGenerateHandle($event: number) {
     if (this.answering) return;
-    const version = this.draftVersion;
     // tackle since model
     let reModel = this.chatModels.find(m=>m.dataId===$event);
     if(reModel===undefined){
@@ -317,14 +336,6 @@ export class ChatMainComponent implements OnDestroy{
       return;
     }
     this.answering = true;
-    let parseStatus = await this.parseAllFile(endPointerModel);
-    if (version !== this.draftVersion) return;
-
-    if(!parseStatus){
-      this.answering = false;
-      this.notification.error(this.localization.text('notifications.fileParseFailed'), '');
-      return;
-    }
     let generateModel: ChatModel | undefined;
     if(reModel.role===AssistantRole){
       generateModel = reModel;
@@ -390,7 +401,6 @@ export class ChatMainComponent implements OnDestroy{
   chatDataService = inject(ChatDataService);
   notification = inject(NzNotificationService);
   private modelFetchService: ModelFetchService = inject(ModelFetchService);
-  private parseService: ParseService = inject(ParseService);
   private sendManagerService: SendManagerService = inject(SendManagerService);
   private readonly auth = inject(AuthService);
   private bs64Handler: Bs64Handler = inject(Bs64Handler);
@@ -416,6 +426,7 @@ export class ChatMainComponent implements OnDestroy{
       for (const subscription of this.responseHolder) subscription.unsubscribe();
       this.responseHolder = [];
       this.chatHistoryModel = this.session.draft(chatHistory);
+      this.jumpToLatest();
       this.chatContext = chatHistory
         ? this.contextMemoryService.getValue(chatHistory.dataId!, chatHistory.userId) || defaultContext
         : defaultContext;
@@ -436,14 +447,19 @@ export class ChatMainComponent implements OnDestroy{
     return new ChatPacket(messages, this.chatHistoryModel?.dataId?.toString());
   }
 
-  private followOutput = true;
+  followOutput = true;
+
+  jumpToLatest(): void {
+    this.followOutput = true;
+    this.scrollToBottom();
+  }
   private scrollTimer?: ReturnType<typeof setTimeout>;
   onPanelScroll() {
     const panel = this.chatPanel?.nativeElement;
     if (panel) this.followOutput = panel.scrollHeight - panel.scrollTop - panel.clientHeight < 100;
   }
   scrollToBottom(): void {
-    if (!this.chatPanel || !this.followOutput || this.scrollTimer) return;
+    if (!this.followOutput || this.scrollTimer) return;
     this.scrollTimer = setTimeout(() => {
       this.scrollTimer = undefined;
       const panel = this.chatPanel?.nativeElement;
@@ -517,22 +533,14 @@ export class ChatMainComponent implements OnDestroy{
   showLogo() {
     return this.chatHistoryModel===undefined || this.chatHistoryModel.chatList?.chatModel?.length===0;
   }
-  miniPhone() {
-    return this.sizeReportService.miniPhoneView();
-  }
-
   enableTouch() {
     // 正在回复 | 没有在回复，内容不为空 |  模型为转录或者tts，且添加了文件
     return this.answering || (!this.answering && this.inputText.trim() !== '') ||
       (this.fileList.length > 0);
   }
 
-  isFade() {
-    return !this.enableTouch();
-  }
-
   beforeUpload = (file: NzUploadFile): boolean => {
-    this.fileList = this.fileList.concat(file);
+    this.addFiles([file]);
     return false;
   };
   async buildFileList() {
@@ -541,7 +549,7 @@ export class ChatMainComponent implements OnDestroy{
     if (version === this.draftVersion) this.chatFileList = files;
   }
 
-  readFile(file: NzUploadFile): Promise<FileAdds> {
+  readFile(file: File | NzUploadFile): Promise<FileAdds> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onerror = () => reject(reader.error);

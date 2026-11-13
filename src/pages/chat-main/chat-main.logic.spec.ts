@@ -18,6 +18,44 @@ describe('Chat interaction lifecycle', () => {
   let component: ChatMainComponent;
   let stream: Subject<string>;
   let fetch: jasmine.Spy;
+  it('stages dropped files and lets the user remove them before sending', () => {
+    const file = new File(['notes'], 'notes.txt', {type: 'text/plain'});
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+    const event = new DragEvent('drop', {dataTransfer: transfer, cancelable: true});
+
+    component.dropFiles(event);
+
+    expect(event.defaultPrevented).toBeTrue();
+    expect(component.fileList).toEqual([file]);
+    expect(component.enableTouch()).toBeTrue();
+    expect(fetch).not.toHaveBeenCalled();
+
+    component.removeAttachments([file]);
+
+    expect(component.fileList).toEqual([]);
+    expect(component.enableTouch()).toBeFalse();
+  });
+
+  it('previews pasted images and releases the preview when the image is removed', () => {
+    const image = new File(['image bytes'], 'screen.png', {type: 'image/png'});
+    const transfer = new DataTransfer();
+    transfer.items.add(image);
+    const event = new ClipboardEvent('paste', {clipboardData: transfer, cancelable: true});
+    spyOn(URL, 'createObjectURL').and.returnValue('blob:preview');
+    const revoke = spyOn(URL, 'revokeObjectURL');
+
+    component.pasteFiles(event);
+
+    expect(event.defaultPrevented).toBeTrue();
+    expect(component.attachmentPreviews.get(image)).toBe('blob:preview');
+
+    component.removeAttachments([image]);
+
+    expect(revoke).toHaveBeenCalledWith('blob:preview');
+    expect(component.attachmentPreviews.has(image)).toBeFalse();
+  });
+
   beforeEach(() => {
     stream = new Subject();
     fetch = jasmine.createSpy().and.returnValue(stream);
@@ -57,7 +95,8 @@ describe('Chat interaction lifecycle', () => {
   });
   it('preserves failed attachment drafts without inserting duplicate user messages', async () => {
     component.inputText = 'question';
-    spyOn(component, 'parseAllFile').and.resolveTo(false);
+    component.fileList = [{uid: 'broken', name: 'broken.pdf'}];
+    spyOn(component, 'readFile').and.rejectWith(new Error('read failed'));
     await component.askGPT();
     expect(component.chatModels.length).toBe(0);
     expect(component.inputText).toBe('question');
@@ -66,7 +105,6 @@ describe('Chat interaction lifecycle', () => {
   it('pins the submitted prompt/model and preserves the next draft on completion', async () => {
     let finish!: (value: any) => void;
     spyOn(component, 'readFile').and.returnValue(new Promise(resolve => finish = resolve));
-    spyOn(component, 'parseAllFile').and.resolveTo(true);
     component.inputText = 'submitted'; component.fileList = [{uid: 'one', name: 'file'}];
     const pending = component.askGPT();
     component.inputText = 'next question'; component.config!.model.modelValue = 'two';
@@ -94,16 +132,14 @@ describe('Chat interaction lifecycle', () => {
       new ChatModel('user', 'second', undefined, 2), new ChatModel('assistant', 'second reply', undefined, 3));
     expect(component.findNextAssistantModel(1)).toBeUndefined();
   });
-  it('prevents duplicate regenerations and honours stop during preparation', async () => {
-    component.chatModels.push(new ChatModel('user', 'question', undefined, 1), new ChatModel('assistant', 'old reply', undefined, 2));
-    let finish!: (value: boolean) => void;
-    const parse = spyOn(component, 'parseAllFile').and.returnValue(new Promise(resolve => finish = resolve));
-    const pending = component.reGenerateHandle(2);
+  it('prevents duplicate regenerations while a response is running', async () => {
+    component.chatModels.push(new ChatModel('user', 'question', undefined, 1),
+      new ChatModel('assistant', 'old reply', undefined, 2));
     await component.reGenerateHandle(2);
-    expect(parse).toHaveBeenCalledTimes(1);
-    await component.buttonControlGPT(); finish(true); await pending;
-    expect(fetch).not.toHaveBeenCalled();
-    expect(component.chatModels[1].content).toBe('old reply');
+    await component.reGenerateHandle(2);
+    expect(fetch).toHaveBeenCalledTimes(1);
+    await component.buttonControlGPT();
+    expect(component.answering).toBeFalse();
   });
   it('does not remove the last message for an unknown deletion ID', () => {
     component.chatModels.push(new ChatModel('user', 'keep', undefined, 1));

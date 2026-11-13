@@ -1,60 +1,49 @@
-<div class="w-100 ">
-  <div class="chat-box centered flex-column "
-       (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
-    <div class="dialogue-header">
-      <div class="dialogue-identity">
-        <img class="mx-2" nz-image [ngSrc]="getIcon(chatModel?.role)" [nzFallback]="'assets/svgs/programmer.png'" width="20" height="20" [alt]="'universal.icon' | translate"/>
-        <div class="dialogue-name mx-2">{{ getHeadName(chatModel) }}</div>
-        @if(active){
-          <div nz-tooltip [nzTooltipTitle]="'chat.message.inContext' | translate" [attr.aria-label]="'chat.message.inContext' | translate" class="active rounded-4 mx-2"></div>
-        }
-        <div class="dialogue-actions">
-          <button nz-tooltip (click)="reRequest()" [nzTooltipTitle]="'chat.message.regenerate' | translate" [attr.aria-label]="'chat.message.regenerate' | translate" class="rounded-4 mx-0"
-                  [class.d-flex]="isMiniView()"
-                  [class.flex-row]="isMiniView()"
-                  [class.align-items-center]="isMiniView()"
-                  nz-button>
-            <span nz-icon nzType="redo" nzTheme="outline"></span>
-            @if(isMiniView()){
-              <span>{{'chat.message.retry' | translate}}</span>
-            }
-          </button>
-          @if(showActions()){
-            <div class="dialogue-secondary-actions" animate.enter="enter-animation">
-              <button nz-tooltip (click)="triggerEdit()" [nzTooltipTitle]="'chat.message.edit' | translate" [attr.aria-label]="'chat.message.edit' | translate" class="rounded-4 mx-2" nz-button>
-                <span nz-icon nzType="edit" nzTheme="outline"></span>
-              </button>
-              <button nz-tooltip (click)="triggerStartAsContext()" [nzTooltipTitle]="'chat.message.startContextFromHere' | translate" [attr.aria-label]="'chat.message.startContextFromHere' | translate" class="rounded-4" nz-button>
-                <span nz-icon nzType="sort-ascending" nzTheme="outline"></span>
-              </button>
-              <button nz-tooltip (click)="triggerDelete()" [nzTooltipTitle]="'chat.message.deleteContent' | translate" [attr.aria-label]="'chat.message.deleteContent' | translate" class="rounded-4 mx-2" nz-button>
-                <span nz-icon nzType="delete" nzTheme="outline"></span>
-              </button>
-              <button nz-tooltip (click)="copyAllContent()" [nzTooltipTitle]="'chat.message.copyContent' | translate" [attr.aria-label]="'chat.message.copyContent' | translate" class="rounded-4" nz-button>
-                <span nz-icon nzType="copy" nzTheme="outline"></span>
-              </button>
-            </div>
-          }@else{
-            <div>
-              <button type="button" class="rounded-4 mx-2" nz-button (click)="toggleActions()" [attr.aria-label]="'workspace.moreActions' | translate">
-                <span nz-icon nzType="more" nzTheme="outline"></span>
-              </button>
-            </div>
-          }
-        </div>
-      </div>
-    </div>
-    <div class="dialogue-content flex-grow-1 centered my-2 w-100">
-      <div [style]="getFontSize()">
-        @defer (on immediate){
-          <app-chat [chatModel]="chatModel"
-                    [content]="chatModel?.content?.length"
-                    [fileLength]="chatModel?.fileList?.length"></app-chat>
-        }@placeholder (minimum 50ms){
-          <nz-skeleton></nz-skeleton>
-        }
-      </div>
-
-    </div>
+<article class="chat-box" [class.user-turn]="isUser" [attr.aria-label]="getHeadName(chatModel)">
+  <div class="dialogue-identity">
+    @if (!isUser) {
+      <img nz-image [ngSrc]="getIcon(chatModel?.role)" [nzFallback]="'assets/svgs/programmer.png'" width="24" height="24" alt=""/>
+    }
+    <span class="dialogue-name">{{getHeadName(chatModel)}}</span>
+    @if (active) {
+      <span class="active" nz-tooltip [nzTooltipTitle]="'chat.message.inContext' | translate"
+            role="img" [attr.aria-label]="'chat.message.inContext' | translate"></span>
+    }
   </div>
-</div>
+  <div class="dialogue-content" [style]="getFontSize()">
+    <app-chat [chatModel]="chatModel"></app-chat>
+  </div>
+  <div class="dialogue-actions">
+    @if (chatModel?.content) {
+      <button type="button" nz-button nz-tooltip (click)="copyAllContent()"
+              [nzTooltipTitle]="'chat.message.copyContent' | translate"
+              [attr.aria-label]="'chat.message.copyContent' | translate">
+        <span nz-icon nzType="copy"></span>
+      </button>
+    }
+    <button type="button" nz-button nz-tooltip (click)="reRequest()" [disabled]="busy || !chatModel?.finish"
+            [nzTooltipTitle]="'chat.message.regenerate' | translate"
+            [attr.aria-label]="'chat.message.regenerate' | translate">
+      <span nz-icon nzType="redo"></span>
+    </button>
+    <button type="button" nz-button nz-tooltip (click)="toggleActions()" [attr.aria-expanded]="actionsExpanded()"
+            [nzTooltipTitle]="'workspace.moreActions' | translate" [attr.aria-label]="'workspace.moreActions' | translate">
+      <span nz-icon nzType="more"></span>
+    </button>
+    @if (actionsExpanded()) {
+      <button type="button" nz-button nz-tooltip [disabled]="busy" (click)="triggerEdit()"
+              [nzTooltipTitle]="'chat.message.edit' | translate" [attr.aria-label]="'chat.message.edit' | translate">
+        <span nz-icon nzType="edit"></span>
+      </button>
+      <button type="button" nz-button nz-tooltip [disabled]="busy" (click)="triggerStartAsContext()"
+              [nzTooltipTitle]="'chat.message.startContextFromHere' | translate"
+              [attr.aria-label]="'chat.message.startContextFromHere' | translate">
+        <span nz-icon nzType="sort-ascending"></span>
+      </button>
+      <button type="button" nz-button nz-tooltip [disabled]="busy" (click)="triggerDelete()"
+              [nzTooltipTitle]="'chat.message.deleteContent' | translate"
+              [attr.aria-label]="'chat.message.deleteContent' | translate">
+        <span nz-icon nzType="delete"></span>
+      </button>
+    }
+  </div>
+</article>
