@@ -4,6 +4,7 @@
     <a class="workspace-brand-link" routerLink="/chat"><span class="workspace-brand-mark" aria-hidden="true">R</span>RelaxKon</a>
     <p class="workspace-nav-caption">{{'workspace.manage' | translate}}</p>
     <nav class="workspace-links">
+      <a routerLink="auth-security" routerLinkActive="nav-active" ariaCurrentWhenActive="page" (click)="closeOnMobile()"><span nz-icon nzType="safety" aria-hidden="true"></span>{{'admin.authSecurity.title' | translate}}</a>
       <a routerLink="feature-access" routerLinkActive="nav-active" ariaCurrentWhenActive="page" (click)="closeOnMobile()"><span nz-icon nzType="check-circle" aria-hidden="true"></span>{{'admin.featureAccess.title' | translate}}</a>
       <a routerLink="secrets/models" routerLinkActive="nav-active" ariaCurrentWhenActive="page" (click)="closeOnMobile()"><span nz-icon nzType="appstore" aria-hidden="true"></span>{{'admin.management.models' | translate}}</a>
       <a routerLink="secrets/keys" routerLinkActive="nav-active" ariaCurrentWhenActive="page" (click)="closeOnMobile()"><span nz-icon nzType="key" aria-hidden="true"></span>{{'admin.management.keys' | translate}}</a>
