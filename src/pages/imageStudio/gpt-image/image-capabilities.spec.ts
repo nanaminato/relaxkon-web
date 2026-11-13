@@ -11,6 +11,19 @@ describe('Image model capabilities and safe formats', () => {
     expect(request.complexity).toBeUndefined(); expect('style' in request).toBeFalse();
     expect('response_format' in request).toBeFalse(); expect(request.frame_count).toBeUndefined();
   });
+  it('offers landscape and portrait 2K and 4K only for the 2.5 models', () => {
+    const largeSizes = ['2560x1440', '1440x2560', '3840x2160', '2160x3840'];
+    for (const model of ['gpt-image-2.5-flare', 'gpt-image-2.5-sunburst']) {
+      for (const size of largeSizes) {
+        expect(imageCapabilities(model).sizes).toContain(size);
+        expect(normalizeImageRequest({model, prompt: 'image', size}).size).toBe(size);
+      }
+    }
+    for (const model of ['gpt-image-2.6-flare', 'gpt-image-2.6-sunburst']) {
+      expect(imageCapabilities(model).sizes).toEqual(['auto', '1024x1024', '1536x1024', '1024x1536']);
+      expect(normalizeImageRequest({model, prompt: 'image', size: '3840x2160'}).size).toBe('auto');
+    }
+  });
   it('supports newer quality levels and constrains animation/vector output', () => {
     expect(imageCapabilities('gpt-image-2.5-flare').qualities).toContain('max');
     const gif = normalizeImageRequest({model: 'gpt-image-2.6-flare', prompt: 'image', output_format: 'gif',

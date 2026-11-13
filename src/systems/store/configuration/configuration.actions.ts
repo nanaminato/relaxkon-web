@@ -9,6 +9,5 @@ export const configurationActions = createActionGroup({
     "load success": props<{ config: Configuration }>(),
     'load failure': emptyProps(),
     'config update': props<{ config: Configuration }>()
-    // 以后你可以这里添加更多的 systemPrompt 相关 action
   }
 });

@@ -1,14 +1,16 @@
 import {inject, Injectable} from '@angular/core';
-import {from} from 'rxjs';
+import {from, of} from 'rxjs';
 import {AuthService} from './auth.service';
 import {SyncService} from '../services/sync/sync.service';
 import {ChatHistoryTitle, ChatInterface} from '../models';
 import {GenerateTask} from '../models/media';
+import {ImageSyncPreferences} from '../services/sync/image-sync-preferences';
 
 @Injectable({providedIn: 'root'})
 export class RequestService {
   private readonly sync = inject(SyncService);
   private readonly auth = inject(AuthService);
+  private readonly imageSync = inject(ImageSyncPreferences);
   private async records() {
     const accountId = this.auth.user?.id;
     if (!accountId) return [];
@@ -24,6 +26,8 @@ export class RequestService {
       .map(item => item.payload as ChatInterface).sort((left, right) => left.dataId - right.dataId)));
   }
   requestTasks(_knownIds: string[]) {
-    return from(this.records().then(records => records.filter(item => item.kind === 'task').map(item => item.payload as GenerateTask)));
+    if (!this.imageSync.download) return of<GenerateTask[]>([]);
+    return from(this.records().then(records => this.imageSync.download
+      ? records.filter(item => item.kind === 'task').map(item => item.payload as GenerateTask) : []));
   }
 }

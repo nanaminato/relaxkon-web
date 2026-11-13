@@ -379,17 +379,6 @@
       }
     }
   },
-  "ball": {
-    "manageSystemContext": "Manage System Context",
-    "addSystemInfo": "Add System Info",
-    "addAll": "Add All",
-    "removeAll": "Remove All",
-    "singleSystemContext": "Single System Context",
-    "emptyContent": "Nothing here",
-    "selectSystemPrompt": "Select System Prompt",
-    "viewAll": "View All",
-    "skipSelection": "Skip Selection"
-  },
   "banner": {
     "fidelity": "Fidelity",
     "drawingSize": "Drawing Size",
@@ -412,7 +401,6 @@
       "delete-description": "The conversation and its messages will be removed from chat history. This cannot be undone.",
       "new-chat": "New Chat",
       "settings": "Settings",
-      "prompts": "Prompts",
       "delete": "Delete"
     },
     "message": {
@@ -485,11 +473,7 @@
     "taskAlreadyRetrieved": "The result has already been retrieved.",
     "taskResultRetrieved": "Task result retrieved and saved",
     "confirmDeleteTask": "Delete this item? Task ID: {{taskId}}",
-    "promptsImported": "System prompts imported",
-    "promptsReloaded": "System prompts reloaded",
-    "promptsImportFailed": "Failed to import system prompts",
     "validationSuccess": "Validation successful",
-    "promptDeleteFailed": "Failed to delete system prompt",
     "themeApplied": "Theme applied",
     "configImported": "Configuration imported",
     "configImportFailed": "Failed to import configuration",
@@ -497,39 +481,19 @@
     "allTasksStopped": "All tasks stopped",
     "fileParseFailed": "A problem occurred while parsing the file",
     "itemNotFound": "Item not found in the list",
-    "operationNotAllowed": "Operation not allowed",
-    "systemPromptCannotRegenerate": "System prompts cannot be regenerated.",
-    "contextMessageNotFound": "No user or system message was found before this message",
+    "contextMessageNotFound": "No user message was found before this message",
     "contextCleared": "Context cleared",
     "verificationCodeNetworkFailed": "Failed to get verification code: network error",
     "verificationCodeFailed": "Failed to get verification code",
     "loginThrottled": "Too many requests. Wait at least {{seconds}} seconds before retrying."
   },
-  "prompts": {
-    "presetManagement": "Prompts Management",
-    "keywordSearch": "Keyword Search",
-    "import": "Import",
-    "export": "Export",
-    "createNew": "Create New",
-    "view": "View",
-    "delete": "Delete",
-    "deleteAll": "Delete All",
-    "nothing": "Nothing here",
-    "createSystemPresetInfo": "Create System Prompts",
-    "systemPromptTitle": "Prompt Title",
-    "systemPromptContent": "Prompt Content",
-    "add": "Add",
-    "viewSystemPresetInfo": "View System Prompt",
-    "modify": "Modify",
-    "exportSystemPreset": "Export System Prompts",
-    "exportToFile": "Export to File",
-    "copyToClipboard": "Copy to Clipboard",
-    "importSystemPreset": "Import System Prompts",
-    "importFromFile": "Import from File",
-    "oneChatAtLeast": "At least one character",
-    "twoCharAtLeast": "At least two characters"
-  },
   "settings": {
+    "imageSync": {
+      "title": "Image history sync",
+      "description": "These settings apply immediately in this browser. Turning off uploads cancels queued image uploads and keeps local history.",
+      "download": "Download image history from the server",
+      "upload": "Upload generated image history to the server"
+    },
     "self": "Settings",
     "defaultProperties": "Set Defaults",
     "backToTop": "Back to Top",

@@ -117,7 +117,7 @@ button.workspace-icon-button {
   .model-value { color: var(--app-text-muted); }
   .models-toolbar { border-color: var(--app-border); }
 }
-app-settings, app-prompt-store, app-top-image, app-top-media {
+app-settings, app-top-image, app-top-media {
   .ant-card { border: 1px solid var(--app-border); border-radius: var(--app-card-radius); background: var(--app-surface); color: var(--app-text); box-shadow: none; }
   .ant-card-body { padding: 24px; }
   .ant-card-head { color: var(--app-text); border-color: var(--app-border); }
@@ -134,7 +134,7 @@ app-settings, app-prompt-store, app-top-image, app-top-media {
 @media (max-width: 600px) {
   .admin-workspace .search-input { width: 100%; }
   .admin-workspace .ant-page-header-heading { flex-wrap: wrap; gap: 12px; }
-  .admin-workspace .ant-card-body, app-settings .ant-card-body, app-prompt-store .ant-card-body { padding: 16px; }
+  .admin-workspace .ant-card-body, app-settings .ant-card-body { padding: 16px; }
   .admin-workspace .table > :not(caption) > * > * { padding: 12px; }
 }
 

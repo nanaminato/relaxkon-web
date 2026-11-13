@@ -48,6 +48,18 @@
       </div>
     </nz-card>
     <nz-card>
+      <h2 class="title">{{ 'settings.imageSync.title' | translate }}</h2>
+      <p>{{ 'settings.imageSync.description' | translate }}</p>
+      <label class="d-block mb-2">
+        <input type="checkbox" [ngModel]="imageSync.download" (ngModelChange)="updateImageSync('download', $event)">
+        {{ 'settings.imageSync.download' | translate }}
+      </label>
+      <label class="d-block">
+        <input type="checkbox" [ngModel]="imageSync.upload" (ngModelChange)="updateImageSync('upload', $event)">
+        {{ 'settings.imageSync.upload' | translate }}
+      </label>
+    </nz-card>
+    <nz-card>
       <div class="py-2">
         <span class="title">{{ 'settings.quickConfig' | translate }}</span>
       </div>

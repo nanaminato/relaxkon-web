@@ -19,9 +19,4 @@ interface Dictionary<T> {
 }
 export interface ChatContext{
   pointer: number | undefined;
-  systems: SystemContext[] | undefined;
-}
-export interface SystemContext{
-  id: number;
-  in: boolean;
 }

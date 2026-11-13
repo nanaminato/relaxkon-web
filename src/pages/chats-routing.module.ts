@@ -16,11 +16,6 @@ const routes: Routes = [
         loadComponent:()=>import("./settings/settings")
           .then(m=>m.Settings),
       },
-      {
-        path: "prompts",
-        loadComponent: ()=>import("./prompt-store/prompt-store")
-          .then(m=>m.PromptStore),
-      }
     ]
   },
 ];

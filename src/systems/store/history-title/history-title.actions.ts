@@ -14,6 +14,5 @@ export const historyTitleActions = createActionGroup({
     'delete': props<{dataId: number}>(),  // 触发删除
     'delete success': props<{dataId: number}>(),  // 删除成功
     'delete failure': props<{error: any}>()  // 删除失败
-    // 以后你可以这里添加更多的 systemPrompt 相关 action
   }
 });

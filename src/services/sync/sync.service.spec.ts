@@ -13,6 +13,7 @@ import {historyTitleActions} from '../../systems/store/history-title/history-tit
 import {historyTitleReducers} from '../../systems/store/history-title/history-title.reducers';
 import {LanguagePack, LocalizationService} from '../normal-services/localization.service';
 import {LanguagePackSync} from './language-pack-sync.service';
+import {ImageSyncPreferences} from './image-sync-preferences';
 
 describe('Durable synchronization', () => {
   let name: string;
@@ -45,6 +46,39 @@ describe('Durable synchronization', () => {
     }
     throw new Error(`No ${method} sync request`);
   }
+
+  it('skips queued image uploads, preserves local history and catches up when downloads are enabled', async () => {
+    const preferences = TestBed.inject(ImageSyncPreferences);
+    const localTask = {task_id: 'device-image', account_id: 3, date: new Date(), images: ['data:image/png;base64,AQID']};
+    const remoteTask = {version: 2, kind: 'task', action: 'upsert', entityId: 'cloud-image',
+      payload: {...localTask, task_id: 'cloud-image'}};
+    await local.enqueueSync(3, {operationId: crypto.randomUUID(), kind: 'task', action: 'upsert',
+      entityId: localTask.task_id, payload: localTask});
+    try {
+      preferences.upload = false;
+      preferences.download = false;
+      const disabled = service.synchronize();
+      const read = await request('GET');
+      expect(read.request.url).toContain('imageTasks=false');
+      read.flush({cursor: 2, reset: true, hasMore: false, changes: [remoteTask]});
+      await disabled;
+      expect(await local.pendingSync(3)).toEqual([]);
+      expect((await database.getAllGenerateTask()).map(task => task.task_id)).toEqual(['device-image']);
+
+      preferences.download = true;
+      const enabled = service.synchronize();
+      const catchUp = await request('GET');
+      expect(catchUp.request.url).toContain('cursor=2');
+      expect(catchUp.request.url).toContain('imageTaskSnapshot=true');
+      catchUp.flush({cursor: 2, reset: false, hasMore: false, changes: [], imageTasks: [remoteTask]});
+      await enabled;
+      expect((await database.getAllGenerateTask()).map(task => task.task_id)).toEqual(['cloud-image', 'device-image']);
+      expect(await local.needsImageTaskSnapshot(3)).toBeFalse();
+    } finally {
+      localStorage.removeItem('imageSync.upload');
+      localStorage.removeItem('imageSync.download');
+    }
+  });
 
   it('makes the account snapshot available after signing in and clears it when the account changes', async () => {
     const pack: LanguagePack = {code: 'fr', name: 'Français', translations: {account: {username: 'Nom'}}};

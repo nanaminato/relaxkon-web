@@ -1,11 +1,27 @@
 import type {ImageGenerationRequest, ImageOutputFormat, ImageQuality} from '../../../contracts/media';
 
 export const imageModels = ['gpt-image-2.6-flare', 'gpt-image-2.6-sunburst', 'gpt-image-2.5-flare', 'gpt-image-2.5-sunburst'] as const;
+const standardSizes = ['auto', '1024x1024', '1536x1024', '1024x1536'];
+const highResolutionLabels: Readonly<Record<string, string>> = {
+  '2560x1440': '2K · 16:9 · 2560×1440',
+  '1440x2560': '2K · 9:16 · 1440×2560',
+  '3840x2160': '4K · 16:9 · 3840×2160',
+  '2160x3840': '4K · 9:16 · 2160×3840'
+};
+const aspectRatioLabels: Readonly<Record<string, string>> = {
+  '1024x1024': '1:1 · 1024×1024',
+  '1536x1024': '3:2 · 1536×1024',
+  '1024x1536': '2:3 · 1024×1536',
+  ...highResolutionLabels
+};
+const extendedSizes = [...standardSizes, ...Object.keys(highResolutionLabels)];
 export function imageCapabilities(model: string) {
+  const supportsHighResolution = model === 'gpt-image-2.5-flare' || model === 'gpt-image-2.5-sunburst';
   return {
     known: (imageModels as readonly string[]).includes(model),
     complexity: model.startsWith('gpt-image-2.6-'), promptLimit: 32000,
-    sizes: ['auto', '1024x1024', '1536x1024', '1024x1536'],
+    sizes: supportsHighResolution ? extendedSizes : standardSizes,
+    sizeLabels: supportsHighResolution ? aspectRatioLabels : undefined,
     qualities: ['auto', 'low', 'medium', 'high', 'xhigh', 'max'] as ImageQuality[],
     formats: ['png', 'jpeg', 'webp', 'gif', 'svg'] as ImageOutputFormat[], maxCount: 10
   };

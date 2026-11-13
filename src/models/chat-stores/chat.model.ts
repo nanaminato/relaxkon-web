@@ -2,7 +2,6 @@ import {ShowType} from "../enumerates";
 
 export const UserRole = "user";
 export const AssistantRole = "assistant";
-export const SystemRole = "system";
 export interface FileAdds {
   fileName: string;
   fileType?: string;

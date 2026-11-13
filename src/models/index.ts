@@ -1,4 +1,4 @@
-export {ChatModel, UserRole, AssistantRole, SystemRole} from "./chat-stores/chat.model";
+export {ChatModel, UserRole, AssistantRole} from "./chat-stores/chat.model";
 export type { ChatInterface, FileAdds } from "./chat-stores/chat.model";
 
 export {ChatHistoryModel} from "./chat-stores/chatHistory.model"
@@ -10,7 +10,6 @@ export type {Configuration,ChatStreamConfiguration,
   DynamicConfig,
 DisplayConfiguration} from "./chat-stores/configuration.interface"
 export type {ChatHistory,ChatHistoryTitle} from "./chat-stores/chat.interface";
-export type {SystemPromptItem} from "./chat-stores/systemPrompt.interface";
 
 export {ChatPacket} from "./packets/packets"
 export {DisplayModelGenerator, displayModels} from "./chat-stores/display.model";

@@ -33,7 +33,7 @@ describe('Chat interaction lifecycle', () => {
       {provide: AuthService, useValue: {user: {id: 3}}},
       {provide: MenuAbleService, useValue: {enableChat: () => undefined}},
       {provide: Bs64Handler, useValue: {}},
-      {provide: ChatContextHandler, useValue: {handler: () => [], handlerBefore: () => undefined}},
+      {provide: ChatContextHandler, useValue: {handler: () => []}},
       {provide: ContextMemoryService, useValue: {setValue: () => undefined}},
       {provide: SizeReportService, useValue: {}},
       {provide: ModelFetchService, useValue: {getFetchResponse: fetch}},

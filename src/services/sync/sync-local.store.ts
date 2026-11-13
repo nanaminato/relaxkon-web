@@ -14,6 +14,9 @@ export class SyncLocalStore {
     return (await (await this.database.connection()).getAll('syncOutbox')).filter(item => item.accountId === accountId);
   }
   async syncCursor(accountId: number) { return (await (await this.database.connection()).get('syncState', accountId)) ?? 0; }
+  async needsImageTaskSnapshot(accountId: number) {
+    return (await (await this.database.connection()).get('syncBootstrap', `imageTasks:${accountId}`)) === true;
+  }
   async acknowledgeSync(order: number) { await (await this.database.connection()).delete('syncOutbox', order); }
   async syncEntities(accountId: number) {
     return (await (await this.database.connection()).getAll('syncEntities')).filter(item => item.accountId === accountId);
@@ -48,7 +51,7 @@ export class SyncLocalStore {
       await tx.done.catch(() => undefined); throw error;
     }
   }
-  async prepareBootstrap(accountId: number, batch: SyncBatch): Promise<boolean> {
+  async prepareBootstrap(accountId: number, batch: SyncBatch, reconcileImageTasks = true): Promise<boolean> {
     if (!batch.reset) return false;
     const tx = (await this.database.connection()).transaction(SYNC_STORES, 'readwrite');
     try {
@@ -69,8 +72,10 @@ export class SyncLocalStore {
           if (message) await preserve({kind: 'message', action: 'upsert', entityId: String(id), historyId: history.dataId, payload: message});
         }
       }
-      for (const task of await tx.objectStore('generateTask').getAll())
-        if (task.account_id === accountId) await preserve({kind: 'task', action: 'upsert', entityId: task.task_id!, payload: task});
+      if (reconcileImageTasks) {
+        for (const task of await tx.objectStore('generateTask').getAll())
+          if (task.account_id === accountId) await preserve({kind: 'task', action: 'upsert', entityId: task.task_id!, payload: task});
+      }
       await tx.objectStore('syncBootstrap').put(true, accountId);
       await tx.done;
       return queued;
@@ -80,7 +85,7 @@ export class SyncLocalStore {
     }
   }
 
-  async applySyncBatch(accountId: number, batch: SyncBatch, expectedCursor?: number): Promise<false | {mergedLegacySessions: boolean}> {
+  async applySyncBatch(accountId: number, batch: SyncBatch, expectedCursor?: number, downloadImageTasks = true): Promise<false | {mergedLegacySessions: boolean}> {
     const tx = (await this.database.connection()).transaction(SYNC_STORES, 'readwrite');
     try {
       const currentCursor = (await tx.objectStore('syncState').get(accountId)) ?? 0;
@@ -99,11 +104,21 @@ export class SyncLocalStore {
           await tx.objectStore('sessionTitles').delete(historyKey(history.dataId, accountId));
         }
         for (const item of await tx.objectStore('syncEntities').getAll())
-          if (item.accountId === accountId) await tx.objectStore('syncEntities').delete(item.key);
-        for (const task of await tx.objectStore('generateTask').getAll())
-          if (task.account_id === accountId) await tx.objectStore('generateTask').delete(task.task_id!);
+          if (item.accountId === accountId && (downloadImageTasks || item.kind !== 'task'))
+            await tx.objectStore('syncEntities').delete(item.key);
       }
-      for (const change of batch.changes) await this.applySyncEvent(tx, accountId, change);
+      for (const change of batch.changes)
+        if (downloadImageTasks || change.kind !== 'task') await this.applySyncEvent(tx, accountId, change);
+      if (!downloadImageTasks) await tx.objectStore('syncBootstrap').put(true, `imageTasks:${accountId}`);
+      else if (batch.imageTasks) {
+        if (!batch.reset) {
+          const entities = tx.objectStore('syncEntities');
+          for (const item of await entities.getAll())
+            if (item.accountId === accountId && item.kind === 'task') await entities.delete(item.key);
+        }
+        for (const task of batch.imageTasks) await this.applySyncEvent(tx, accountId, task);
+        await tx.objectStore('syncBootstrap').delete(`imageTasks:${accountId}`);
+      }
       if (batch.languagePacks) {
         const entities = tx.objectStore('syncEntities');
         for (const item of await entities.getAll())

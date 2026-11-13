@@ -33,7 +33,6 @@ import {
   ChatPacket,
   Configuration,
   FileAdds,
-  SystemRole,
   UserRole
 } from "../../models";
 import {ChatDataService} from "../../services/db-services";
@@ -272,7 +271,9 @@ export class ChatMainComponent implements OnDestroy{
 
   set chatHistoryModel(value: ChatHistoryModel | undefined) {
     this._chatHistoryModel = value;
-    this.chatModels = this._chatHistoryModel?.chatList?.chatModel ?? [];
+    const messages = value?.chatList?.chatModel;
+    this.chatModels = messages?.filter(message => message.role !== "system") ?? [];
+    if (value?.chatList) value.chatList.chatModel = this.chatModels;
   }
   chatModels: ChatModel[] = [];
   answering: boolean = false;
@@ -285,7 +286,7 @@ export class ChatMainComponent implements OnDestroy{
     let index = this.chatModels.findIndex(m=>m.dataId===lastId);
     for(let id = index;id>=0;id--){
       let model = this.chatModels[id];
-      if(model.role===UserRole||model.role===SystemRole){
+      if(model.role===UserRole){
         return this.chatModels[id];
       }
     }
@@ -295,7 +296,7 @@ export class ChatMainComponent implements OnDestroy{
     let index = this.chatModels.findIndex(m=>m.dataId === id);
     for(let i = index+1;i<this.chatModels.length;i++){
       let model = this.chatModels[i];
-      if(model.role===UserRole || model.role===SystemRole) return undefined;
+      if(model.role===UserRole) return undefined;
       if(model.role===AssistantRole) return model;
     }
     return undefined;
@@ -308,10 +309,6 @@ export class ChatMainComponent implements OnDestroy{
     let reModel = this.chatModels.find(m=>m.dataId===$event);
     if(reModel===undefined){
       this.notification.error(this.localization.text('notifications.itemNotFound'), '');
-      return;
-    }
-    if(reModel.role===SystemRole){
-      this.notification.error(this.localization.text('notifications.operationNotAllowed'), this.localization.text('notifications.systemPromptCannotRegenerate'));
       return;
     }
     const endPointerModel = this.findLatestTrueRequest($event);
@@ -354,7 +351,7 @@ export class ChatMainComponent implements OnDestroy{
       back = this.chatContext.pointer;
     }
     let fetchParam: ChatPacket
-      = this.resolveContext(back,endPointerModel.dataId,endPointerModel);
+      = this.resolveContext(back, endPointerModel.dataId);
     // 添加返回的 聊天信息模型
     generateModel!.finish = false;
     generateModel!.markAsChanged = true;
@@ -383,31 +380,7 @@ export class ChatMainComponent implements OnDestroy{
   }
 
   isActive(chat: ChatModel) {
-    if(chat.role===SystemRole){
-      if(this.chatContext.pointer===undefined){
-        let id = chat.dataId;
-        let sys = this.chatContext.systems?.find(s=>s.id===id);
-        if(sys!==undefined){
-          return sys.in;
-        }else{
-          return false;
-        }
-      }else{
-        if(chat.dataId!>= this.chatContext.pointer){
-          return true;
-        }
-        let id = chat.dataId;
-        let sys = this.chatContext.systems?.find(s=>s.id===id);
-        if(sys!==undefined){
-          return sys.in;
-        }else{
-          return false;
-        }
-      }
-    }else{
-      return this.chatContext.pointer !== undefined && chat.dataId! >= this.chatContext.pointer;
-    }
-
+    return this.chatContext.pointer !== undefined && chat.dataId! >= this.chatContext.pointer;
   }
   sizeReportService = inject(SizeReportService)
   menuAbleService = inject(MenuAbleService);
@@ -425,7 +398,6 @@ export class ChatMainComponent implements OnDestroy{
   constructor() {
     this.chatContext = {
       pointer: undefined,
-      systems: [],
     }
     this.menuAbleService.enableChat();
     // 添加默认值
@@ -435,7 +407,6 @@ export class ChatMainComponent implements OnDestroy{
     this.store.select(selectChatHistory).pipe(takeUntilDestroyed()).subscribe((chatHistory: ChatHistoryModel) => {
       let defaultContext = {
         pointer: undefined,
-        systems: [],
       }
       if (this.answering && this.chatHistoryModel?.dataId === chatHistory.dataId) return;
       this.draftVersion++;
@@ -451,7 +422,7 @@ export class ChatMainComponent implements OnDestroy{
     })
 
   }
-  resolveContext( startPointer: number|undefined = undefined, endPointer: number | undefined = undefined, reModel: ChatModel | undefined = undefined) {
+  resolveContext( startPointer: number|undefined = undefined, endPointer: number | undefined = undefined) {
     if (this.chatModels === undefined) {
       console.log("未知错误")
     }
@@ -460,12 +431,6 @@ export class ChatMainComponent implements OnDestroy{
       this.config!,
       this.chatModels,
       endPointer
-    );
-    // 添加指针之前的系统消息
-    this.chatContextHandler.handlerBefore(
-      this.chatContext,
-      this.chatModels,
-      messages
     );
     // The persisted history ID survives reloads, retries, and regenerations.
     return new ChatPacket(messages, this.chatHistoryModel?.dataId?.toString());
@@ -512,10 +477,6 @@ export class ChatMainComponent implements OnDestroy{
       case TaskType.delete:
         const index = this.chatHistoryModel?.chatList?.chatModel!.findIndex(item => item.dataId === $event.id);
         if (index !== undefined && index >= 0) {
-          let model = this.chatHistoryModel?.chatList?.chatModel![index]!;
-          if(model.role===SystemRole){
-            this.chatContext.systems = this.chatContext.systems?.filter(si=>si.id!==model.dataId);
-          }
           this.chatHistoryModel?.chatList?.chatModel!.splice(index, 1); // 删除符合条件的元素
           this.chatDataService.deleteChatModel($event.id, this.chatHistoryModel!.dataId!, this.chatHistoryModel!.userId);
           this.sendManagerService.deleteMessage(this.chatHistoryModel?.dataId!,$event.id);

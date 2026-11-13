@@ -1,8 +1,0 @@
-.system-info{
-  border: black 1px solid;
-}
-.scrollable-list{
-  min-height: 200px;
-  max-height: 200px;
-  overflow-y: scroll;
-}

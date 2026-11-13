@@ -19,7 +19,7 @@ test('npm package and lockfile use the same RelaxKon identity without publishing
 
 test('production and development API addresses remain deployment-compatible', () => {
   assert.match(read('src/environments/environment.prod.ts'), /apiUrl:\s*['"]\/['"]/);
-  assert.match(read('src/environments/environment.ts'), /apiUrl:\s*['"]http:\/\/localhost:5111\/['"]/);
+  assert.match(read('src/environments/environment.ts'), /developmentApiUrl\s*=\s*['"]http:\/\/localhost:5111\/['"]/);
   assert.match(read('src/services/normal-services/feature-access.service.ts'), /api\/feature-access/);
 });
 

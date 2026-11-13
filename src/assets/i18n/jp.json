@@ -379,17 +379,6 @@
       }
     }
   },
-  "ball": {
-    "manageSystemContext": "システムコンテキストの管理",
-    "addSystemInfo": "システム情報を追加",
-    "addAll": "すべて追加",
-    "removeAll": "すべて削除",
-    "singleSystemContext": "個別システムコンテキスト",
-    "emptyContent": "コンテンツがありません",
-    "selectSystemPrompt": "システムプロンプトを選択",
-    "viewAll": "すべて表示",
-    "skipSelection": "選択をスキップ"
-  },
   "banner": {
     "fidelity": "忠実度",
     "drawingSize": "描画サイズ",
@@ -412,7 +401,6 @@
       "delete-description": "会話とメッセージがチャット履歴から削除されます。この操作は取り消せません。",
       "new-chat": "新規チャット",
       "settings": "設定",
-      "prompts": "プリセット",
       "delete": "削除"
     },
     "message": {
@@ -485,11 +473,7 @@
     "taskAlreadyRetrieved": "結果はすでに取得済みです。",
     "taskResultRetrieved": "タスク結果を取得して保存しました",
     "confirmDeleteTask": "この項目を削除しますか？タスク ID：{{taskId}}",
-    "promptsImported": "システムプロンプトをインポートしました",
-    "promptsReloaded": "システムプロンプトを再読み込みしました",
-    "promptsImportFailed": "システムプロンプトのインポートに失敗しました",
     "validationSuccess": "検証に成功しました",
-    "promptDeleteFailed": "システムプロンプトの削除に失敗しました",
     "themeApplied": "テーマを適用しました",
     "configImported": "設定をインポートしました",
     "configImportFailed": "設定のインポートに失敗しました",
@@ -497,39 +481,19 @@
     "allTasksStopped": "すべてのタスクを停止しました",
     "fileParseFailed": "ファイルの解析中に問題が発生しました",
     "itemNotFound": "リストに項目がありません",
-    "operationNotAllowed": "許可されていない操作です",
-    "systemPromptCannotRegenerate": "システムプロンプトは再生成できません。",
-    "contextMessageNotFound": "このメッセージより前にユーザーまたはシステムメッセージが見つかりません",
+    "contextMessageNotFound": "このメッセージの前にユーザーメッセージが見つかりません",
     "contextCleared": "コンテキストをクリアしました",
     "verificationCodeNetworkFailed": "認証コードの取得に失敗しました：ネットワークエラー",
     "verificationCodeFailed": "認証コードの取得に失敗しました",
     "loginThrottled": "リクエストが多すぎます。少なくとも {{seconds}} 秒待ってから再試行してください。"
   },
-  "prompts": {
-    "presetManagement": "プリセット管理",
-    "keywordSearch": "キーワードで検索",
-    "import": "インポート",
-    "export": "エクスポート",
-    "createNew": "新規作成",
-    "view": "表示",
-    "delete": "削除",
-    "deleteAll": "すべて削除",
-    "nothing": "ここには何もありません",
-    "createSystemPresetInfo": "システムプリセットの新規作成",
-    "systemPromptTitle": "システムプロンプトのタイトル",
-    "systemPromptContent": "システムプロンプトの内容",
-    "add": "追加",
-    "viewSystemPresetInfo": "システムプリセット情報の表示",
-    "modify": "変更",
-    "exportSystemPreset": "システムプリセットをエクスポート",
-    "exportToFile": "ファイルにエクスポート",
-    "copyToClipboard": "クリップボードにコピー",
-    "importSystemPreset": "システムプリセットをインポート",
-    "importFromFile": "ファイルからインポート",
-    "oneChatAtLeast": "1文字以上入力してください",
-    "twoCharAtLeast": "2文字以上入力してください"
-  },
   "settings": {
+    "imageSync": {
+      "title": "画像履歴の同期",
+      "description": "設定はこのブラウザーにすぐに適用されます。アップロードをオフにすると、保留中のアップロードが取り消され、ローカル履歴は保持されます。",
+      "download": "サーバーから画像履歴を取得する",
+      "upload": "生成した画像の履歴をサーバーにアップロードする"
+    },
     "self": "設定",
     "defaultProperties": "デフォルトプロパティ設定",
     "backToTop": "トップに戻る",

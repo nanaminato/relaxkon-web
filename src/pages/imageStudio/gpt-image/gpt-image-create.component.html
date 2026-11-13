@@ -28,7 +28,7 @@
             <button type="button" (click)="useExample('studio.image.workspace.exampleIllustration')">{{'studio.image.workspace.illustration' | translate}}</button>
           </div>
           <div class="option-grid">
-            <div><label for="image-size">{{'studio.image.size' | translate}}</label><select id="image-size" name="size" [(ngModel)]="size">@for (item of sizes; track item) { <option [value]="item">{{item === 'auto' ? ('studio.image.options.auto' | translate) : item}}</option> }</select></div>
+            <div><label for="image-size">{{'studio.image.size' | translate}}</label><select id="image-size" name="size" [(ngModel)]="size">@for (item of sizes; track item) { <option [value]="item">{{item === 'auto' ? ('studio.image.options.auto' | translate) : sizeLabel(item)}}</option> }</select></div>
             <div><label for="image-quality">{{'studio.image.quality' | translate}}</label><select id="image-quality" name="quality" [(ngModel)]="quality">@for (item of qualities; track item) { <option [value]="item">{{('studio.image.options.' + item) | translate}}</option> }</select></div>
             <div><label for="image-count">{{'studio.image.quantity' | translate}}</label><input id="image-count" name="count" type="number" min="1" [max]="image_num_max" step="1" [(ngModel)]="image_num" (change)="formatChange()"></div>
             <div><label for="image-format">{{'studio.image.imageFormat' | translate}}</label><select id="image-format" name="format" [(ngModel)]="output_format" (ngModelChange)="formatChange()">@for (item of output_formats; track item) { <option [value]="item">{{item.toUpperCase()}}</option> }</select></div>

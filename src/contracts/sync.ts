@@ -5,7 +5,7 @@ export interface SyncMutationRequest {
 }
 export interface SyncVersionResponse { version: number; }
 export interface SyncEventResponse extends Omit<SyncMutationRequest, 'operationId'> { version: number; }
-export interface SyncBatchResponse { cursor: number; reset: boolean; hasMore: boolean; changes: SyncEventResponse[]; languagePacks?: SyncEventResponse[]; uiLanguageSupported?: boolean; }
+export interface SyncBatchResponse { cursor: number; reset: boolean; hasMore: boolean; changes: SyncEventResponse[]; languagePacks?: SyncEventResponse[]; uiLanguageSupported?: boolean; imageTasks?: SyncEventResponse[]; }
 export interface HistoryWriteRequest { dataId: number; title?: string | null; }
 export interface SyncFileContract {
   fileName?: string | null; fileType?: string | null; fileSize: number; fileContent?: string | null; parsedContent?: string | null;

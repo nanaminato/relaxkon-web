@@ -8,6 +8,7 @@ describe('Chat context defaults', () => {
     } as unknown as Configuration;
     const chats = [1, 2, 3, 4].map(id => new ChatModel('user', String(id), undefined, id));
     chats[2].fileList = [{fileName: 'image.png', fileType: 'image/png', fileContent: 'data:image/png;base64,aA=='}];
+    chats.splice(2, 0, new ChatModel('system', 'Old instruction', undefined, 2.5));
     const messages = new ChatContextHandler().handler(2, configuration, chats, 3) as VisionMessage[];
     expect(messages.length).toBe(2);
     expect(messages.map(message => message.content.find(part => part.type === 'text')?.text)).toEqual(['2', '3']);

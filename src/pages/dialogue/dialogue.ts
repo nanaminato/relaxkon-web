@@ -10,7 +10,7 @@ import {Chat} from "./chat/chat";
 import {NzButtonModule} from "ng-zorro-antd/button";
 import {NzSkeletonModule} from "ng-zorro-antd/skeleton";
 import {TranslateModule} from "@ngx-translate/core";
-import {ChatModel, Configuration, SystemRole, UserRole} from "../../models";
+import {ChatModel, Configuration, UserRole} from "../../models";
 import {LocalizationService, SizeReportService} from "../../services/normal-services";
 import {TaskType, UserTask} from "../../models/operations";
 import {Store} from "@ngrx/store";
@@ -73,8 +73,6 @@ export class Dialogue {
     if(role===undefined) return "assets/svgs/chat-gpt_11zon.jpg";
     if(role===UserRole){
       return 'assets/svgs/programmer.png';
-    }else if(role===SystemRole){
-      return 'assets/svgs/system.svg';
     }
     return "assets/svgs/chat-gpt_11zon.jpg";
   }

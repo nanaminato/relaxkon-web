@@ -57,8 +57,4 @@ export class ChatPage {
     this.closeMenuIfCompact();
     this.router.navigate(user_routes.settings);
   }
-  openPromptPage() {
-    this.closeMenuIfCompact();
-    this.router.navigate(user_routes.prompts);
-  }
 }

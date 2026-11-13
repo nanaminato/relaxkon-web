@@ -6,8 +6,7 @@ import {
   ChatHistoryTitle,
   ChatInterface,
   Configuration,
-  DisplayModel,
-  SystemPromptItem
+  DisplayModel
 } from "../../models";
 import {CONFIGURATION} from "../../models/chat-stores/configuration.interface";
 import {GenerateTask} from "../../models/media";
@@ -57,7 +56,6 @@ export class DbService{
         ensureStore("chatHistoryTitles", { keyPath: 'dataId' });
         ensureStore("configuration");
         ensureStore("chatInterface", { keyPath: 'dataId' });
-        ensureStore("systemPrompt", { keyPath: "id" });
         ensureStore("selectableModel", { keyPath: "modelValue" });
 
         // --- 针对 generateTask 的专门重构逻辑 ---
@@ -120,15 +118,6 @@ export class DbService{
     return (await this.ready).put('configuration', configuration,CONFIGURATION);
   }
 
-  async getSystemPrompts(){
-    return (await this.ready).getAll("systemPrompt");
-  }
-  async addOrUpdateSystemPrompt(systemPromptItem: SystemPromptItem){
-    return (await this.ready).put("systemPrompt",systemPromptItem);
-  }
-  async deleteSystemPrompt(id: number){
-    return (await this.ready).delete("systemPrompt",id);
-  }
   async getAllSelectableModels(){
     return (await this.ready).getAll("selectableModel");
   }
@@ -193,19 +182,6 @@ export class DbService{
     await tx.done;
   }
 
-  async getMaxPromptId(){
-    let prompts = await this.getSystemPrompts();
-    if(prompts===undefined){
-      return 1;
-    }
-    let id = 1;
-    for(let prompt of prompts!) {
-      if (prompt.id! > id) {
-        id = prompt.id!;
-      }
-    }
-    return id;
-  }
   /**
    * 彻底重置数据库：删除所有数据并应用最新架构
    */
@@ -235,7 +211,7 @@ export interface ChatDb extends DBSchema{
   sessionHistories: {key: string, value: ChatHistory & {localKey: string}};
   sessionMessages: {key: string, value: ChatInterface & {localKey: string, historyId: number, userId?: number}};
   sessionTitles: {key: string, value: ChatHistoryTitle & {localKey: string}};
-  syncBootstrap: {key: number | 'languagePacks', value: boolean};
+  syncBootstrap: {key: number | 'languagePacks' | `imageTasks:${number}`, value: boolean};
   syncOutbox: {key: number, value: PendingSync};
   syncState: {key: number, value: number};
   syncEntities: {key: string, value: SyncEntity};
@@ -254,10 +230,6 @@ export interface ChatDb extends DBSchema{
   chatInterface:{
     key: number,
     value: ChatInterface
-  },
-  systemPrompt:{
-    key: number;
-    value: SystemPromptItem;
   },
   selectableModel: {
     key: string,

@@ -56,6 +56,7 @@ export class GptImageCreate {
   readonly complexities = ['low', 'medium', 'high'];
   get caps() { return imageCapabilities(this.model); }
   get sizes() { return this.output_format === 'gif' ? ['auto'] : this.caps.sizes; }
+  sizeLabel(size: string) { return this.caps.sizeLabels?.[size] ?? size; }
   get qualities() { return this.caps.qualities; }
   get output_formats() { return this.caps.formats; }
   get image_num_max() { return this.output_format === 'svg' ? 1 : this.caps.maxCount; }

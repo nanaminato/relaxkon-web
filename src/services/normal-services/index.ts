@@ -1,5 +1,5 @@
 export {ContextMemoryService} from "./contextMemory.service";
-export type { ChatContext, SystemContext } from "./contextMemory.service";
+export type { ChatContext } from "./contextMemory.service";
 export {SizeReportService} from "./sizeReport.service";
 export {ModelFetchService} from "./modelFetch.service";
 export {ThemeSwitcherService} from "./themeSwitcher.service";

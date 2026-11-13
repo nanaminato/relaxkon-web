@@ -6,6 +6,7 @@ import {AuthService} from '../../auth_module/auth.service';
 import {ServiceProvider} from '../../roots';
 import {SyncLocalStore} from './sync-local.store';
 import {SyncBatch, SyncMutation} from './sync.models';
+import {ImageSyncPreferences} from './image-sync-preferences';
 
 @Injectable({providedIn: 'root'})
 export class SyncService {
@@ -13,6 +14,7 @@ export class SyncService {
   private readonly auth = inject(AuthService);
   private readonly provider = inject(ServiceProvider);
   private readonly database = inject(SyncLocalStore);
+  private readonly imageSync = inject(ImageSyncPreferences);
   private running?: {accountId: number; promise: Promise<void>};
   private readonly languagePackSnapshots = new Set<number>();
   private readonly uiLanguageSupport = new Set<number>();
@@ -35,7 +37,8 @@ export class SyncService {
     if (!accountId || (expectedAccount !== undefined && accountId !== expectedAccount))
       throw new Error('A matching signed-in account is required for sync');
     const queued = await this.database.enqueueSyncBatch(accountId,
-      operations.map(operation => ({...structuredClone(operation), operationId: crypto.randomUUID()})), migrateLanguagePacks);
+      operations.filter(operation => operation.kind !== 'task' || this.imageSync.upload)
+        .map(operation => ({...structuredClone(operation), operationId: crypto.randomUUID()})), migrateLanguagePacks);
     if (!queued) return;
     this.status$.next({accountId, pending: true});
     void this.synchronize().catch(() => undefined);
@@ -67,6 +70,10 @@ export class SyncService {
       const pending = await this.database.pendingSync(accountId);
       for (const item of pending) {
         assertAccount();
+        if (item.mutation.kind === 'task' && !this.imageSync.upload) {
+          await this.database.acknowledgeSync(item.order!);
+          continue;
+        }
         const acknowledgement = await firstValueFrom(this.http.post<SyncVersionResponse>(url, item.mutation, options));
         if (!acknowledgement || !Number.isSafeInteger(acknowledgement.version) || acknowledgement.version < 1)
           throw new Error('Invalid sync acknowledgement');
@@ -76,17 +83,21 @@ export class SyncService {
       assertAccount();
       const cursor = await this.database.syncCursor(accountId);
       const snapshot = !this.supportsLanguagePacks(accountId);
+      const downloadImages = this.imageSync.download;
+      const imageSnapshot = downloadImages && await this.database.needsImageTaskSnapshot(accountId);
       const response = await firstValueFrom(this.http.get<SyncBatchResponse>(
-        `${url}?cursor=${cursor}&languagePacks=true&languagePackSnapshot=${snapshot}&uiLanguage=true`, options));
+        `${url}?cursor=${cursor}&languagePacks=true&languagePackSnapshot=${snapshot}&uiLanguage=true&imageTasks=${downloadImages}&imageTaskSnapshot=${imageSnapshot}`, options));
       assertAccount();
+      if (downloadImages !== this.imageSync.download) continue;
       const batch: SyncBatch = {...response, changes: response.changes.map(change => ({...change, historyId: change.historyId ?? undefined})),
+        imageTasks: response.imageTasks?.map(change => ({...change, historyId: undefined})),
         languagePacks: response.languagePacks?.map(change => ({...change, historyId: undefined}))};
-      if (await this.database.prepareBootstrap(accountId, batch)) continue;
-      const applied = await this.database.applySyncBatch(accountId, batch, cursor);
+      if (await this.database.prepareBootstrap(accountId, batch, downloadImages && this.imageSync.upload)) continue;
+      const applied = await this.database.applySyncBatch(accountId, batch, cursor, downloadImages);
       if (!applied) continue;
       if (response.uiLanguageSupported) this.uiLanguageSupport.add(accountId);
       if (batch.languagePacks) this.languagePackSnapshots.add(accountId);
-      changed ||= batch.reset || batch.changes.length > 0 || !!batch.languagePacks || applied.mergedLegacySessions;
+      changed ||= batch.reset || batch.changes.length > 0 || !!batch.languagePacks || !!batch.imageTasks || applied.mergedLegacySessions;
       if (batch.hasMore) continue;
       if ((await this.database.pendingSync(accountId)).length) continue;
       this.status$.next({accountId, pending: false});

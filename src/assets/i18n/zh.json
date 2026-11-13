@@ -379,17 +379,6 @@
       }
     }
   },
-  "ball": {
-    "manageSystemContext": "管理系统上下文",
-    "addSystemInfo": "添加系统信息",
-    "addAll": "添加所有",
-    "removeAll": "去除所有",
-    "singleSystemContext": "单个系统上下文",
-    "emptyContent": "这里什么都没有哦",
-    "selectSystemPrompt": "选择系统提示词",
-    "viewAll": "查看全部",
-    "skipSelection": "跳过选择"
-  },
   "banner": {
     "fidelity": "保真度",
     "drawingSize": "绘图大小",
@@ -412,7 +401,6 @@
       "delete-description": "对话及其消息将从聊天记录中移除，删除后无法恢复。",
       "new-chat": "新的聊天",
       "settings": "设置",
-      "prompts": "预设",
       "delete": "删除"
     },
     "message": {
@@ -485,11 +473,7 @@
     "taskAlreadyRetrieved": "已经取得结果，无需再次获取。",
     "taskResultRetrieved": "获取结果成功，已保存到数据库",
     "confirmDeleteTask": "确定要删除该项目吗？任务 ID：{{taskId}}",
-    "promptsImported": "系统预设导入成功",
-    "promptsReloaded": "系统预设信息重载成功",
-    "promptsImportFailed": "系统预设导入失败",
     "validationSuccess": "验证成功",
-    "promptDeleteFailed": "删除系统预设信息失败",
     "themeApplied": "主题已应用",
     "configImported": "配置导入成功",
     "configImportFailed": "配置导入失败",
@@ -497,39 +481,19 @@
     "allTasksStopped": "所有任务已停止",
     "fileParseFailed": "解析文件时出现问题",
     "itemNotFound": "列表中不存在该项目",
-    "operationNotAllowed": "不允许的操作",
-    "systemPromptCannotRegenerate": "不能重新生成系统级提示词。",
-    "contextMessageNotFound": "在该消息之前找不到用户信息或系统信息",
+    "contextMessageNotFound": "在此消息之前未找到用户消息",
     "contextCleared": "上下文已清除",
     "verificationCodeNetworkFailed": "获取验证码失败：网络错误",
     "verificationCodeFailed": "获取验证码失败",
     "loginThrottled": "请求过于频繁，请至少等待 {{seconds}} 秒后再试。"
   },
-  "prompts": {
-    "presetManagement": "预设管理",
-    "keywordSearch": "通过关键字进行查找",
-    "import": "导入",
-    "export": "导出",
-    "createNew": "新建",
-    "view": "查看",
-    "delete": "删除",
-    "deleteAll": "全部删除",
-    "nothing": "这里什么都没有哦",
-    "createSystemPresetInfo": "新建系统预设信息",
-    "systemPromptTitle": "系统提示词标题",
-    "systemPromptContent": "系统提示词内容",
-    "add": "添加",
-    "viewSystemPresetInfo": "查看系统预设信息",
-    "modify": "更改",
-    "exportSystemPreset": "导出系统预设",
-    "exportToFile": "导出到文件",
-    "copyToClipboard": "复制到剪切板",
-    "importSystemPreset": "导入系统预设",
-    "importFromFile": "从文件中导入",
-    "oneChatAtLeast": "最少一个字符",
-    "twoCharAtLeast": "最少两个字符"
-  },
   "settings": {
+    "imageSync": {
+      "title": "图像记录同步",
+      "description": "设置立即生效，仅适用于当前浏览器。关闭上传会取消待上传的图像记录，本地记录仍可查看。",
+      "download": "从服务器拉取图像记录",
+      "upload": "上传生成的图像记录到服务器"
+    },
     "self": "设置",
     "defaultProperties": "设置默认属性",
     "backToTop": "回到顶部",

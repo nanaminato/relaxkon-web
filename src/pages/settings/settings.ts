@@ -34,6 +34,8 @@ import {HttpBackend, HttpClient} from '@angular/common/http';
 import {firstValueFrom} from 'rxjs';
 import {MAX_LANGUAGE_PACK_BYTES} from '../../services/normal-services/localization.service';
 import {LanguagePackSync} from '../../services/sync/language-pack-sync.service';
+import {ImageSyncPreferences} from '../../services/sync/image-sync-preferences';
+import {SyncService} from '../../services/sync/sync.service';
 import {environment} from '../../environments/environment';
 @Component({
   selector: 'app-settings',
@@ -57,6 +59,12 @@ export class Settings {
   sizeReportService = inject(SizeReportService);
   private readonly assets = new HttpClient(inject(HttpBackend));
   private readonly languagePacks = inject(LanguagePackSync);
+  protected readonly imageSync = inject(ImageSyncPreferences);
+  private readonly sync = inject(SyncService);
+  protected updateImageSync(direction: 'upload' | 'download', enabled: boolean) {
+    this.imageSync[direction] = enabled;
+    void this.sync.synchronize().catch(() => undefined);
+  }
   constructor(
               private themeSwitcherService: ThemeSwitcherService,
               private configurationService: ConfigurationService,

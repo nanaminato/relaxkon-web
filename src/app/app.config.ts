@@ -20,11 +20,9 @@ import {CLIPBOARD_OPTIONS, ClipboardButtonComponent,  provideMarkdown} from "ngx
 import {AuthEffects} from "../systems/store/auth/auth.effects";
 import {HistoryTitleEffect} from "../systems/store/history-title/history-title.effects";
 import {ConfigurationEffects} from "../systems/store/configuration/configuration.effects";
-import {SystemPromptsEffects} from "../systems/store/system-prompts/prompts.effects";
 import {SystemEffects} from "../systems/store/system.effects";
 import {configurationReducer} from "../systems/store/configuration/configuration.reducer";
 import {historyTitleReducers} from "../systems/store/history-title/history-title.reducers";
-import {systemPromptsReducer} from "../systems/store/system-prompts/prompts.reducer";
 import {ChatHistoryEffects} from "../systems/store/chat-history/chat-history.effects";
 import {chatHistoryReducer} from "../systems/store/chat-history/chat-history.reducers";
 
@@ -52,7 +50,6 @@ export const appConfig: ApplicationConfig = {
     provideStore({
         "config": configurationReducer,
         "historyTitle": historyTitleReducers,
-        "prompts": systemPromptsReducer,
         "chatHistory": chatHistoryReducer,
       },
       {
@@ -62,7 +59,7 @@ export const appConfig: ApplicationConfig = {
         }
       }),
     provideEffects(SyncEffects, AuthEffects, ConfigurationEffects, HistoryTitleEffect,
-      SystemPromptsEffects, SystemEffects, ChatHistoryEffects),
+      SystemEffects, ChatHistoryEffects),
     provideStoreDevtools({
       maxAge: 25, // Retains last 25 states
       logOnly: !isDevMode(), // Restrict extension to log-only mode
