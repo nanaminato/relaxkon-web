@@ -1,5 +1,15 @@
 <section class="operations" [attr.aria-busy]="loading">
-  <h2>{{'admin.operations.title' | translate}}</h2>
+  <header class="dashboard-heading">
+    <h2>{{'admin.operations.title' | translate}}</h2>
+    <nav class="dashboard-nav" [attr.aria-label]="'admin.operations.title' | translate">
+      @for (page of pages; track page.path) {
+        <a [routerLink]="['../', page.path]" routerLinkActive="active" ariaCurrentWhenActive="page">
+          <span nz-icon [nzType]="page.icon" aria-hidden="true"></span>
+          {{('admin.operations.' + page.title) | translate}}
+        </a>
+      }
+    </nav>
+  </header>
   <div class="filters">
     <label>{{'admin.operations.period' | translate}}
       <select class="form-select" [ngModel]="days" (ngModelChange)="changePeriod($event)">
@@ -25,7 +35,7 @@
         @for (item of report?.filters?.endpoints ?? []; track item) { <option [value]="item">{{item}}</option> }
       </select>
     </label>
-    <button class="btn btn-outline-primary" [disabled]="loading" (click)="reload()">{{'universal.reload' | translate}}</button>
+    <button class="btn btn-outline-primary" [disabled]="loading" (click)="reload()"><span nz-icon nzType="reload" aria-hidden="true"></span> {{'universal.reload' | translate}}</button>
   </div>
   @if (loading) { <p role="status">{{'admin.featureAccess.loading' | translate}}</p> }
   @if (failed) { <p class="text-danger" role="alert">{{'admin.operations.loadError' | translate}}</p> }
@@ -33,15 +43,54 @@
     <p class="operations-note">{{'admin.operations.definition' | translate}}</p>
     <div class="summary">
       @for (key of metrics; track key) {
-        <div class="metric"><span>{{('admin.operations.' + key) | translate}}</span>
+        <div class="metric" [attr.data-metric]="key"><span class="metric-label"><span nz-icon [nzType]="metricIcons[key]" aria-hidden="true"></span>{{('admin.operations.' + key) | translate}}</span>
           <strong>{{report.summary[key] | number}}{{key === 'p95Milliseconds' ? ' ms' : ''}}</strong>
         </div>
       }
     </div>
-    @if (report.summary.requests === 0) { <p role="status">{{'admin.operations.empty' | translate}}</p> }
+    @if (view === "models") {
+    <section class="model-usage" aria-labelledby="model-usage-title">
+      <h3 id="model-usage-title"><span nz-icon nzType="apartment" aria-hidden="true"></span> {{'admin.operations.modelUsage' | translate}}</h3>
+      @if (report.models.length) {
+        <div class="table-scroll"><table class="table">
+          <thead><tr>
+            <th scope="col">{{'admin.operations.model' | translate}}</th>
+            <th scope="col">{{'admin.operations.inputTokens' | translate}}</th>
+            <th scope="col">{{'admin.operations.outputTokens' | translate}}</th>
+            <th scope="col">{{'admin.operations.images' | translate}}</th>
+          </tr></thead>
+          <tbody>@for (row of report.models; track row.key) {
+            <tr><th scope="row">{{row.key}}</th>
+              <td>{{row.metrics.tokenReports ? (row.metrics.inputTokens | number) : '—'}}</td>
+              <td>{{row.metrics.tokenReports ? (row.metrics.outputTokens | number) : '—'}}</td>
+              <td>{{row.metrics.images | number}}</td></tr>
+          }</tbody>
+        </table></div>
+      } @else {
+        <p class="operations-note" role="status">{{'admin.operations.modelUsageEmpty' | translate}}</p>
+      }
+    </section>
+    }
     <div class="tables">
-      <section>
-        <h3>{{'admin.operations.trend' | translate}}</h3>
+      @if (view === "trend") {
+      <section class="trend-panel" aria-labelledby="operations-trend">
+        <div class="chart-heading">
+          <h3 id="operations-trend"><span nz-icon nzType="line-chart" aria-hidden="true"></span> {{'admin.operations.trend' | translate}}</h3>
+          <select class="form-select" [(ngModel)]="trendMetric" [attr.aria-label]="'admin.operations.trend' | translate">
+            @for (key of metrics; track key) { <option [value]="key">{{('admin.operations.' + key) | translate}}</option> }
+          </select>
+        </div>
+        @let peak = trendPeak;
+        <div class="chart" aria-hidden="true">
+          @for (row of report.trend; track row.day) {
+            <div class="chart-column" [title]="row.day + ' · ' + (row.metrics[trendMetric] | number) + (trendMetric === 'p95Milliseconds' ? ' ms' : '')">
+              <div class="chart-bar" [style.height.%]="row.metrics[trendMetric] / peak * 100"></div>
+            </div>
+          }
+        </div>
+        <div class="chart-axis" aria-hidden="true"><span>{{report.trend[0]?.day}}</span><span>{{report.trend[report.trend.length - 1]?.day}}</span></div>
+        <details class="trend-details">
+          <summary>{{'admin.operations.dailyData' | translate}}</summary>
         <div class="table-scroll"><table class="table">
           <thead><tr><th scope="col">{{'admin.operations.date' | translate}}</th>
             @for (key of metrics; track key) { <th scope="col">{{('admin.operations.' + key) | translate}}</th> }
@@ -52,24 +101,52 @@
             }</tr>
           }</tbody>
         </table></div>
+        </details>
       </section>
+      }
+      @if (view === "users") {
+      <section class="cohorts-panel" aria-labelledby="operations-users">
+        <h3 id="operations-users"><span nz-icon nzType="team" aria-hidden="true"></span> {{'admin.operations.users' | translate}}</h3>
+        <p class="operations-note">{{'admin.operations.cohortNote' | translate}}</p>
+        <div class="table-scroll"><table class="table">
+          <thead><tr>
+            <th scope="col">{{'admin.operations.date' | translate}}</th>
+            <th scope="col">{{'admin.operations.registrations' | translate}}</th>
+            <th scope="col">{{'admin.operations.activation' | translate}}</th>
+            <th scope="col">{{'admin.operations.retention1' | translate}}</th>
+            <th scope="col">{{'admin.operations.retention7' | translate}}</th>
+          </tr></thead>
+          <tbody>@for (row of report.cohorts; track row.day) {
+            <tr><th scope="row">{{row.day}}</th><td>{{row.registrations | number}}</td>
+              <td>{{rate(row.activated, row.registrations)}}</td>
+              <td>{{rate(row.day1, row.registrations)}}</td><td>{{rate(row.day7, row.registrations)}}</td></tr>
+          }</tbody>
+        </table></div>
+      </section>
+      }
       @for (section of sections; track section) {
-        @if (report[section].length) {
-          <section>
+        @if (report[section].length && ((view === "models" && section === "models") || (view === "trend" && section === "features") || (view === "diagnostics" && section === "endpoints"))) {
+          <section class="breakdown-panel">
             <h3>{{('admin.operations.' + section) | translate}}</h3>
             <div class="table-scroll"><table class="table">
               <thead><tr><th scope="col">{{'admin.operations.dimension' | translate}}</th>
                 @for (key of metrics; track key) { <th scope="col">{{('admin.operations.' + key) | translate}}</th> }
+                @if (section === 'models') {
+                  <th scope="col">{{'admin.operations.successRate' | translate}}</th>
+                }
               </tr></thead>
               <tbody>@for (row of report[section]; track row.key) {
                 <tr><th scope="row">{{row.key}}</th>@for (key of metrics; track key) {
                   <td>{{row.metrics[key] | number}}{{key === 'p95Milliseconds' ? ' ms' : ''}}</td>
+                } @if (section === 'models') {
+                  <td>{{rate(row.metrics.successes, row.metrics.requests)}}</td>
                 }</tr>
               }</tbody>
             </table></div>
           </section>
         }
       }
+      @if (view === "diagnostics") {
       @if (report.errors.length) {
         <section>
           <h3>{{'admin.operations.errorStatuses' | translate}}</h3>
@@ -80,6 +157,38 @@
             }</tbody>
           </table></div>
         </section>
+      }
+      <section class="diagnostics-panel" aria-labelledby="operations-diagnostics">
+        <h3 id="operations-diagnostics"><span nz-icon nzType="tool" aria-hidden="true"></span> {{'admin.operations.diagnostics' | translate}}</h3>
+        @if (!report.edgeLogConfigured) { <p class="operations-note">{{'admin.operations.edgeUnavailable' | translate}}</p> }
+        @if (report.errorDetails.length) {
+          <div class="table-scroll"><table class="table">
+            <thead><tr><th scope="col">{{'admin.operations.endpoint' | translate}}</th>
+              <th scope="col">{{'admin.operations.status' | translate}}</th>
+              <th scope="col">{{'admin.operations.errorType' | translate}}</th>
+              <th scope="col">{{'admin.operations.errors' | translate}}</th></tr></thead>
+            <tbody>@for (row of report.errorDetails; track row.endpoint + row.status + row.kind) {
+              <tr><th scope="row">{{row.endpoint}}</th><td>{{row.status}}</td>
+                <td>{{('admin.operations.errorKinds.' + row.kind) | translate}}</td><td>{{row.count | number}}</td></tr>
+            }</tbody>
+          </table></div>
+        }
+        @if (report.syncSizes.length) {
+          <h3 class="mt-3">{{'admin.operations.syncSizes' | translate}}</h3>
+          <div class="table-scroll"><table class="table">
+            <thead><tr><th scope="col">{{'admin.operations.endpoint' | translate}}</th>
+              <th scope="col">{{'admin.operations.size' | translate}}</th>
+              <th scope="col">{{'admin.operations.requests' | translate}}</th>
+              <th scope="col">{{'admin.operations.errors' | translate}}</th>
+              <th scope="col">{{'admin.operations.p95Milliseconds' | translate}}</th></tr></thead>
+            <tbody>@for (row of report.syncSizes; track row.endpoint + row.bucket) {
+              <tr><th scope="row">{{row.endpoint}}</th><td>{{('admin.operations.sizeBuckets.' + row.bucket) | translate}}</td>
+                <td>{{row.metrics.requests | number}}</td><td>{{row.metrics.errors | number}}</td>
+                <td>{{row.metrics.p95Milliseconds | number}} ms</td></tr>
+            }</tbody>
+          </table></div>
+        }
+      </section>
       }
     </div>
   }
