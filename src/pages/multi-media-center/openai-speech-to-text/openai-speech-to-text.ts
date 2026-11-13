@@ -4,7 +4,7 @@ import {Component, inject} from '@angular/core';
 import {MenuAbleService} from "../../../services/normal-services/menu-able.service";
 import {NzIconDirective} from "ng-zorro-antd/icon";
 import {TtsFile} from "../../../models/media";
-import {NzColDirective, NzRowDirective} from "ng-zorro-antd/grid";
+import {NzRowDirective} from "ng-zorro-antd/grid";
 import {NzCardComponent} from "ng-zorro-antd/card";
 import {NzOptionComponent, NzOptionGroupComponent, NzSelectComponent} from "ng-zorro-antd/select";
 import {FormsModule} from "@angular/forms";
@@ -31,7 +31,6 @@ import {LocalizationService} from '../../../services/normal-services';
     NzIconDirective,
     NzRowDirective,
     NzCardComponent,
-    NzColDirective,
     NzOptionComponent,
     NzOptionGroupComponent,
     NzSelectComponent,
@@ -42,7 +41,6 @@ import {LocalizationService} from '../../../services/normal-services';
     NzInputDirective,
     NzModalModule,
     JsonCodeViewer,
-    NzModalModule,
     NzWaveDirective,
     CdkTextareaAutosize
     ,TranslateModule
