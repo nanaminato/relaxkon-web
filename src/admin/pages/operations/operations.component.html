@@ -1,0 +1,86 @@
+<section class="operations" [attr.aria-busy]="loading">
+  <h2>{{'admin.operations.title' | translate}}</h2>
+  <div class="filters">
+    <label>{{'admin.operations.period' | translate}}
+      <select class="form-select" [ngModel]="days" (ngModelChange)="changePeriod($event)">
+        <option [ngValue]="7">{{'admin.operations.days7' | translate}}</option>
+        <option [ngValue]="30">{{'admin.operations.days30' | translate}}</option>
+      </select>
+    </label>
+    <label>{{'admin.operations.feature' | translate}}
+      <select class="form-select" [ngModel]="feature" (ngModelChange)="feature = $event; reload()">
+        <option value="">{{'admin.operations.all' | translate}}</option>
+        @for (item of report?.filters?.features ?? []; track item) { <option [value]="item">{{item}}</option> }
+      </select>
+    </label>
+    <label>{{'admin.operations.model' | translate}}
+      <select class="form-select" [ngModel]="model" (ngModelChange)="model = $event; reload()">
+        <option value="">{{'admin.operations.all' | translate}}</option>
+        @for (item of report?.filters?.models ?? []; track item) { <option [value]="item">{{item}}</option> }
+      </select>
+    </label>
+    <label>{{'admin.operations.endpoint' | translate}}
+      <select class="form-select" [ngModel]="endpoint" (ngModelChange)="endpoint = $event; reload()">
+        <option value="">{{'admin.operations.all' | translate}}</option>
+        @for (item of report?.filters?.endpoints ?? []; track item) { <option [value]="item">{{item}}</option> }
+      </select>
+    </label>
+    <button class="btn btn-outline-primary" [disabled]="loading" (click)="reload()">{{'universal.reload' | translate}}</button>
+  </div>
+  @if (loading) { <p role="status">{{'admin.featureAccess.loading' | translate}}</p> }
+  @if (failed) { <p class="text-danger" role="alert">{{'admin.operations.loadError' | translate}}</p> }
+  @if (report && !failed && !loading) {
+    <p class="operations-note">{{'admin.operations.definition' | translate}}</p>
+    <div class="summary">
+      @for (key of metrics; track key) {
+        <div class="metric"><span>{{('admin.operations.' + key) | translate}}</span>
+          <strong>{{report.summary[key] | number}}{{key === 'p95Milliseconds' ? ' ms' : ''}}</strong>
+        </div>
+      }
+    </div>
+    @if (report.summary.requests === 0) { <p role="status">{{'admin.operations.empty' | translate}}</p> }
+    <div class="tables">
+      <section>
+        <h3>{{'admin.operations.trend' | translate}}</h3>
+        <div class="table-scroll"><table class="table">
+          <thead><tr><th scope="col">{{'admin.operations.date' | translate}}</th>
+            @for (key of metrics; track key) { <th scope="col">{{('admin.operations.' + key) | translate}}</th> }
+          </tr></thead>
+          <tbody>@for (row of report.trend; track row.day) {
+            <tr><th scope="row">{{row.day}}</th>@for (key of metrics; track key) {
+              <td>{{row.metrics[key] | number}}{{key === 'p95Milliseconds' ? ' ms' : ''}}</td>
+            }</tr>
+          }</tbody>
+        </table></div>
+      </section>
+      @for (section of sections; track section) {
+        @if (report[section].length) {
+          <section>
+            <h3>{{('admin.operations.' + section) | translate}}</h3>
+            <div class="table-scroll"><table class="table">
+              <thead><tr><th scope="col">{{'admin.operations.dimension' | translate}}</th>
+                @for (key of metrics; track key) { <th scope="col">{{('admin.operations.' + key) | translate}}</th> }
+              </tr></thead>
+              <tbody>@for (row of report[section]; track row.key) {
+                <tr><th scope="row">{{row.key}}</th>@for (key of metrics; track key) {
+                  <td>{{row.metrics[key] | number}}{{key === 'p95Milliseconds' ? ' ms' : ''}}</td>
+                }</tr>
+              }</tbody>
+            </table></div>
+          </section>
+        }
+      }
+      @if (report.errors.length) {
+        <section>
+          <h3>{{'admin.operations.errorStatuses' | translate}}</h3>
+          <div class="table-scroll"><table class="table">
+            <thead><tr><th scope="col">{{'admin.operations.status' | translate}}</th><th scope="col">{{'admin.operations.errors' | translate}}</th></tr></thead>
+            <tbody>@for (row of report.errors; track row.status) {
+              <tr><th scope="row">{{row.status}}</th><td>{{row.count | number}}</td></tr>
+            }</tbody>
+          </table></div>
+        </section>
+      }
+    </div>
+  }
+</section>

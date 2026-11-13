@@ -1,5 +1,7 @@
 {
   "account": {
+    "loginIdentifier": "用户名或邮箱",
+    "loginIdentifierHint": "请输入用户名或邮箱",
     "registrationEmail": {
       "label": "邮箱验证码",
       "placeholder": "请输入 6 位邮箱验证码",
@@ -78,6 +80,7 @@
     }
   },
   "admin": {
+    "operations": {"title":"运营概览","period":"时间范围","days7":"最近 7 天","days30":"最近 30 天","feature":"功能","model":"模型","endpoint":"接口","all":"全部","activeUsers":"活跃用户","requests":"请求量","errors":"错误数","p95Milliseconds":"P95 耗时","trend":"每日趋势（UTC）","date":"日期","features":"按功能","models":"按模型","endpoints":"按接口","dimension":"分组","errorStatuses":"错误状态码","status":"状态码","loadError":"加载运营数据失败","empty":"所选范围暂无记录","definition":"活跃用户按成功使用功能的已登录账号去重。"},
     "controlCenter": "管理后台",
     "management": {
       "keysFailed": "加载密钥失败",

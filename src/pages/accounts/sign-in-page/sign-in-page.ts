@@ -22,7 +22,7 @@ export class SignInPage {
   readonly busy = signal(false);
   readonly retrySeconds = signal<number | null>(null);
   readonly validateForm = this.fb.group({
-    username: ['', [Validators.required, Validators.maxLength(20)]],
+    username: ['', [Validators.required, Validators.maxLength(50)]],
     password: ['', [Validators.required, Validators.maxLength(512)]],
     remember: [true]
   });

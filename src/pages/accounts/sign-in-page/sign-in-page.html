@@ -3,9 +3,9 @@
   <p class="auth-intro">{{'account.ui.signInDescription' | translate}}</p>
   <form novalidate [formGroup]="validateForm" (ngSubmit)="submitForm()">
     <div class="field">
-      <label for="login-username">{{'account.username' | translate}}</label>
-      <input id="login-username" class="form-control" formControlName="username" autocomplete="username" [placeholder]="'account.pleaseUsername' | translate" [attr.aria-invalid]="validateForm.controls.username.invalid && validateForm.controls.username.touched" aria-describedby="username-error">
-      @if (validateForm.controls.username.invalid && validateForm.controls.username.touched) { <p id="username-error" class="field-error" role="alert">{{'account.userTip' | translate}}</p> }
+      <label for="login-username">{{'account.loginIdentifier' | translate}}</label>
+      <input id="login-username" class="form-control" formControlName="username" autocomplete="username" [placeholder]="'account.loginIdentifierHint' | translate" [attr.aria-invalid]="validateForm.controls.username.invalid && validateForm.controls.username.touched" aria-describedby="username-error">
+      @if (validateForm.controls.username.invalid && validateForm.controls.username.touched) { <p id="username-error" class="field-error" role="alert">{{'account.loginIdentifierHint' | translate}}</p> }
     </div>
     <div class="field">
       <label for="login-password">{{'account.password' | translate}}</label>

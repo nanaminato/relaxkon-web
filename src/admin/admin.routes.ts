@@ -10,6 +10,7 @@ export const ADMIN_ROUTES: Routes = [
     canActivate: [featureAdminGuard],
     canActivateChild: [featureAdminGuard],
     children: [
+      {path: 'operations', loadComponent: () => import('./pages/operations/operations.component').then(m => m.OperationsComponent)},
       {path: 'auth-security', canActivate: [authSecurityGuard], loadComponent: () => import('./pages/auth-security/auth-security.component').then(m => m.AuthSecurityComponent)},
       {path: 'feature-access', loadComponent: () => import('./pages/feature-access/feature-access.component').then(m => m.FeatureAccessComponent)},
       {path: '', pathMatch: 'full', redirectTo: 'accounts/account-info'},

@@ -1,0 +1,16 @@
+.operations { display: grid; gap: 1rem; }
+.operations h2, .operations h3 { margin: 0; }
+.operations h3 { font-size: 1rem; margin-bottom: .75rem; }
+.filters { display: flex; flex-wrap: wrap; align-items: end; gap: .75rem; }
+.filters label { display: grid; gap: .25rem; min-width: 9rem; max-width: 100%; }
+.filters select { max-width: 24rem; }
+.summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: .75rem; }
+.metric, .tables section { border: 1px solid var(--app-border); background: var(--app-surface); border-radius: .75rem; padding: 1rem; min-width: 0; }
+.metric { display: grid; gap: .25rem; }
+.metric strong { font-size: 1.5rem; }
+.operations-note { color: var(--app-text-muted); margin: 0; }
+.tables { display: grid; gap: 1rem; min-width: 0; }
+.table-scroll { overflow: auto; max-height: 24rem; }
+.table { margin-bottom: 0; }
+.table th, .table td { white-space: nowrap; }
+.table thead th { position: sticky; top: 0; }

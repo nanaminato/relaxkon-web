@@ -1,5 +1,7 @@
 {
   "account": {
+    "loginIdentifier": "ユーザー名またはメールアドレス",
+    "loginIdentifierHint": "ユーザー名またはメールアドレスを入力してください",
     "registrationEmail": {
       "label": "メール確認コード",
       "placeholder": "6桁のメール確認コードを入力",
@@ -78,6 +80,7 @@
     }
   },
   "admin": {
+    "operations": {"title":"運用概要","period":"期間","days7":"過去7日間","days30":"過去30日間","feature":"機能","model":"モデル","endpoint":"API","all":"すべて","activeUsers":"アクティブユーザー","requests":"リクエスト数","errors":"エラー数","p95Milliseconds":"P95 応答時間","trend":"日別推移（UTC）","date":"日付","features":"機能別","models":"モデル別","endpoints":"API別","dimension":"グループ","errorStatuses":"エラーステータス","status":"ステータス","loadError":"運用データを読み込めませんでした","empty":"該当する記録がありません","definition":"機能の利用に成功したログイン済みアカウントを重複なしで集計します。"},
     "controlCenter": "管理コンソール",
     "management": {
       "keysFailed": "プロバイダーキーを読み込めません",

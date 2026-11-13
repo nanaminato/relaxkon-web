@@ -1,5 +1,7 @@
 {
   "account": {
+    "loginIdentifier": "Username or email",
+    "loginIdentifierHint": "Enter your username or email",
     "registrationEmail": {
       "label": "Email verification code",
       "placeholder": "Enter the 6-digit email code",
@@ -78,6 +80,7 @@
     }
   },
   "admin": {
+    "operations": {"title":"Operations overview","period":"Period","days7":"Last 7 days","days30":"Last 30 days","feature":"Feature","model":"Model","endpoint":"Endpoint","all":"All","activeUsers":"Active users","requests":"Requests","errors":"Errors","p95Milliseconds":"P95 latency","trend":"Daily trend (UTC)","date":"Date","features":"By feature","models":"By model","endpoints":"By endpoint","dimension":"Group","errorStatuses":"Error statuses","status":"Status","loadError":"Could not load operations data","empty":"No records for these filters","definition":"Active users are distinct signed-in accounts with successful feature requests."},
     "controlCenter": "Admin console",
     "management": {
       "keysFailed": "Could not load provider keys",
