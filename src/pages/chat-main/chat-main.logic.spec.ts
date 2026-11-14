@@ -1,7 +1,7 @@
 import {TestBed} from '@angular/core/testing';
 import {Renderer2} from '@angular/core';
 import {Store} from '@ngrx/store';
-import {Subject, of} from 'rxjs';
+import {BehaviorSubject, Subject, of} from 'rxjs';
 import {ChatMainComponent} from './chat-main';
 import {ChatSessionFacade} from '../../services/chat/chat-session.facade';
 import {ChatDataService} from '../../services/db-services';
@@ -18,6 +18,7 @@ describe('Chat interaction lifecycle', () => {
   let component: ChatMainComponent;
   let stream: Subject<string>;
   let fetch: jasmine.Spy;
+  let accountIds: BehaviorSubject<number | undefined>;
   it('stages dropped files and lets the user remove them before sending', () => {
     const file = new File(['notes'], 'notes.txt', {type: 'text/plain'});
     const transfer = new DataTransfer();
@@ -57,6 +58,7 @@ describe('Chat interaction lifecycle', () => {
   });
 
   beforeEach(() => {
+    accountIds = new BehaviorSubject<number | undefined>(3);
     stream = new Subject();
     fetch = jasmine.createSpy().and.returnValue(stream);
     const history = new Subject<ChatHistoryModel>();
@@ -68,7 +70,7 @@ describe('Chat interaction lifecycle', () => {
       {provide: ChatSessionFacade, useValue: {saveUser: async () => undefined, response: (source: any) => source}},
       {provide: ChatDataService, useValue: {putHistory: async () => undefined}},
       {provide: SendManagerService, useValue: {updateMessage: async () => undefined}},
-      {provide: AuthService, useValue: {user: {id: 3}}},
+      {provide: AuthService, useValue: {user: {id: 3}, accountId$: accountIds}},
       {provide: MenuAbleService, useValue: {enableChat: () => undefined}},
       {provide: Bs64Handler, useValue: {}},
       {provide: ChatContextHandler, useValue: {handler: () => []}},
@@ -82,6 +84,39 @@ describe('Chat interaction lifecycle', () => {
     component.chatHistoryModel = new ChatHistoryModel();
   });
   afterEach(() => component.ngOnDestroy());
+  it('clears private drafts and invalidates pending file reads on owner change', async () => {
+    const file = new File(['private'], 'secret.txt');
+    const revoke = spyOn(URL, 'revokeObjectURL');
+    component.fileList = [file];
+    component.attachmentPreviews.set(file, 'blob:private');
+    component.chatFileList = [{fileName: 'old.txt', fileContent: 'c2VjcmV0'}];
+    component.inputText = 'private draft';
+    component.libraryPickerVisible = true;
+    component.shareMessages = [{role: 'user', content: 'private', selected: true}];
+    let finish!: (value: any) => void;
+    spyOn(component, 'readFile').and.returnValue(new Promise(resolve => finish = resolve));
+    const pending = component.askGPT();
+    accountIds.next(4);
+    finish({fileName: 'secret.txt', fileContent: 'c2VjcmV0'});
+    await pending;
+    expect(component.fileList).toEqual([]);
+    expect(component.chatFileList).toEqual([]);
+    expect(component.attachmentPreviews.size).toBe(0);
+    expect(revoke).toHaveBeenCalledWith('blob:private');
+    expect(component.inputText).toBe('');
+    expect(component.shareMessages).toBeNull();
+    expect(component.libraryPickerVisible).toBeFalse();
+    expect(component.chatModels).toEqual([]);
+    expect(component.answering).toBeFalse();
+    expect(fetch).not.toHaveBeenCalled();
+  });
+  it('preserves the draft when the same account is re-emitted', () => {
+    component.inputText = 'keep';
+    const file = new File(['keep'], 'keep.txt'); component.fileList = [file];
+    accountIds.next(3);
+    expect(component.inputText).toBe('keep');
+    expect(component.fileList).toEqual([file]);
+  });
   it('stops an in-flight file read without sending or appending messages', async () => {
     let finish!: (value: any) => void;
     spyOn(component, 'readFile').and.returnValue(new Promise(resolve => finish = resolve));

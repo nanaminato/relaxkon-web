@@ -1,3 +1,6 @@
+import {LibraryPicker} from './library-picker/library-picker';
+import {ShareDialog} from './share-dialog/share-dialog';
+import {createShareSnapshot, ShareMessage} from './share-dialog/share-snapshot';
 import {ChatChunk} from '../../contracts/chat';
 import {ChatSessionFacade} from '../../services/chat/chat-session.facade';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -56,6 +59,8 @@ import {historyTitleActions} from "../../systems/store/history-title/history-tit
   standalone: true,
   imports: [
     LanguageSwitcher,
+    ShareDialog,
+    LibraryPicker,
     NzModalModule,
     ModelEditor,
     NzIconModule,
@@ -76,6 +81,13 @@ import {historyTitleActions} from "../../systems/store/history-title/history-tit
   providers: [ChatSessionFacade]
 })
 export class ChatMainComponent implements OnDestroy{
+  libraryPickerVisible = false;
+  addLibraryFile(file: File): void { this.addFiles([file]); this.libraryPickerVisible = false; }
+  shareMessages: ShareMessage[] | null = null;
+  get hasShareableMessages(): boolean { return createShareSnapshot(this.chatModels).length > 0; }
+  openShare(): void {
+    if (!this.answering && this.hasShareableMessages) this.shareMessages = createShareSnapshot(this.chatModels);
+  }
   private localization = inject(LocalizationService);
   private readonly session = inject(ChatSessionFacade);
   private draftVersion = 0;
@@ -290,6 +302,8 @@ export class ChatMainComponent implements OnDestroy{
   }
 
   set chatHistoryModel(value: ChatHistoryModel | undefined) {
+    this.shareMessages = null;
+    this.libraryPickerVisible = false;
     this._chatHistoryModel = value;
     const messages = value?.chatList?.chatModel;
     this.chatModels = messages?.filter(message => message.role !== "system") ?? [];
@@ -410,6 +424,24 @@ export class ChatMainComponent implements OnDestroy{
       pointer: undefined,
     }
     this.menuAbleService.enableChat();
+    let owner = this.auth.user?.id;
+    this.auth.accountId$.pipe(takeUntilDestroyed()).subscribe(accountId => {
+      if (accountId === owner) return;
+      owner = accountId;
+      this.draftVersion++;
+      this.answering = false;
+      this.finalizeResponse();
+      this.removeAttachments([...this.fileList, ...this.attachmentPreviews.keys()]);
+      this.fileList = [];
+      this.chatFileList = [];
+      this.inputText = '';
+      this.draggingFiles = false;
+      this.dragDepth = 0;
+      this.animalModel = undefined;
+      if (this.isVisible) this.handleCancel();
+      this.chatHistoryModel = undefined;
+      this.chatContext = {pointer: undefined};
+    });
     // 添加默认值
     this.store.select(selectConfig).pipe(takeUntilDestroyed()).subscribe((config: Configuration | null)=>{
       this.config = config ? structuredClone(config) : undefined;

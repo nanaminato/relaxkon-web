@@ -137,3 +137,20 @@ h1{font-size:30px;color:inherit}
   .composer { width: calc(100% - 20px); }
   .composer-control { width: 32px; }
 }
+/* Keep the conversation and composer on one readable column. */
+.topbar { gap: 12px; }
+.share-button { display: inline-flex; gap: 7px; align-items: center; margin-left: auto; padding: 7px 12px; border: 1px solid var(--app-border); border-radius: 999px; background: transparent; color: var(--app-text); cursor: pointer; }
+.share-button:disabled { opacity: .45; cursor: default; }
+.share-button:hover:enabled { background: var(--app-hover); }
+app-language-switcher { margin-left: 0; }
+.messages { overscroll-behavior: contain; scrollbar-gutter: stable; padding-bottom: 18px; }
+.composer { border-radius: 26px; padding: 12px 14px; box-shadow: 0 3px 18px #00000008; }
+.ask-box { padding: 8px 4px; }
+.attach-button { border: 0; border-radius: 50%; }
+.composer-control:focus-visible, .share-button:focus-visible { outline: 2px solid var(--app-accent); outline-offset: 3px; }
+@media (max-width: 600px) {
+  .topbar { gap: 8px; }
+  .share-button { padding: 8px; }
+  .share-button > span:last-child { display: none; }
+  .composer { padding: 9px 10px; }
+}

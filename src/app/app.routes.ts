@@ -4,6 +4,10 @@ import {UserAuthGuardService} from '../services/guards/user-auth-guard.service';
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: '/chat' },
   {
+    path: 'library', canActivate: [UserAuthGuardService],
+    loadComponent: () => import('../pages/library/library.component').then(m => m.LibraryComponent),
+  },
+  {
     path: 'chat',
     loadChildren: () =>
       import('../pages/chat.module').then(m => m.ChatModule),

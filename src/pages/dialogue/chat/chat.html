@@ -10,12 +10,13 @@
             <img [src]="getIcon(file.fileType ?? '', file.fileName)" width="24" height="24" alt=""/>
             <div class="sent-file-label">
               <span class="sent-file-name" [title]="file.fileName">{{file.fileName}}</span>
-              @if (file.fileSize != null) {
+              @if (file.fileSize !== null && file.fileSize !== undefined) {
                 <span class="sent-file-size">{{file.fileSize / 1024 | number:'1.0-1'}} KB</span>
               }
             </div>
           </div>
         }
+        @if (file.fileContent) { <app-save-to-library [file]="file"></app-save-to-library> }
         @if (chatModel?.role === 'assistant' && file.fileContent) {
           <button type="button" class="download-file" (click)="download(file)"
                   [attr.aria-label]="'chat.composer.downloadAttachment' | translate:{name: file.fileName}">

@@ -20,11 +20,6 @@
         <span nz-icon nzType="copy"></span>
       </button>
     }
-    <button type="button" nz-button nz-tooltip (click)="reRequest()" [disabled]="busy || !chatModel?.finish"
-            [nzTooltipTitle]="'chat.message.regenerate' | translate"
-            [attr.aria-label]="'chat.message.regenerate' | translate">
-      <span nz-icon nzType="redo"></span>
-    </button>
     <button type="button" nz-button nz-tooltip (click)="toggleActions()" [attr.aria-expanded]="actionsExpanded()"
             [nzTooltipTitle]="'workspace.moreActions' | translate" [attr.aria-label]="'workspace.moreActions' | translate">
       <span nz-icon nzType="more"></span>
@@ -39,11 +34,7 @@
               [attr.aria-label]="'chat.message.startContextFromHere' | translate">
         <span nz-icon nzType="sort-ascending"></span>
       </button>
-      <button type="button" nz-button nz-tooltip [disabled]="busy" (click)="triggerDelete()"
-              [nzTooltipTitle]="'chat.message.deleteContent' | translate"
-              [attr.aria-label]="'chat.message.deleteContent' | translate">
-        <span nz-icon nzType="delete"></span>
-      </button>
+
     }
   </div>
 </article>

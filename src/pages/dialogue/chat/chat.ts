@@ -1,3 +1,4 @@
+import {SaveToLibrary} from './save-to-library';
 import {FileAdds} from '../../../models';
 import {Component, Input} from '@angular/core';
 import {DecimalPipe} from "@angular/common";
@@ -12,6 +13,7 @@ import {TranslateModule} from '@ngx-translate/core';
   styleUrl: './chat.css',
   imports: [
     DecimalPipe,
+    SaveToLibrary,
     NzSpinModule,
     MarkdownRoot,
     NzImageDirective,

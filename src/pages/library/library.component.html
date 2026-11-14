@@ -1,0 +1,48 @@
+<div class="library-shell">
+  <aside class="library-nav"><a class="brand" routerLink="/chat">RelaxKon</a><app-workspace-links /></aside>
+  <main>
+    <header><div><a class="back" routerLink="/chat">← {{ 'library.back' | translate }}</a><h1>{{ 'library.title' | translate }}</h1><p>{{ 'library.description' | translate }}</p></div>
+      <label class="upload" [class.disabled]="disabled || !snapshot">+ {{ (busy ? 'library.working' : 'library.upload') | translate }}<input type="file" [disabled]="disabled || !snapshot" (click)="beginPick()" (change)="choose($event)" /></label>
+    </header>
+    <section class="library-meta">
+      <span>{{ 'library.private' | translate }}</span>
+      <div class="sync"><span>{{ 'library.autoSync' | translate }} @if(lastUpdated) { · {{ lastUpdated | date:'shortTime' }} }</span><button type="button" [disabled]="disabled" (click)="reload()">{{ (loading ? 'library.refreshing' : 'library.refresh') | translate }}</button></div>
+    </section>
+    @if (status) { <p class="status" role="status">{{ status | translate }}</p> }
+    <div class="tools"><input type="search" [(ngModel)]="query" [placeholder]="'library.search' | translate" [attr.aria-label]="'library.search' | translate" />
+      <div class="filters" [attr.aria-label]="'library.filter' | translate">
+        <button type="button" [class.selected]="filter === 'all'" [attr.aria-pressed]="filter === 'all'" (click)="filter = 'all'">{{ 'library.all' | translate }}</button>
+        <button type="button" [class.selected]="filter === 'document'" [attr.aria-pressed]="filter === 'document'" (click)="filter = 'document'">{{ 'library.documents' | translate }}</button>
+        <button type="button" [class.selected]="filter === 'image'" [attr.aria-pressed]="filter === 'image'" (click)="filter = 'image'">{{ 'library.images' | translate }}</button>
+      </div>
+    </div>
+    @if (snapshot) {
+      <div class="quota"><span>{{ 'library.storage' | translate }} {{ size(snapshot.usedBytes) }} / {{ size(snapshot.maxBytes) }} · {{ 'library.fileLimit' | translate }} {{ size(snapshot.maxFileBytes) }}</span><progress [value]="usedPercent" max="100" [attr.aria-label]="'library.storage' | translate"></progress></div>
+      @if (items.length) {
+        <section class="file-grid" [attr.aria-label]="'library.files' | translate">
+          @for (item of items; track item.id) {
+            <article class="file-card">
+              <div class="file-mark" aria-hidden="true">{{ item.contentType.startsWith('image/') ? '▧' : '▤' }}</div>
+              <h2 [title]="item.name">{{ item.name }}</h2><p>{{ size(item.size) }} · {{ item.updatedAt | date:'mediumDate' }}</p>
+              <div class="actions"><button type="button" [disabled]="disabled" (click)="download(item)">{{ 'library.download' | translate }}</button>
+                <button type="button" [disabled]="disabled" (click)="requestRename(item)">{{ 'library.rename' | translate }}</button>
+                <button type="button" [disabled]="disabled" (click)="requestDelete(item)">{{ 'library.delete' | translate }}</button></div>
+            </article>
+          }
+        </section>
+      } @else {
+        <section class="empty"><div aria-hidden="true">▤</div><h2>{{ (query || filter !== 'all' ? 'library.noResults' : 'library.empty') | translate }}</h2><p>{{ 'library.emptyHint' | translate }}</p></section>
+      }
+    }
+    @if (editing || deleting) {
+      <div class="dialog-backdrop"><section class="dialog" cdkTrapFocus [cdkTrapFocusAutoCapture]="true" (keydown.escape)="cancel()" role="dialog" aria-modal="true" aria-labelledby="library-dialog-title">
+        <h2 id="library-dialog-title">{{ (editing ? 'library.rename' : 'library.delete') | translate }}</h2>
+        @if (editing) { <label>{{ 'library.fileName' | translate }}<input type="text" [(ngModel)]="editName" maxlength="200" [disabled]="busy" (keydown.enter)="rename()" /></label> }
+        @else { <p>{{ 'library.deleteWarning' | translate:{name: deleting?.name} }}</p> }
+        @if (status) { <p class="status" role="alert">{{ status | translate }}</p> }
+        <div class="dialog-actions"><button type="button" [disabled]="busy" (click)="cancel()">{{ 'library.cancel' | translate }}</button>
+          <button type="button" class="primary" [disabled]="disabled || (!!editing && !editName.trim())" (click)="editing ? rename() : remove()">{{ (editing ? 'library.save' : 'library.delete') | translate }}</button></div>
+      </section></div>
+    }
+  </main>
+</div>

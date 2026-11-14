@@ -1,0 +1,29 @@
+<nz-modal [nzVisible]="true" [nzTitle]="'chat.share.title' | translate" [nzFooter]="null"
+          [nzWidth]="640" (nzOnCancel)="closed.emit()">
+  <ng-container *nzModalContent>
+    <p class="share-notice">{{'chat.share.notice' | translate}}</p>
+    <div class="selection-actions">
+      <button type="button" (click)="selectAll(true)" [disabled]="busy">{{'chat.share.selectAll' | translate}}</button>
+      <button type="button" (click)="selectAll(false)" [disabled]="busy">{{'chat.share.selectNone' | translate}}</button>
+    </div>
+    <div class="share-messages">
+      @for (message of messages; track $index) {
+        <label class="share-message">
+          <input type="checkbox" [(ngModel)]="message.selected" [disabled]="busy" (ngModelChange)="status = ''">
+          <span><strong>{{(message.role === 'user' ? 'chat.share.you' : 'chat.share.assistant') | translate}}</strong>
+          <span class="message-preview">{{message.content}}</span></span>
+        </label>
+      }
+    </div>
+    <label class="preview-label" for="share-preview">{{'chat.share.preview' | translate}}</label>
+    <textarea id="share-preview" readonly [value]="text" rows="7"></textarea>
+    <p class="share-status" role="status">@if (status) { {{('chat.share.' + status) | translate}} }</p>
+    <div class="share-actions">
+      <button type="button" (click)="download()" [disabled]="busy || !text">{{'chat.share.download' | translate}}</button>
+      @if (nativeShareAvailable) {
+        <button type="button" (click)="share()" [disabled]="busy || !text">{{'chat.share.systemShare' | translate}}</button>
+      }
+      <button type="button" class="primary" (click)="copy()" [disabled]="busy || !text">{{'chat.share.copy' | translate}}</button>
+    </div>
+  </ng-container>
+</nz-modal>

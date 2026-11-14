@@ -24,6 +24,7 @@ export class WorkspaceLinks {
   private readonly layout = inject(SizeReportService);
   protected readonly links = [
     {path: '/chat', icon: 'message', label: 'universal.aiChat'},
+    {path: '/library', icon: 'folder', label: 'library.title'},
     {path: '/image-studio', icon: 'picture', label: 'universal.image-studio'},
     {path: '/media-studio', icon: 'sound', label: 'universal.mediaStudio'}
   ];
