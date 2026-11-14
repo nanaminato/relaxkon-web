@@ -1,3 +1,4 @@
+import {SUCCESS_TOAST_DURATION} from '../../../../../shared/toast-duration';
 import {roleErrorKey} from '../../../../services/role-errors';
 import {finalize} from 'rxjs';
 import {TranslateService} from '@ngx-translate/core';
@@ -61,9 +62,6 @@ export class AccountCreateComponent {
   });
   roles: Role[] = [];
   allRoles: Role[] | undefined;
-  actionTip(roleId: number){
-    return this.roles.find(r=>r.roleId===roleId)!==undefined?this.i18n.instant('admin.management.remove'):this.i18n.instant('admin.management.add');
-  }
   active(roleId: number){
     return this.roles.find(r=>r.roleId===roleId)!==undefined;
   }
@@ -72,7 +70,7 @@ export class AccountCreateComponent {
       next: roles=>{
         this.allRoles = roles;
         if(refresh){
-          this.message.success(this.i18n.instant('admin.management.refreshSuccess'));
+          this.message.success(this.i18n.instant('admin.management.refreshSuccess'), {nzDuration: SUCCESS_TOAST_DURATION});
         }
       },
       error:() => {
@@ -96,7 +94,7 @@ export class AccountCreateComponent {
         })
         .pipe(finalize(() => this.saving = false)).subscribe({
           next: () =>{
-            this.message.success(this.i18n.instant('admin.management.accountCreated'));
+            this.message.success(this.i18n.instant('admin.management.accountCreated'), {nzDuration: SUCCESS_TOAST_DURATION});
             this.router.navigate(admin_routes.management);
           },
           error: (err: any) => {

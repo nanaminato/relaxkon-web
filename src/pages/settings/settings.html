@@ -36,18 +36,6 @@
       </div>
     </nz-card>
     <nz-card>
-      <div class="py-2">
-        <div class="d-flex justify-content-between m-1">
-          <nz-row>
-            {{ 'settings.currentBackendServer' | translate }}
-          </nz-row>
-          <nz-row>
-            <input nz-input class="rounded-2" [ngModel]="apiUrl()"/>
-          </nz-row>
-        </div>
-      </div>
-    </nz-card>
-    <nz-card>
       <h2 class="title">{{ 'settings.imageSync.title' | translate }}</h2>
       <p>{{ 'settings.imageSync.description' | translate }}</p>
       <label class="d-block mb-2">
@@ -221,33 +209,6 @@
         >
           {{ 'universal.reset' | translate }}
         </button>
-      </div>
-    </nz-card>
-    <nz-card>
-      <div class="py-2">
-        <span class="title">{{ 'settings.providerCatalog' | translate }}</span>
-      </div>
-      <div class="py-2 follow">
-        {{ 'settings.providerCatalogHint' | translate }}
-      </div>
-      <div class="d-flex flex-wrap m-1">
-        @for (provider of providerCatalog; track provider.type) {
-          <button class="provider-chip"
-                  nz-popover
-                  [nzPopoverTitle]="provider.displayName"
-                  nzPopoverPlacement="bottom"
-                  type="button">
-            {{ provider.displayName }}
-            <span class="follow">
-              · {{ 'settings.providerId' | translate }} {{ provider.type }}
-              · {{
-                provider.supportsChat
-                  ? ('settings.providerSupportsChat' | translate)
-                  : ('settings.providerNotChat' | translate)
-              }}
-            </span>
-          </button>
-        }
       </div>
     </nz-card>
   </div>

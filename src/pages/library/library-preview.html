@@ -1,0 +1,83 @@
+<div class="backdrop">
+  <section class="preview-dialog" [class.editor-dialog]="edit()" cdkTrapFocus [cdkTrapFocusAutoCapture]="true" role="dialog" aria-modal="true"
+           aria-labelledby="library-preview-title" (keydown.escape)="!busy && closed.emit(changed)">
+    <header class="preview-header">
+      <h2 id="library-preview-title">{{ item()?.name || ('library.newDocument' | translate) }}</h2>
+      <button type="button" [attr.cdkFocusInitial]="edit() ? null : ''" [disabled]="busy" (click)="closed.emit(changed)">{{ 'library.closePreview' | translate }}</button>
+    </header>
+    @if (status) { <p role="alert">{{ status | translate }}</p> }
+    @if (!loaded && busy) { <p role="status">{{ 'library.working' | translate }}</p> }
+    @if (loaded && item()?.contentType === documentType) {
+      <div class="history-tools">
+        <button type="button" [disabled]="busy" (click)="loadHistory()">{{ 'library.history' | translate }}</button>
+        @if (revisions; as versions) {
+          @if (!versions.length) { <p>{{ 'library.noRevisions' | translate }}</p> }
+          @else {
+            <ul class="revisions">
+              @for (version of versions; track version.version) {
+                <li><button type="button" [disabled]="busy" (click)="previewRevision(version)">
+                  {{ 'library.revisionNumber' | translate:{version: version.version} }} · {{ version.name }} · {{ version.updatedAt | date:'short' }}
+                </button></li>
+              }
+            </ul>
+          }
+        }
+      </div>
+    }
+    @if (historical; as previous) {
+      <h3>{{ 'library.revisionNumber' | translate:{version: previous.revision.version} }} · {{ previous.revision.name }}</h3>
+      <div class="markdown" [innerHTML]="html"></div>
+      <div class="history-tools">
+        <button type="button" [disabled]="busy" (click)="closeHistoryPreview()">{{ 'library.backToCurrent' | translate }}</button>
+        <button type="button" class="primary" [disabled]="busy || hasDraft" (click)="restoreRevision()">{{ 'library.restoreVersion' | translate }}</button>
+        @if (hasDraft) { <p>{{ 'library.finishDraft' | translate }}</p> }
+        @else { <p>{{ 'library.restoreHint' | translate }}</p> }
+      </div>
+    } @else if (edit() && loaded) {
+      <form class="editor-form" (ngSubmit)="save()">
+        <label class="title-field">
+          <span>{{ 'library.fileName' | translate }}</span>
+          <input cdkFocusInitial name="name" [ngModel]="name" (ngModelChange)="name = $event; saveDraft()"
+                 maxlength="200" required [disabled]="busy" [placeholder]="'library.titlePlaceholder' | translate">
+        </label>
+        <div class="editor-layout">
+          <div class="editor-pane">
+            <div class="pane-bar">
+              <label for="library-markdown-source">{{ 'library.markdownSource' | translate }}</label>
+              <label class="image-picker" [class.disabled]="busy">
+                ＋ {{ 'library.insertImage' | translate }}
+                <input type="file" accept="image/png,image/jpeg,image/gif,image/webp,image/avif,image/bmp"
+                       [disabled]="busy" (change)="addImage($event, editor)">
+              </label>
+            </div>
+            <textarea #editor id="library-markdown-source" class="editor-source" name="source" [ngModel]="text"
+                      (ngModelChange)="text = $event; saveDraft(); render()" [readOnly]="busy"
+                      [placeholder]="'library.sourcePlaceholder' | translate"></textarea>
+          </div>
+          <div class="editor-pane">
+            <div class="pane-bar">{{ 'library.preview' | translate }}</div>
+            @if (html) { <div class="markdown editor-render" [innerHTML]="html"></div> }
+            @else { <p class="editor-render preview-empty">{{ 'library.previewPlaceholder' | translate }}</p> }
+          </div>
+        </div>
+        <footer class="editor-footer">
+          <p role="status">{{ (draftStatus || 'library.draftAutomatic') | translate }}</p>
+          <div class="editor-actions">
+            @if (draftConflict) {
+              <button type="button" [disabled]="busy || !name.trim()" (click)="saveDraftCopy()">{{ 'library.saveDraftCopy' | translate }}</button>
+              <button type="button" [disabled]="busy" (click)="discardDraft()">{{ 'library.discardDraft' | translate }}</button>
+            } @else {
+              <button type="submit" class="primary" [disabled]="busy || !name.trim()">{{ 'library.save' | translate }}</button>
+            }
+          </div>
+        </footer>
+      </form>
+    } @else if (loaded) {
+      @if (image) { <img class="full-image" [src]="image" [alt]="item()?.name"> }
+      @else if (pdf) { <a [href]="pdfUrl" target="_blank" rel="noopener noreferrer">{{ 'library.previewPdfTab' | translate }}</a>
+        <iframe [src]="pdf" sandbox [title]="item()?.name"></iframe> }
+      @else if (html) { <div class="markdown" [innerHTML]="html"></div> }
+      @else { <pre>{{ text }}</pre> }
+    }
+  </section>
+</div>

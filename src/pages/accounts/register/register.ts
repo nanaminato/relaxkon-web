@@ -1,3 +1,4 @@
+import {SUCCESS_TOAST_DURATION} from '../../../shared/toast-duration';
 import {Component, DestroyRef, ElementRef, inject, signal, ViewChild} from '@angular/core';
 import {AbstractControl, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validators} from '@angular/forms';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -91,7 +92,7 @@ export class Register {
     const body = this.validateForm.getRawValue();
     this.registerService.register({...body, email: this.email, username: body.username.trim()})
       .pipe(takeUntilDestroyed(this.destroy), finalize(() => this.busy.set(false))).subscribe({
-        next: () => {this.message.success(this.localization.text('notifications.registrationSuccess')); void this.router.navigate(user_routes.sign_in);},
+        next: () => {this.message.success(this.localization.text('notifications.registrationSuccess'), {nzDuration: SUCCESS_TOAST_DURATION}); void this.router.navigate(user_routes.sign_in);},
         error: (failure: unknown) => this.error.set(apiErrorMessage(failure, this.localization.text('notifications.networkError')))
       });
   }

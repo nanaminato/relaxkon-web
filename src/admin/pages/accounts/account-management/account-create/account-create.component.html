@@ -53,7 +53,7 @@
             <div
               class="border-black border-1 solid m-1 rounded-3 p-2"
               [class.active]="active(role.roleId)"
-              nz-tooltip [nzTooltipTitle]='actionTip(role.roleId)'
+              nz-tooltip [nzTooltipTitle]="(active(role.roleId) ? 'admin.management.remove' : 'admin.management.add') | translate"
               (click)="action(role)"
             >{{role.name}}</div>
           }

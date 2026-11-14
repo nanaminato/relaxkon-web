@@ -1,3 +1,4 @@
+import {SUCCESS_TOAST_DURATION} from '../../../../shared/toast-duration';
 import {roleErrorKey} from '../../../services/role-errors';
 import {finalize} from 'rxjs';
 import {TranslateService} from '@ngx-translate/core';
@@ -52,7 +53,7 @@ export class AccountManagementComponent implements OnInit{
       this.call.deleteAccountById(id)
         .pipe(finalize(() => this.deleting.delete(id))).subscribe({
           next: msg=>{
-            this.message.success(this.i18n.instant('admin.management.deleteSuccess'))
+            this.message.success(this.i18n.instant('admin.management.deleteSuccess'), {nzDuration: SUCCESS_TOAST_DURATION})
             this.refresh();
           },
           error: err=>{
@@ -65,7 +66,7 @@ export class AccountManagementComponent implements OnInit{
         next: accounts=>{
           this.accounts = accounts;
           if(refresh){
-            this.message.success(this.i18n.instant('admin.management.refreshSuccess'));
+            this.message.success(this.i18n.instant('admin.management.refreshSuccess'), {nzDuration: SUCCESS_TOAST_DURATION});
           }
         },
         error: err => {

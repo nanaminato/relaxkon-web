@@ -1,17 +1,12 @@
 <div class="screen-content w-100 h-100">
-  @if (visible()) {
+  @if (!isCompact() || visible()) {
     @if (isCompact()) { <button class="menu-backdrop" (click)="hideMenu()" [attr.aria-label]="'workspace.closeNavigation' | translate"></button> }
-    <aside class="app-sidebar d-flex flex-column h-100" [attr.aria-label]="'workspace.conversationNavigation' | translate">
-      <a class="workspace-brand-link" routerLink="/chat" (click)="closeMenuIfCompact()"><span class="workspace-brand-mark" aria-hidden="true">R</span>RelaxKon</a>
-      <div class="history-area">
-        @defer (on immediate) { <app-chat-history></app-chat-history> } @placeholder { <nz-skeleton></nz-skeleton> }
-      </div>
-      <app-workspace-links>
-        <div class="sidebar-utilities">
-          <button (click)="openSettingPage()"><span nz-icon nzType="setting" aria-hidden="true"></span>{{'chat.history.settings' | translate}}</button>
+    <aside class="app-sidebar d-flex flex-column h-100" [class.rail-only]="!visible()" [attr.aria-label]="'workspace.conversationNavigation' | translate">
+      <app-workspace-sidebar sectionTitle="universal.aiChat" [collapsed]="!visible()">
+        <div class="history-area">
+          @defer (on immediate) { <app-chat-history /> } @placeholder { <nz-skeleton /> }
         </div>
-      </app-workspace-links>
-      <app-account-label></app-account-label>
+      </app-workspace-sidebar>
     </aside>
   }
   <main class="main-pane"><router-outlet id="main-content"></router-outlet></main>

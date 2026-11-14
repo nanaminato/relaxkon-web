@@ -1,3 +1,4 @@
+import {DEFAULT_TOAST_DURATION} from '../shared/toast-duration';
 import {NZ_CONFIG} from 'ng-zorro-antd/core/config';
 import {SyncEffects} from '../services/sync/sync.effects';
 import {provideAppTranslations} from './app-translations';
@@ -28,7 +29,7 @@ import {chatHistoryReducer} from "../systems/store/chat-history/chat-history.red
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    {provide: NZ_CONFIG, useValue: {message: {nzDuration: 2400, nzMaxStack: 1, nzPauseOnHover: false, nzTop: 24}, notification: {nzDuration: 3200, nzMaxStack: 1, nzPauseOnHover: true, nzPlacement: 'topRight'}}},
+    {provide: NZ_CONFIG, useValue: {message: {nzDuration: DEFAULT_TOAST_DURATION, nzMaxStack: 1, nzPauseOnHover: false, nzTop: 24}, notification: {nzDuration: DEFAULT_TOAST_DURATION, nzMaxStack: 1, nzPauseOnHover: true, nzPlacement: 'topRight'}}},
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes, withPreloading(PreloadAllModules)),

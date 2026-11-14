@@ -1,3 +1,4 @@
+import {SUCCESS_TOAST_DURATION} from '../../../../../shared/toast-duration';
 import {apiErrorMessage} from '../../../../../contracts/common';
 import {TranslateService} from '@ngx-translate/core';
 import {TranslateModule} from '@ngx-translate/core';
@@ -71,9 +72,6 @@ export class KeyCreateComponent {
   });
   modelKeyBinds: ModelKeyBind[] = [];
   allModels: Model[] | undefined;
-  actionTip(modelId: number){
-    return this.modelKeyBinds.find(r=>r.modelId===modelId)!==undefined?this.i18n.instant('admin.management.remove'):this.i18n.instant('admin.management.add');
-  }
   active(modelId: number){
     return this.modelKeyBinds.find(r=>r.modelId===modelId)!==undefined;
   }
@@ -92,7 +90,7 @@ export class KeyCreateComponent {
       next: models=>{
         this.allModels = models;
         if(refresh){
-          this.message.success(this.i18n.instant('admin.management.refreshSuccess'));
+          this.message.success(this.i18n.instant('admin.management.refreshSuccess'), {nzDuration: SUCCESS_TOAST_DURATION});
         }
       },
       error:() => {
@@ -114,7 +112,7 @@ export class KeyCreateComponent {
         })
         .subscribe({
           next: () =>{
-            this.message.success(this.i18n.instant('admin.management.keyCreated'));
+            this.message.success(this.i18n.instant('admin.management.keyCreated'), {nzDuration: SUCCESS_TOAST_DURATION});
             this.router.navigate(admin_routes.keys);
           },
           error: (err: any) => {

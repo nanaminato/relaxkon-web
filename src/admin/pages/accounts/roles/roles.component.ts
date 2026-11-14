@@ -1,3 +1,4 @@
+import {SUCCESS_TOAST_DURATION} from '../../../../shared/toast-duration';
 import {roleErrorKey} from '../../../services/role-errors';
 import {Component, DestroyRef, inject, OnInit} from '@angular/core';
 import {FormsModule} from '@angular/forms';
@@ -49,7 +50,7 @@ export class RolesComponent implements OnInit {
     if (this.protectedRole(role) || this.deleting.has(role.roleId)) return;
     this.deleting.add(role.roleId);
     this.call.deleteRoleById(role.roleId).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.deleting.delete(role.roleId))).subscribe({
-      next: () => { this.message.success(this.i18n.instant('admin.management.deleteSuccess')); this.fetchRoles(); },
+      next: () => { this.message.success(this.i18n.instant('admin.management.deleteSuccess'), {nzDuration: SUCCESS_TOAST_DURATION}); this.fetchRoles(); },
       error: error => this.message.error(this.i18n.instant(roleErrorKey(error, 'admin.roles.deleteError')))
     });
   }

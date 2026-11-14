@@ -1,3 +1,4 @@
+import {SUCCESS_TOAST_DURATION} from '../../../../shared/toast-duration';
 import {TranslateService} from '@ngx-translate/core';
 import {TranslateModule} from '@ngx-translate/core';
 import {inject,  Component } from '@angular/core';
@@ -79,7 +80,7 @@ export class ModelsComponent {
         this.models = models;
         this.filterModels();
         if (refresh) {
-          this.message.success(this.i18n.instant('admin.management.refreshSuccess'));
+          this.message.success(this.i18n.instant('admin.management.refreshSuccess'), {nzDuration: SUCCESS_TOAST_DURATION});
         }
       },
       error: (err: any) => {
@@ -106,7 +107,7 @@ export class ModelsComponent {
   delete(roleId: number) {
     this.call.deleteModel(roleId).subscribe({
       next: () => {
-        this.message.success(this.i18n.instant('admin.management.deleteSuccess'));
+        this.message.success(this.i18n.instant('admin.management.deleteSuccess'), {nzDuration: SUCCESS_TOAST_DURATION});
         this.fetchModels(true);
       },
       error: () => {
@@ -123,7 +124,7 @@ export class ModelsComponent {
   disableModel(modelId: number | undefined) {
     this.call.disableModel(modelId!).subscribe({
       next: (msg: any) => {
-        this.message.success(msg.msg);
+        this.message.success(msg.msg, {nzDuration: SUCCESS_TOAST_DURATION});
       },
       error: err => {
         this.message.error(err.error);
@@ -134,7 +135,7 @@ export class ModelsComponent {
   enableModel(modelId: number | undefined) {
     this.call.enableModel(modelId!).subscribe({
       next: (msg: any) => {
-        this.message.success(msg.msg);
+        this.message.success(msg.msg, {nzDuration: SUCCESS_TOAST_DURATION});
       },
       error: err => {
         this.message.error(err.error);

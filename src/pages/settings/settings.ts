@@ -1,3 +1,4 @@
+import {SUCCESS_TOAST_DURATION} from '../../shared/toast-duration';
 import {configurationActions} from '../../systems/store/configuration/configuration.actions';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Component, ElementRef, inject, Renderer2, ViewChild} from '@angular/core';
@@ -7,7 +8,6 @@ import {NzModalModule, NzModalService} from "ng-zorro-antd/modal";
 import {NzCardModule} from "ng-zorro-antd/card";
 import {NzButtonModule} from "ng-zorro-antd/button";
 import {NzIconModule} from "ng-zorro-antd/icon";
-import {NzPopoverModule} from "ng-zorro-antd/popover";
 import {NzInputNumberModule} from "ng-zorro-antd/input-number";
 import {NzSliderModule} from "ng-zorro-antd/slider";
 import {FormsModule} from "@angular/forms";
@@ -24,8 +24,6 @@ import {DynamicConfigService, LocalizationService, SizeReportService, ThemeSwitc
 import {Configuration, DynamicConfig} from "../../models";
 import {ConfigurationService, DbService} from "../../services/db-services";
 import {ModelCenter} from "./model-center/model-center";
-import {providerCatalog, ProviderDefinition} from "../../models/enumerates/enum.type";
-import {ServiceProvider} from "../../roots";
 import {themeOptions} from '../../themes/theme'
 import {selectConfig} from "../../systems/store/configuration/configuration.selectors";
 import {Store} from "@ngrx/store";
@@ -44,7 +42,7 @@ import {environment} from '../../environments/environment';
   standalone: true,
   imports: [
     NzFormModule, NzModalModule, NzCardModule,
-    NzButtonModule, NzIconModule, NzPopoverModule,
+    NzButtonModule, NzIconModule,
     NzInputNumberModule, NzSliderModule, FormsModule,
     NzInputModule, RouterLink, NgStyle,
     NzSelectModule, NzSkeletonModule,
@@ -73,7 +71,6 @@ export class Settings {
               private translate: TranslateService,
               private localization: LocalizationService,
               private dynamicConfigService: DynamicConfigService,
-              private serviceProvider: ServiceProvider,
               private modal: NzModalService,
               private message: NzMessageService,
               private dbService: DbService
@@ -84,9 +81,6 @@ export class Settings {
         this.loadProperties();
       }
     });
-  }
-  apiUrl(){
-    return this.serviceProvider.apiUrl;
   }
   miniPhone() {
     return this.sizeReportService.miniPhoneView();
@@ -202,7 +196,7 @@ export class Settings {
     try {
       const result = await this.languagePacks.importPack(file);
       const text = this.localization.text(`settings.languagePacks.${result}`);
-      if (result === 'imported') this.message.success(text);
+      if (result === 'imported') this.message.success(text, {nzDuration: SUCCESS_TOAST_DURATION});
       else this.message.error(text);
     } catch {
       this.message.error(this.localization.text('settings.languagePacks.invalidPack'));
@@ -218,7 +212,7 @@ export class Settings {
       this.dynamicConfig.language = this.localization.normalize(code);
       this.dynamicConfigService.setDynamicConfig(this.config!, this.dynamicConfig);
     }
-    this.message.success(this.localization.text('settings.languagePacks.removed'));
+    this.message.success(this.localization.text('settings.languagePacks.removed'), {nzDuration: SUCCESS_TOAST_DURATION});
   }
   modelCenterVisible: boolean = false;
 
@@ -264,8 +258,7 @@ export class Settings {
     this.isResetting = true;
     this.isResetting = false;
     await this.dbService.forceFactoryReset();
-    this.message.success(this.localization.text('notifications.databaseResetSuccess'));
+    this.message.success(this.localization.text('notifications.databaseResetSuccess'), {nzDuration: SUCCESS_TOAST_DURATION});
   }
 
-  protected readonly providerCatalog: ReadonlyArray<ProviderDefinition> = providerCatalog;
 }

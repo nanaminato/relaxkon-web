@@ -1,50 +1,48 @@
-import {Component, inject} from '@angular/core';
-import {Router} from "@angular/router";
-import {NzButtonModule} from "ng-zorro-antd/button";
-import {TranslateModule} from "@ngx-translate/core";
-import {AuthService} from "../../../auth_module";
-import {SizeReportService} from "../../../services/normal-services";
-import {user_routes} from "../../../roots/routes";
+import {Component, inject, signal} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {RouterLink} from '@angular/router';
+import {TranslatePipe} from '@ngx-translate/core';
+import {NzIconDirective} from 'ng-zorro-antd/icon';
+import {Store} from '@ngrx/store';
+import {catchError, map, of, switchMap} from 'rxjs';
+import {AuthService} from '../../../auth_module';
+import {SizeReportService} from '../../../services/normal-services';
+import {FeatureAccessService} from '../../../services/normal-services/feature-access.service';
+import {user_routes} from '../../../roots/routes';
+import {LanguageSwitcher} from '../../../shared/language-switcher';
+import {authActions} from '../../../systems/store/system.actions';
 
 @Component({
   selector: 'app-account-label',
   templateUrl: './account-label.html',
   styleUrl: './account-label.css',
-  imports: [
-    NzButtonModule,
-    TranslateModule,
-  ],
-  providers: [
-  ],
-  standalone: true
+  imports: [RouterLink, TranslatePipe, NzIconDirective, LanguageSwitcher],
 })
 export class AccountLabel {
-  sizeReportService: SizeReportService = inject(SizeReportService);
-  router: Router = inject(Router);
-  authService: AuthService = inject(AuthService);
-  get isLogin():boolean{
-    return this.authService.isLogin;
+  protected readonly auth = inject(AuthService);
+  protected readonly routes = user_routes;
+  protected readonly canManage = signal(false);
+  private readonly layout = inject(SizeReportService);
+  private readonly store = inject(Store);
+  private readonly access = inject(FeatureAccessService);
+
+  constructor() {
+    this.auth.accountId$.pipe(
+      switchMap(id => {
+        this.canManage.set(false);
+        return id === undefined ? of(false) : this.access.me().pipe(
+          map(access => access.canManagePolicies === true), catchError(() => of(false)));
+      }),
+      takeUntilDestroyed(),
+    ).subscribe(allowed => this.canManage.set(allowed));
   }
 
-  openSignIn() {
-    this.router.navigate(user_routes.sign_in).then(
-      ()=>{
-        if(this.sizeReportService.miniPhoneView()){
-        }
-      }
-    );
-  }
+  get displayName() { return this.auth.user?.nickname?.trim() || this.auth.user?.name; }
+  get initial() { return Array.from(this.displayName ?? 'R')[0]?.toUpperCase() ?? 'R'; }
 
-  openAccount() {
-    if(this.sizeReportService.miniPhoneView()){
-    }
-    this.router.navigate(user_routes.account_info).then(
-      ()=>{
-      }
-    );
-  }
+  get compact() { return this.layout.miniPhoneView(); }
 
-  openAdmin() {
-    this.router.navigate(['/admin']);
-  }
+  closeDrawer() { if (this.layout.miniPhoneView()) this.layout.hideMenu(); }
+  close(menu: HTMLDetailsElement) { menu.open = false; this.closeDrawer(); }
+  logout(menu: HTMLDetailsElement) { this.close(menu); this.store.dispatch(authActions.logout()); }
 }

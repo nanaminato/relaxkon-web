@@ -1,3 +1,4 @@
+import {SUCCESS_TOAST_DURATION} from '../../../shared/toast-duration';
 import {LocalizationService} from '../../../services/normal-services/localization.service';
 import {inject, Injectable} from "@angular/core";
 import {Actions, createEffect, ofType} from "@ngrx/effects";
@@ -38,7 +39,7 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(authActions.loginSuccess),
         tap(action => {
-          this.messageService.success(this.localization.text('notifications.loginSuccess'))
+          this.messageService.success(this.localization.text('notifications.loginSuccess'), {nzDuration: SUCCESS_TOAST_DURATION});
           this.authService.restore(action.user, action.token, action.refreshToken);
           this.router.navigate(['/chat']);
         })

@@ -1,3 +1,4 @@
+import {SUCCESS_TOAST_DURATION} from '../../../../../shared/toast-duration';
 import {firstValueFrom} from 'rxjs';
 import {TranslateService} from '@ngx-translate/core';
 import {TranslateModule} from '@ngx-translate/core';
@@ -74,7 +75,7 @@ export class MultipleAddModelComponent {
         } catch { failed = true; }
       }
       if (failed) this.message.error(this.i18n.instant('admin.management.batchPartialFailure'));
-      else { this.message.success(this.i18n.instant('admin.management.addSuccess')); this.close.emit(true); }
+      else { this.message.success(this.i18n.instant('admin.management.addSuccess'), {nzDuration: SUCCESS_TOAST_DURATION}); this.close.emit(true); }
     } finally { this.saving = false; }
   }
 }

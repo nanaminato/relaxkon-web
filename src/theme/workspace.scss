@@ -235,3 +235,12 @@ app-task-lib > div > .studio-heading { padding:24px; }
   app-top-image .ant-card-body, app-top-media .ant-card-body { padding:16px; }
   app-top-media .studio-actions, app-top-media .studio-field { padding-inline:16px; }
 }
+
+app-workspace-sidebar > app-workspace-links .workspace-links { border-top: 0; padding: 4px 10px 10px; }
+app-workspace-sidebar .studio-section-nav { border-top: 1px solid var(--app-border); }
+
+@media (min-width: 901px) {
+  app-workspace-sidebar > app-workspace-links .workspace-links { padding: 8px 6px; }
+  app-top-image .menu, app-top-media .menu { width: 284px !important; max-width: 284px; flex-basis: 284px; }
+  app-top-image .menu.rail-only, app-top-media .menu.rail-only { width: 56px !important; max-width: 56px; flex-basis: 56px; border-right: 0; }
+}

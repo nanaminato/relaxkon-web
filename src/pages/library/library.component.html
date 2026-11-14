@@ -1,38 +1,96 @@
 <div class="library-shell">
-  <aside class="library-nav"><a class="brand" routerLink="/chat">RelaxKon</a><app-workspace-links /></aside>
+  @if (!layout.miniPhoneView() || layout.menuVisible) {
+    @if (layout.miniPhoneView()) {
+      <button type="button" class="library-nav-backdrop" (click)="layout.hideMenu()" [attr.aria-label]="'workspace.closeNavigation' | translate"></button>
+    }
+    <aside id="library-navigation" class="library-nav"><app-workspace-sidebar sectionTitle="library.title">
+      <nav class="library-categories" [attr.aria-label]="'library.filter' | translate">
+        @for (category of categories; track category.id) {
+          <button type="button" [attr.aria-pressed]="filter === category.id" (click)="selectCategory(category.id)">
+            {{ category.label | translate }}
+          </button>
+        }
+      </nav>
+    </app-workspace-sidebar></aside>
+  }
   <main>
-    <header><div><a class="back" routerLink="/chat">← {{ 'library.back' | translate }}</a><h1>{{ 'library.title' | translate }}</h1><p>{{ 'library.description' | translate }}</p></div>
+    <div class="library-mobile-nav">
+      <button type="button" class="workspace-icon-button" aria-controls="library-navigation"
+              [attr.aria-expanded]="layout.menuVisible" [attr.aria-label]="(layout.menuVisible ? 'workspace.closeNavigation' : 'workspace.openNavigation') | translate"
+              (click)="layout.toggleMenu()"><span aria-hidden="true">☰</span></button>
+    </div>
+    <header><h1>{{ categoryTitle | translate }}</h1>
+
+      <div class="header-actions">
+        <label class="library-search">
+          <span nz-icon nzType="search" aria-hidden="true"></span>
+          <input type="search" [(ngModel)]="query" [placeholder]="'library.search' | translate" [attr.aria-label]="'library.search' | translate" />
+        </label>
+      <button type="button" [disabled]="disabled || !snapshot" (click)="openPreview(undefined, true)">{{ 'library.newDocument' | translate }}</button>
       <label class="upload" [class.disabled]="disabled || !snapshot">+ {{ (busy ? 'library.working' : 'library.upload') | translate }}<input type="file" [disabled]="disabled || !snapshot" (click)="beginPick()" (change)="choose($event)" /></label>
+      </div>
     </header>
     <section class="library-meta">
       <span>{{ 'library.private' | translate }}</span>
       <div class="sync"><span>{{ 'library.autoSync' | translate }} @if(lastUpdated) { · {{ lastUpdated | date:'shortTime' }} }</span><button type="button" [disabled]="disabled" (click)="reload()">{{ (loading ? 'library.refreshing' : 'library.refresh') | translate }}</button></div>
     </section>
     @if (status) { <p class="status" role="status">{{ status | translate }}</p> }
-    <div class="tools"><input type="search" [(ngModel)]="query" [placeholder]="'library.search' | translate" [attr.aria-label]="'library.search' | translate" />
-      <div class="filters" [attr.aria-label]="'library.filter' | translate">
-        <button type="button" [class.selected]="filter === 'all'" [attr.aria-pressed]="filter === 'all'" (click)="filter = 'all'">{{ 'library.all' | translate }}</button>
-        <button type="button" [class.selected]="filter === 'document'" [attr.aria-pressed]="filter === 'document'" (click)="filter = 'document'">{{ 'library.documents' | translate }}</button>
-        <button type="button" [class.selected]="filter === 'image'" [attr.aria-pressed]="filter === 'image'" (click)="filter = 'image'">{{ 'library.images' | translate }}</button>
-      </div>
-    </div>
     @if (snapshot) {
       <div class="quota"><span>{{ 'library.storage' | translate }} {{ size(snapshot.usedBytes) }} / {{ size(snapshot.maxBytes) }} · {{ 'library.fileLimit' | translate }} {{ size(snapshot.maxFileBytes) }}</span><progress [value]="usedPercent" max="100" [attr.aria-label]="'library.storage' | translate"></progress></div>
-      @if (items.length) {
-        <section class="file-grid" [attr.aria-label]="'library.files' | translate">
-          @for (item of items; track item.id) {
+      @for (group of groups; track group.key) {
+        <section class="file-group" [attr.aria-labelledby]="'library-group-' + group.key">
+          <h2 class="group-title" [id]="'library-group-' + group.key">
+            {{ ('library.' + group.key) | translate }} <span>{{ group.items.length }}</span>
+          </h2>
+          <div class="file-grid">
+          @for (item of group.items; track item.id) {
             <article class="file-card">
-              <div class="file-mark" aria-hidden="true">{{ item.contentType.startsWith('image/') ? '▧' : '▤' }}</div>
-              <h2 [title]="item.name">{{ item.name }}</h2><p>{{ size(item.size) }} · {{ item.updatedAt | date:'mediumDate' }}</p>
-              <div class="actions"><button type="button" [disabled]="disabled" (click)="download(item)">{{ 'library.download' | translate }}</button>
-                <button type="button" [disabled]="disabled" (click)="requestRename(item)">{{ 'library.rename' | translate }}</button>
-                <button type="button" [disabled]="disabled" (click)="requestDelete(item)">{{ 'library.delete' | translate }}</button></div>
+              <button type="button" class="file-menu-trigger" [cdkMenuTriggerFor]="fileMenu" [disabled]="disabled"
+                      [attr.aria-label]="'library.fileActions' | translate:{name: item.name}">
+                <span aria-hidden="true">⋯</span>
+              </button>
+              <ng-template #fileMenu>
+                <div cdkMenu class="file-menu" [attr.aria-label]="'library.fileActions' | translate:{name: item.name}">
+                  @if (previewKind(item)) {
+                    <button cdkMenuItem type="button" (cdkMenuItemTriggered)="openPreview(item)"><span nz-icon nzType="eye" aria-hidden="true"></span>{{ 'library.preview' | translate }}</button>
+                  }
+                  @if (item.contentType === documentType) {
+                    <button cdkMenuItem type="button" (cdkMenuItemTriggered)="openPreview(item, true)"><span nz-icon nzType="form" aria-hidden="true"></span>{{ 'library.editDocument' | translate }}</button>
+                  }
+                  <button cdkMenuItem type="button" (cdkMenuItemTriggered)="requestRename(item)"><span nz-icon nzType="edit" aria-hidden="true"></span>{{ 'library.rename' | translate }}</button>
+                  <button cdkMenuItem type="button" (cdkMenuItemTriggered)="download(item)"><span nz-icon nzType="download" aria-hidden="true"></span>{{ 'library.download' | translate }}</button>
+                  <div class="menu-divider" role="separator"></div>
+                  <button cdkMenuItem type="button" class="danger" (cdkMenuItemTriggered)="requestDelete(item)"><span nz-icon nzType="delete" aria-hidden="true"></span>{{ 'library.delete' | translate }}</button>
+                </div>
+              </ng-template>
+              @if (previewKind(item) === 'image') {
+                <button class="image-card" type="button" [disabled]="disabled" (click)="openPreview(item)"
+                        [attr.aria-label]="('library.preview' | translate) + ' ' + item.name">
+                  @defer (on viewport) {
+                    <app-library-thumbnail [id]="item.id" />
+                  } @placeholder {
+                    <span aria-hidden="true">▧</span>
+                  }
+                </button>
+              } @else {
+                <div class="file-mark" aria-hidden="true">▤</div>
+              }
+              <h3 [title]="item.name">
+                @if (previewKind(item) && previewKind(item) !== 'image') {
+                  <button class="file-title" type="button" [disabled]="disabled" (click)="openPreview(item)">{{ item.name }}</button>
+                } @else { {{ item.name }} }
+              </h3>
+              <p>{{ size(item.size) }} · {{ item.updatedAt | date:'mediumDate' }}</p>
             </article>
           }
+          </div>
         </section>
-      } @else {
+      } @empty {
         <section class="empty"><div aria-hidden="true">▤</div><h2>{{ (query || filter !== 'all' ? 'library.noResults' : 'library.empty') | translate }}</h2><p>{{ 'library.emptyHint' | translate }}</p></section>
       }
+    }
+    @if (preview; as active) {
+      <app-library-preview [item]="active.item" [accountId]="accountId" [edit]="active.edit" (closed)="closePreview($event)" />
     }
     @if (editing || deleting) {
       <div class="dialog-backdrop"><section class="dialog" cdkTrapFocus [cdkTrapFocusAutoCapture]="true" (keydown.escape)="cancel()" role="dialog" aria-modal="true" aria-labelledby="library-dialog-title">

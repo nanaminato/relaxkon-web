@@ -6,3 +6,8 @@
 .sidebar-utilities { display: flex; gap: 8px; margin-top: 10px; }
 .sidebar-utilities button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px; padding: 8px; border: 1px solid var(--app-border); border-radius: 7px; background: var(--app-surface); color: var(--app-text-muted); font-size: 12px; cursor: pointer; }
 @media (max-width: 900px) { .app-sidebar { position: absolute; inset: 0 auto 0 0; z-index: 20; width: min(84vw, 300px); box-shadow: 12px 0 28px #0b17362b; } .menu-backdrop { position: absolute; inset: 0; width: 100%; border: 0; background: #0b173666; z-index: 19; } }
+
+@media (min-width: 901px) {
+  .app-sidebar { width: 284px; flex-basis: 284px; }
+  .app-sidebar.rail-only { width: 56px; flex-basis: 56px; border-right: 0; }
+}

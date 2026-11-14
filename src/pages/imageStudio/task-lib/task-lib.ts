@@ -1,3 +1,4 @@
+import {SUCCESS_TOAST_DURATION} from '../../../shared/toast-duration';
 import {RouterLink} from '@angular/router';
 import {Component, inject, OnInit} from '@angular/core';
 import {GenerateTask} from "../../../models/media";
@@ -116,7 +117,7 @@ export class TaskLib implements OnInit {
 
   protected stopAllTask() {
     this.taskService.stopAllTasks();
-    this.notification.success(this.localization.text('notifications.allTasksStopped'), '');
+    this.notification.success(this.localization.text('notifications.allTasksStopped'), '', {nzDuration: SUCCESS_TOAST_DURATION});
   }
   imageProxyKey: string = "imageProxy";
   protected useProxy: boolean = false;
@@ -281,7 +282,7 @@ export class TaskLib implements OnInit {
         failedIds: '',
         skippedIds: ''
       });
-      this.notification.success(title, message);
+      this.notification.success(title, message, {nzDuration: SUCCESS_TOAST_DURATION});
       return;
     }
 
@@ -296,8 +297,6 @@ export class TaskLib implements OnInit {
       failedIds,
       skippedIds
     });
-    this.notification.warning(title, message, {
-      nzDuration: 8000
-    });
+    this.notification.warning(title, message);
   }
 }

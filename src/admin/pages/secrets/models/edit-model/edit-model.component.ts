@@ -1,3 +1,4 @@
+import {SUCCESS_TOAST_DURATION} from '../../../../../shared/toast-duration';
 import {TranslateService} from '@ngx-translate/core';
 import {TranslateModule} from '@ngx-translate/core';
 import {Component, inject, EventEmitter, Input, Output} from '@angular/core';
@@ -70,7 +71,7 @@ export class EditModelComponent {
         })
         .subscribe({
           next: () =>{
-            this.message.success(this.i18n.instant('admin.management.modelUpdated'));
+            this.message.success(this.i18n.instant('admin.management.modelUpdated'), {nzDuration: SUCCESS_TOAST_DURATION});
             this.close.next(true);
           },
           error: (err: any) => {

@@ -95,9 +95,7 @@ export class HistoryTitleEffect {
         ofType(historyTitleActions.loadFailure),
         // 使用 tap 执行副作用（弹窗），不改变流
         tap(({ error }) => {
-          this.messageService.error(this.i18n.instant('admin.management.historyLoadFailed', {error}), {
-            nzDuration: 3000 // 持续3秒
-          });
+          this.messageService.error(this.i18n.instant('admin.management.historyLoadFailed', {error}));
         })
       ),
     { dispatch: false } // 必须设置，因为这里不返回新的 Action

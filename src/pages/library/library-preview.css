@@ -1,0 +1,94 @@
+.backdrop { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 16px; background: #0008; }
+ .preview-dialog { box-sizing: border-box; width: min(100%, 960px); max-height: 90dvh; overflow: auto; padding: clamp(16px, 3vw, 28px); border-radius: 18px; background: var(--app-surface, #fff); color: var(--app-text, #202123); box-shadow: 0 15px 60px #0004; }
+.preview-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 16px; }
+h2 { margin: 0; font-size: 20px; overflow-wrap: anywhere; }
+button, .image-picker { cursor: pointer; border: 1px solid #7778; border-radius: 8px; padding: 8px 12px; background: transparent; color: inherit; font: inherit; }
+button:hover:not(:disabled), .image-picker:hover:not(.disabled) { background: #5177ab30; border-color: #5177ab; }
+button.primary { background: #264976; color: #fff; }
+button.primary:hover:not(:disabled) { background: #173659; color: #fff; }
+button:disabled, .disabled { opacity: .5; cursor: not-allowed; }
+.image-picker { display: inline-block; position: relative; }
+.image-picker input { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); }
+.image-picker:focus-within { outline: 2px solid #5177ab; }
+.markdown { overflow-wrap: anywhere; overflow: auto; border: 1px solid #7774; border-radius: 8px; padding: 12px; }
+:host ::ng-deep .markdown img { max-width: 100%; height: auto; }
+.full-image { display: block; max-height: 70dvh; max-width: 100%; object-fit: contain; margin: auto; }
+iframe { border: 0; width: 100%; height: 70dvh; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+.history-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.revisions { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 0; list-style: none; }
+.editor-dialog { padding: clamp(18px, 3vw, 30px); }
+.editor-dialog h2 { font-size: 24px; font-weight: 650; letter-spacing: -.02em; }
+.editor-form { display: grid; gap: 18px; }
+.title-field { display: grid; gap: 5px; font-size: 13px; color: var(--app-text-muted, #536173); }
+.editor-dialog .title-field input, .editor-dialog .editor-source {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  color: var(--app-text, #202123);
+  background: var(--app-surface, #fff);
+}
+.editor-dialog .title-field input {
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 1px solid var(--app-border, #ddd);
+  border-radius: 0;
+  font: inherit;
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 600;
+}
+.editor-layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--app-border, #ddd);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.editor-pane { display: flex; flex-direction: column; min-width: 0; }
+.editor-pane + .editor-pane { border-left: 1px solid var(--app-border, #ddd); }
+.pane-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 46px;
+  padding: 6px 14px;
+  border-bottom: 1px solid var(--app-border, #ddd);
+  background: var(--app-background, #f7f8fa);
+  font-size: 13px;
+  font-weight: 600;
+}
+.pane-bar .image-picker { padding: 5px 9px; font-size: 12px; }
+.editor-dialog .editor-source {
+  flex: 1;
+  height: clamp(240px, 42dvh, 520px);
+  padding: 16px;
+  border: 0;
+  border-radius: 0;
+  resize: none;
+  font: 14px/1.65 ui-monospace, monospace;
+}
+.editor-render {
+  box-sizing: border-box;
+  height: clamp(240px, 42dvh, 520px);
+  padding: 16px;
+  overflow: auto;
+  border: 0;
+  border-radius: 0;
+  margin: 0;
+}
+.preview-empty, .editor-footer p { color: var(--app-text-muted, #536173); font-size: 13px; }
+.editor-footer, .editor-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.editor-footer { justify-content: space-between; }
+.editor-footer p { margin: 0; }
+.editor-footer .primary { min-width: 82px; border-radius: 10px; }
+.editor-dialog :is(input, textarea, button):focus-visible { outline: 2px solid #5177ab; outline-offset: -2px; }
+@media (max-width: 680px) {
+  .editor-layout { grid-template-columns: 1fr; }
+  .editor-pane + .editor-pane { border-left: 0; border-top: 1px solid var(--app-border, #ddd); }
+  .editor-dialog .editor-source { flex: none; height: 240px; }
+  .editor-render { height: auto; min-height: 115px; max-height: 38dvh; }
+}

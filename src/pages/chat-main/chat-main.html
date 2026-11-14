@@ -37,7 +37,7 @@
         <nz-icon nzType="menu-unfold" nzTheme="outline" />
       }
     </button>
-    <div class="chat-title"><strong>{{'universal.aiChat' | translate}}</strong><span>{{'workspace.chatSubtitle' | translate}}</span></div>
+    <strong class="chat-title">{{ 'universal.aiChat' | translate }}</strong>
     <button type="button" class="share-button" (click)="openShare()" [disabled]="answering || !hasShareableMessages"
             [attr.aria-label]="'chat.share.title' | translate"><span nz-icon nzType="export" aria-hidden="true"></span><span>{{'chat.share.title' | translate}}</span></button>
     <app-language-switcher></app-language-switcher>

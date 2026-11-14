@@ -1,3 +1,4 @@
+import {SUCCESS_TOAST_DURATION} from '../../../../../shared/toast-duration';
 import {roleErrorKey} from '../../../../services/role-errors';
 import {Component, DestroyRef, EventEmitter, inject, Output} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
@@ -32,7 +33,7 @@ export class NewRoleComponent {
     this.saving = true;
     const body = {...this.validateForm.getRawValue()};
     this.call.addRole(body).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.saving = false)).subscribe({
-      next: () => { this.message.success(this.i18n.instant('admin.management.addSuccess')); this.close.emit(true); },
+      next: () => { this.message.success(this.i18n.instant('admin.management.addSuccess'), {nzDuration: SUCCESS_TOAST_DURATION}); this.close.emit(true); },
       error: error => this.message.error(this.i18n.instant(roleErrorKey(error)))
     });
   }

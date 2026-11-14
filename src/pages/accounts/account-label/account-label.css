@@ -1,2 +1,27 @@
-.loginBox { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; padding: 12px; border-top: 1px solid var(--app-border); background: var(--app-background); }
-.loginBox button { width: auto !important; flex: 1 1 90px; height: auto; min-height: 34px; margin: 0 !important; border: 1px solid var(--app-border); border-radius: 7px; font-size: 12px; color: var(--app-text); }
+:host { display: block; flex-shrink: 0; }
+.account-footer { padding: 10px; border-top: 1px solid var(--app-border); }
+details { position: relative; }
+summary { display: flex; align-items: center; gap: 10px; padding: 6px 9px; min-height: 46px; border-radius: 10px; cursor: pointer; color: var(--app-text); list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary:hover, details[open] summary { background: var(--app-hover); }
+.avatar { display: grid; place-items: center; width: 34px; height: 34px; flex-shrink: 0; border-radius: 50%; background: var(--app-selection); color: var(--app-text); font-weight: 650; }
+.identity { display: grid; flex: 1; min-width: 0; }
+.identity strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.identity small { color: var(--app-text-muted); font-size: 11px; }
+.account-panel { position: absolute; z-index: 5; bottom: calc(100% + 6px); inset-inline: 0; max-height: 64dvh; overflow: auto; padding: 6px; border: 1px solid var(--app-border); border-radius: 12px; background: var(--app-surface); box-shadow: 0 8px 28px #18253922; }
+.account-panel a, .account-panel button, .guest a { display: flex; align-items: center; min-height: 44px; width: 100%; padding: 6px 10px; border: 0; border-radius: 7px; background: transparent; color: var(--app-text); text-decoration: none; cursor: pointer; font-size: 13px; }
+.account-panel a:hover, .account-panel button:hover, .guest a:hover { background: var(--app-hover); }
+.locale { padding: 5px 10px; }
+.guest { display: flex; }
+.guest a { width: auto; flex: 1; justify-content: center; }
+:where(summary, a, button):focus-visible { outline: 2px solid var(--app-accent); outline-offset: -2px; }
+
+.guest a { gap: 8px; }
+@media (min-width: 901px) {
+  .account-footer { padding: 6px; }
+  summary { padding: 0; justify-content: center; }
+  .identity, summary > .anticon, .guest-label { display: none; }
+  .guest { flex-direction: column; }
+  .guest a { font-size: 18px; padding: 0; }
+  .account-panel { inset-inline-start: 0; inset-inline-end: auto; width: 214px; }
+}

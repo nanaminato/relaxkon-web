@@ -2,7 +2,7 @@
 .chat-main,.messages{display:flex;flex-direction:column;min-height:0}
 .tools,.notice{display:flex;gap:8px}
 .chat-title{display:grid}
-.chat-title span,.welcome p,.starters small,.notice{color:var(--app-text-muted);font-size:12px}
+.welcome p,.starters small,.notice{color:var(--app-text-muted);font-size:12px}
 app-language-switcher{margin-left:auto}
 .messages{flex:1;overflow:auto}
 .welcome{width:min(720px,100%);padding:32px 24px;margin:auto;text-align:center}
@@ -130,7 +130,7 @@ h1{font-size:30px;color:inherit}
 }
 .notice { justify-content: center; padding: 8px 20px 12px; text-align: center; }
 @media (max-width: 600px) {
-  .chat-title span, .starters small { display: none; }
+   .starters small { display: none; }
   h1 { font-size: 24px; }
   .starters { gap: 8px; }
   .starters button { padding: 12px 8px; }
@@ -154,3 +154,7 @@ app-language-switcher { margin-left: 0; }
   .share-button > span:last-child { display: none; }
   .composer { padding: 9px 10px; }
 }
+
+@media (max-width: 360px) { .share-button span:last-child { display: none; } }
+
+.chat-title { margin-inline-end: auto; }

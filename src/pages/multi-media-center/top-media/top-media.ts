@@ -1,10 +1,7 @@
-import {WorkspaceLinks} from '../../../shared/workspace-links';
-import {LanguageSwitcher} from '../../../shared/language-switcher';
+import {WorkspaceSidebar} from '../../../shared/workspace-sidebar';
 import {Component, HostListener, inject,} from '@angular/core';
 import {RouterLink, RouterLinkActive, RouterOutlet} from "@angular/router";
 import {NzImageService} from "ng-zorro-antd/image";
-import {AccountLabel} from "../../accounts/account-label/account-label";
-import {NzSkeletonComponent} from "ng-zorro-antd/skeleton";
 import {TranslatePipe} from "@ngx-translate/core";
 import {SizeReportService} from "../../../services/normal-services";
 
@@ -15,10 +12,7 @@ import {SizeReportService} from "../../../services/normal-services";
   standalone: true,
   imports: [
     RouterOutlet,
-    LanguageSwitcher,
-    WorkspaceLinks,
-    AccountLabel,
-    NzSkeletonComponent,
+    WorkspaceSidebar,
     RouterLink,
     TranslatePipe,
     RouterLinkActive,
@@ -36,6 +30,8 @@ export class TopMedia {
     return this.sizeReportService.miniPhoneView();
   }
   @HostListener('document:keydown.escape')
+  dismissDrawer() { this.closeMenuIfCompact(); }
+
   hideMenu() {
     this.sizeReportService.hideMenu();
   }

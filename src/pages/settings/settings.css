@@ -63,18 +63,6 @@
   overflow-wrap: anywhere;
 }
 
-.provider-chip {
-  max-width: 100%;
-  margin: 4px;
-  padding: 6px 10px;
-  border: 1px solid var(--app-border);
-  border-radius: var(--app-control-radius);
-  background: var(--app-surface-muted);
-  color: var(--app-text);
-  text-align: start;
-  overflow-wrap: anywhere;
-}
-.provider-chip:hover { background: var(--app-hover); }
 
 .back-to-top {
   position: fixed;

@@ -1,3 +1,4 @@
+import {SUCCESS_TOAST_DURATION} from '../../../../../shared/toast-duration';
 import {TranslateService} from '@ngx-translate/core';
 import {TranslateModule} from '@ngx-translate/core';
 import {Component, inject, EventEmitter, Output} from '@angular/core';
@@ -63,7 +64,7 @@ export class NewModelComponent {
         vision: this.validateForm.value.vision!
       }).subscribe({
         next: () =>{
-          this.message.success(this.i18n.instant('admin.management.addSuccess'));
+          this.message.success(this.i18n.instant('admin.management.addSuccess'), {nzDuration: SUCCESS_TOAST_DURATION});
           this.close.next(true);
         },
         error: (err: any) => {

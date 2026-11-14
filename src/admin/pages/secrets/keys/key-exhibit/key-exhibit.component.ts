@@ -1,3 +1,4 @@
+import {SUCCESS_TOAST_DURATION} from '../../../../../shared/toast-duration';
 import {TranslateService} from '@ngx-translate/core';
 import {TranslateModule} from '@ngx-translate/core';
 import {inject, Component, EventEmitter, Input, Output} from '@angular/core';
@@ -38,7 +39,7 @@ export class KeyExhibitComponent {
     this.call.deleteKey(id)
       .subscribe({
         next: msg=>{
-          this.message.success(this.i18n.instant('admin.management.deleteSuccess'))
+          this.message.success(this.i18n.instant('admin.management.deleteSuccess'), {nzDuration: SUCCESS_TOAST_DURATION})
           this.refresh.next(true);
         },
         error: err=>{

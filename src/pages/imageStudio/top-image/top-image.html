@@ -1,26 +1,17 @@
 <div class="d-flex flex-row w-100 h-100" style="position: relative;">
-  @if(visible()){
+  @if(!isCompact() || visible()){
     @if(isCompact()){
       <button class="menu-backdrop" type="button" [attr.aria-label]="'studio.shared.menu' | translate" (click)="hideMenu()"></button>
     }
-    <div class="d-flex flex-column h-100 menu" [class.w-100]="!isCompact()" [class.menu-overlay]="isCompact()">
-      <div class="bg-theme overflow-y-auto flex-grow-1">
-        <a class="workspace-brand-link" routerLink="/chat" (click)="closeMenuIfCompact()"><span class="workspace-brand-mark" aria-hidden="true">R</span>RelaxKon</a>
+    <div class="d-flex flex-column h-100 menu" [class.w-100]="!isCompact()" [class.menu-overlay]="isCompact()" [class.rail-only]="!visible()">
+      <app-workspace-sidebar sectionTitle="universal.image-studio" [collapsed]="!visible()">
         <nav class="workspace-links studio-section-nav" [attr.aria-label]="'universal.image-studio' | translate">
           <p class="workspace-nav-caption">{{'universal.image-studio' | translate}}</p>
           <a (click)="closeMenuIfCompact()" routerLinkActive="nav-active" ariaCurrentWhenActive="page" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/image-studio/gpt-image']">{{'workspace.openaiImage' | translate}}</a>
           <a (click)="closeMenuIfCompact()" routerLinkActive="nav-active" ariaCurrentWhenActive="page" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/image-studio/APIMart-image']">{{'studio.image.apimart.nav' | translate}}</a>
           <a (click)="closeMenuIfCompact()" routerLinkActive="nav-active" ariaCurrentWhenActive="page" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="['/image-studio/task-lib']">{{'universal.storeHouse'| translate}}</a>
         </nav>
-      </div>
-      <div class="studio-footer"><div class="studio-locale"><app-language-switcher /></div>
-        <app-workspace-links />
-        @defer (on viewport) {
-          <app-account-label></app-account-label>
-        } @placeholder {
-          <nz-skeleton></nz-skeleton>
-        }
-      </div>
+      </app-workspace-sidebar>
     </div>
   }
   <div style="flex: 1 1 auto; min-width:0; overflow: hidden;">

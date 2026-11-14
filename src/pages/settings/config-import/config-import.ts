@@ -1,3 +1,4 @@
+import {SUCCESS_TOAST_DURATION} from '../../../shared/toast-duration';
 import {Component, EventEmitter, inject, Output} from '@angular/core';
 import {ClipboardModule} from "ngx-clipboard";
 import {FormsModule} from "@angular/forms";
@@ -47,7 +48,7 @@ export class ConfigImport {
     try {
       let config = JSON.parse(ujson);
       this.configInput.emit(config);
-      this.notification.success(this.localization.text('notifications.configImported'), '');
+      this.notification.success(this.localization.text('notifications.configImported'), '', {nzDuration: SUCCESS_TOAST_DURATION});
     } catch (error) {
       this.notification.error(this.localization.text('notifications.configImportFailed'), `${error}`);
     }

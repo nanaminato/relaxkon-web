@@ -1,3 +1,4 @@
+import {SUCCESS_TOAST_DURATION} from '../../../../shared/toast-duration';
 import {DatePipe} from '@angular/common';
 import {AuthenticatedImage} from '../../../../shared/authenticated-image';
 import {Component, EventEmitter, inject, input, Input, Output} from '@angular/core';
@@ -64,7 +65,7 @@ export class TaskItem {
   deleteItem(task: GenerateTask) {
     this.sendService.deleteTask(task.task_id!).then(msg=>{
       this.universalService.deleteGenerateTask(task).then(c=>{
-        this.notification.success(msg,"")
+        this.notification.success(msg,"", {nzDuration: SUCCESS_TOAST_DURATION})
       });
       this.delete.emit(task.task_id!);
     })

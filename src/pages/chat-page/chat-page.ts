@@ -1,13 +1,10 @@
-import {WorkspaceLinks} from '../../shared/workspace-links';
+import {WorkspaceSidebar} from '../../shared/workspace-sidebar';
 import {Component, HostListener, inject} from '@angular/core';
-import {Router, RouterLink, RouterOutlet} from "@angular/router";
+import {Router, RouterOutlet} from "@angular/router";
 import {MenuAbleService} from "../../services/normal-services/menu-able.service";
-import {AccountLabel} from "../accounts/account-label/account-label";
 import {ChatHistory} from "../chat-history/chat-history";
-import {NzIconDirective} from "ng-zorro-antd/icon";
 import {NzSkeletonComponent} from "ng-zorro-antd/skeleton";
 import {TranslatePipe} from "@ngx-translate/core";
-import {user_routes} from "../../roots/routes";
 import {Configuration} from "../../models";
 import {SizeReportService} from "../../services/normal-services";
 import {AuthService} from "../../auth_module";
@@ -20,12 +17,9 @@ import {Store} from "@ngrx/store";
   standalone: true,
   imports: [
     RouterOutlet,
-    AccountLabel,
     ChatHistory,
-    NzIconDirective,
     NzSkeletonComponent,
-    RouterLink,
-    WorkspaceLinks,
+    WorkspaceSidebar,
     TranslatePipe
   ],
   providers: [
@@ -52,9 +46,5 @@ export class ChatPage {
     if (this.isCompact()) {
       this.sizeReportService.hideMenu();
     }
-  }
-  openSettingPage() {
-    this.closeMenuIfCompact();
-    this.router.navigate(user_routes.settings);
   }
 }

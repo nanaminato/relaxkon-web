@@ -1,3 +1,4 @@
+import {SUCCESS_TOAST_DURATION} from '../../shared/toast-duration';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Component, EventEmitter, inject, Input, Output, signal} from '@angular/core';
 import {ClipboardService} from "ngx-clipboard";
@@ -103,7 +104,7 @@ export class Dialogue {
 
   copyAllContent() {
     this.clipboard.copy(this.chatModel?.content!);
-    this.notification.success(this.localization.text('notifications.copySuccess'), '');
+    this.notification.success(this.localization.text('notifications.copySuccess'), '', {nzDuration: SUCCESS_TOAST_DURATION});
   }
   @Output()
   reGenerateSignal = new EventEmitter<number>();

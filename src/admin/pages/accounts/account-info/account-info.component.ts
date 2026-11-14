@@ -9,9 +9,6 @@ import {NzCardComponent} from "ng-zorro-antd/card";
 import {AuthService, VerificationService} from "../../../../auth_module";
 import {AccountCallService} from "../../../services";
 import {admin_routes} from "../../../routes";
-import {ServiceProvider} from "../../../roots";
-import {FormsModule} from "@angular/forms";
-import {NzInputDirective} from "ng-zorro-antd/input";
 
 @Component({
   selector: 'app-account-info',
@@ -19,8 +16,6 @@ import {NzInputDirective} from "ng-zorro-antd/input";
   imports: [
     TranslateModule,
     NzCardComponent,
-    FormsModule,
-    NzInputDirective,
   ],
   templateUrl: './account-info.component.html',
   styleUrl: './account-info.component.css'
@@ -31,16 +26,12 @@ export class AccountInfoComponent {
               private verificationService: VerificationService,
               private router: Router,
               private authService: AuthService,
-              private call: AccountCallService,
-              private provider: ServiceProvider,) {
+              private call: AccountCallService) {
 
   }
 
   get user() {
     return this.authService.user;
-  }
-  apiUrl(){
-    return this.provider.apiUrl
   }
 
   ngOnInit() {

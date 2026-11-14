@@ -1,8 +1,23 @@
-<div class="loginBox">
-  @if (isLogin) {
-    <button class="bg-theme w-100 " nz-button (click)="openAccount()">{{ 'account.self' | translate }}</button>
-    <button class="bg-theme w-100 mt-1" nz-button (click)="openAdmin()">{{ 'admin.controlCenter' | translate }}</button>
+<div class="account-footer">
+  @if (auth.isLogin) {
+    <details #accountMenu (keydown.escape)="accountMenu.open = false; profile.focus()">
+      <summary #profile [attr.aria-label]="displayName || ('account.self' | translate)" [attr.title]="compact ? null : (displayName || ('account.self' | translate))">
+        <span class="avatar" aria-hidden="true">{{ initial }}</span>
+        <span class="identity"><strong>{{ displayName || ('account.self' | translate) }}</strong><small>{{ 'account.self' | translate }}</small></span>
+        <span nz-icon nzType="up" aria-hidden="true"></span>
+      </summary>
+      <div class="account-panel">
+        <a [routerLink]="routes.account_info" (click)="close(accountMenu)">{{ 'account.self' | translate }}</a>
+        <a [routerLink]="routes.settings" (click)="close(accountMenu)">{{ 'chat.history.settings' | translate }}</a>
+        @if (canManage()) { <a routerLink="/admin" (click)="close(accountMenu)">{{ 'admin.controlCenter' | translate }}</a> }
+        <div class="locale"><app-language-switcher /></div>
+        <button type="button" (click)="logout(accountMenu)">{{ 'account.signOut' | translate }}</button>
+      </div>
+    </details>
   } @else {
-    <button class="bg-theme w-100" nz-button (click)="openSignIn()">{{ 'account.signIn' | translate }}</button>
+    <div class="guest">
+      <a [routerLink]="routes.sign_in" (click)="closeDrawer()" [attr.title]="compact ? null : ('account.signIn' | translate)" [attr.aria-label]="'account.signIn' | translate"><span nz-icon nzType="login" aria-hidden="true"></span><span class="guest-label">{{ 'account.signIn' | translate }}</span></a>
+      <a [routerLink]="routes.settings" (click)="closeDrawer()" [attr.title]="compact ? null : ('chat.history.settings' | translate)" [attr.aria-label]="'chat.history.settings' | translate"><span nz-icon nzType="setting" aria-hidden="true"></span><span class="guest-label">{{ 'chat.history.settings' | translate }}</span></a>
+    </div>
   }
 </div>

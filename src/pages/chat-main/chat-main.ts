@@ -1,3 +1,4 @@
+import {SUCCESS_TOAST_DURATION} from '../../shared/toast-duration';
 import {LibraryPicker} from './library-picker/library-picker';
 import {ShareDialog} from './share-dialog/share-dialog';
 import {createShareSnapshot, ShareMessage} from './share-dialog/share-snapshot';
@@ -400,7 +401,7 @@ export class ChatMainComponent implements OnDestroy{
   clearContext() {
     if (this.answering) return;
     this.chatContext.pointer = undefined;
-    this.notification.success(this.localization.text('chat.composer.clearContext'), this.localization.text('notifications.contextCleared'));
+    this.notification.success(this.localization.text('chat.composer.clearContext'), this.localization.text('notifications.contextCleared'), {nzDuration: SUCCESS_TOAST_DURATION});
     this.awareContextChange();
   }
 

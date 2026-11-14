@@ -1,3 +1,4 @@
+import {SUCCESS_TOAST_DURATION} from '../../../../shared/toast-duration';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {Subscription, finalize} from 'rxjs';
@@ -68,7 +69,7 @@ export class KeysComponent {
       next: keys=>{
         this.keys = keys;
         if(refresh){
-          this.message.success(this.i18n.instant('admin.management.refreshSuccess'));
+          this.message.success(this.i18n.instant('admin.management.refreshSuccess'), {nzDuration: SUCCESS_TOAST_DURATION});
         }
       },
       error: err => {
@@ -83,7 +84,7 @@ export class KeysComponent {
   loadIntoRunPool() {
     this.reloadService.loadKeys().subscribe({
       next: msg=>{
-        this.message.success(msg.msg);
+        this.message.success(msg.msg, {nzDuration: SUCCESS_TOAST_DURATION});
       },
       error: err => {
         this.message.error(err.error);
