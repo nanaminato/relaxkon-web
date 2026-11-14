@@ -24,6 +24,28 @@ RelaxKon Web是一个 Angular 单页应用，用于访问 RelaxKon Server 提供
 - 本地保存显示偏好、常用模型与会话设置；账户登录后可使用服务端提供的同步能力。
 - 支持中文、英文和日文，以及响应式页面与离线资源缓存。
 
+## 生产环境截图
+
+以下示例截自 [RelaxKon 生产站点](https://relaxkon.com/chat) 的 AI 对话。
+
+### 在对话中生成文件
+
+模型按提示生成 CSV，并在回复中提供文件卡片和下载链接。可直接打开 [生成的 CSV 示例](docs/examples/relaxkon-live.csv)。
+
+![生产环境中生成 CSV 文件的对话](docs/screenshots/production-chat-file.jpg)
+
+### 在对话中生成图像
+
+生成的图像直接显示在模型回复中，可以从对话下载。
+
+![生产环境中生成图像的对话](docs/screenshots/production-chat-image.jpg)
+
+### 在对话中发送文件
+
+用户随消息发送扫描版 PDF，模型读取附件并返回扫描图上的编号。可直接打开 [对话中发送的 PDF 示例](docs/examples/live-scan-fixture.pdf)。
+
+![生产环境中发送 PDF 附件并读取内容的对话](docs/screenshots/production-chat-attachment.jpg)
+
 ## 快速开始
 
 已部署的站点无需安装任何软件：使用管理员提供的地址注册或登录，选择可用模型后即可开始对话。若页面提示没有可用模型或无权调用功能，请联系管理员完成账户角色、模型和供应商密钥配置。
