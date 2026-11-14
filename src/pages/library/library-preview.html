@@ -3,7 +3,19 @@
            aria-labelledby="library-preview-title" (keydown.escape)="!busy && closed.emit(changed)">
     <header class="preview-header">
       <h2 id="library-preview-title">{{ item()?.name || ('library.newDocument' | translate) }}</h2>
+      <div class="preview-header-actions">
+        @if (edit() && loaded && !historical) {
+          <div class="view-modes" role="group" [attr.aria-label]="'library.editorView' | translate">
+            @for (mode of viewModes; track mode.id) {
+              <button type="button" [attr.aria-label]="mode.label | translate" [title]="mode.label | translate"
+                      [attr.aria-pressed]="viewMode === mode.id" (click)="viewMode = mode.id">
+                <span nz-icon [nzType]="mode.icon" aria-hidden="true"></span>
+              </button>
+            }
+          </div>
+        }
       <button type="button" [attr.cdkFocusInitial]="edit() ? null : ''" [disabled]="busy" (click)="closed.emit(changed)">{{ 'library.closePreview' | translate }}</button>
+      </div>
     </header>
     @if (status) { <p role="alert">{{ status | translate }}</p> }
     @if (!loaded && busy) { <p role="status">{{ 'library.working' | translate }}</p> }
@@ -40,8 +52,8 @@
           <input cdkFocusInitial name="name" [ngModel]="name" (ngModelChange)="name = $event; saveDraft()"
                  maxlength="200" required [disabled]="busy" [placeholder]="'library.titlePlaceholder' | translate">
         </label>
-        <div class="editor-layout">
-          <div class="editor-pane">
+        <div class="editor-layout" [class.single-pane]="viewMode !== 'split'">
+          <div class="editor-pane source-pane" [hidden]="viewMode === 'preview'">
             <div class="pane-bar">
               <label for="library-markdown-source">{{ 'library.markdownSource' | translate }}</label>
               <label class="image-picker" [class.disabled]="busy">
@@ -54,7 +66,7 @@
                       (ngModelChange)="text = $event; saveDraft(); render()" [readOnly]="busy"
                       [placeholder]="'library.sourcePlaceholder' | translate"></textarea>
           </div>
-          <div class="editor-pane">
+          <div class="editor-pane render-pane" [hidden]="viewMode === 'source'">
             <div class="pane-bar">{{ 'library.preview' | translate }}</div>
             @if (html) { <div class="markdown editor-render" [innerHTML]="html"></div> }
             @else { <p class="editor-render preview-empty">{{ 'library.previewPlaceholder' | translate }}</p> }

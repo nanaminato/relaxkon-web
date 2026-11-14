@@ -37,10 +37,11 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; }
   border-bottom: 1px solid var(--app-border, #ddd);
   border-radius: 0;
   font: inherit;
-  font-size: clamp(20px, 3vw, 28px);
+  font-size: clamp(16px, 2vw, 20px);
   font-weight: 600;
 }
 .editor-layout {
+  --editor-body-height: clamp(240px, 42dvh, 520px);
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   border: 1px solid var(--app-border, #ddd);
@@ -63,8 +64,8 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; }
 }
 .pane-bar .image-picker { padding: 5px 9px; font-size: 12px; }
 .editor-dialog .editor-source {
-  flex: 1;
-  height: clamp(240px, 42dvh, 520px);
+  flex: none;
+  height: var(--editor-body-height);
   padding: 16px;
   border: 0;
   border-radius: 0;
@@ -73,7 +74,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; }
 }
 .editor-render {
   box-sizing: border-box;
-  height: clamp(240px, 42dvh, 520px);
+  height: var(--editor-body-height);
   padding: 16px;
   overflow: auto;
   border: 0;
@@ -89,6 +90,18 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; }
 @media (max-width: 680px) {
   .editor-layout { grid-template-columns: 1fr; }
   .editor-pane + .editor-pane { border-left: 0; border-top: 1px solid var(--app-border, #ddd); }
-  .editor-dialog .editor-source { flex: none; height: 240px; }
-  .editor-render { height: auto; min-height: 115px; max-height: 38dvh; }
+  .editor-layout { --editor-body-height: 240px; }
+  .editor-layout:not(.single-pane) .editor-render { height: auto; min-height: 115px; max-height: 38dvh; }
+}
+
+.preview-header { flex-wrap: wrap; }
+.preview-header-actions { display: flex; align-items: center; gap: 8px; margin-inline-start: auto; }
+.view-modes { display: flex; gap: 2px; padding: 3px; border-radius: 9px; background: var(--app-background, #f7f8fa); }
+.view-modes button { display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border-color: transparent; }
+.view-modes button[aria-pressed="true"] { background: var(--app-selection, #5177ab30); color: var(--app-text, #202123); border-color: var(--app-border, #8885); }
+.editor-layout.single-pane { grid-template-columns: minmax(0, 1fr); }
+.editor-layout.single-pane .render-pane { border: 0; }
+.editor-pane[hidden] { display: none; }
+@media (max-width: 680px), (pointer: coarse) {
+  .view-modes button { width: 44px; height: 44px; }
 }

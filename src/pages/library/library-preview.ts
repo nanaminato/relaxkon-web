@@ -1,4 +1,6 @@
 import {Component, DestroyRef, OnInit, inject, input, output} from '@angular/core';
+import {NzIconDirective, provideNzIconsPatch} from 'ng-zorro-antd/icon';
+import {AlignLeftOutline, LayoutOutline, EyeOutline} from '@ant-design/icons-angular/icons';
 import {DatePipe} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {A11yModule} from '@angular/cdk/a11y';
@@ -25,7 +27,8 @@ export function libraryPreviewKind(item: LibraryItem) {
 
 @Component({
   selector: 'app-library-preview',
-  imports: [A11yModule, FormsModule, TranslatePipe, DatePipe],
+  imports: [A11yModule, FormsModule, TranslatePipe, DatePipe, NzIconDirective],
+  providers: [provideNzIconsPatch([AlignLeftOutline, LayoutOutline, EyeOutline])],
   templateUrl: './library-preview.html',
   styleUrl: './library-preview.css',
 })
@@ -61,6 +64,12 @@ export class LibraryPreview implements OnInit {
   status = '';
   changed = false;
   loaded = false;
+  readonly viewModes = [
+    {id: 'source', icon: 'align-left', label: 'library.sourceOnly'},
+    {id: 'split', icon: 'layout', label: 'library.splitView'},
+    {id: 'preview', icon: 'eye', label: 'library.previewOnly'},
+  ] as const;
+  viewMode: typeof this.viewModes[number]['id'] = 'split';
   draftStatus = '';
   draftConflict = false;
   private savedName = '';
