@@ -21,6 +21,7 @@ export const libraryDocumentType = 'text/vnd.relaxkon.document+markdown';
 export interface LibraryLimits {
   maxBytes: number;
   maxFileBytes: number;
+  maxHistoryBytes?: number;
 }
 
 export interface LibraryAdminLimits extends LibraryLimits {

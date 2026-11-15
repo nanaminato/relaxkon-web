@@ -31,6 +31,9 @@ const MiB = 1024 * 1024;
         <label>{{ 'library.fileLimitMiB' | translate }}
           <input type="number" name="file" [(ngModel)]="file" [disabled]="busy" min="0" max="10" step="any" required>
         </label>
+        <label>{{ 'library.historyLimitMiB' | translate }}
+          <input type="number" name="history" [(ngModel)]="history" [disabled]="busy" min="0" max="1024" step="any" required>
+        </label>
         <button type="submit" [disabled]="busy || invalid">{{ 'library.save' | translate }}</button>
       </form>
     }
@@ -51,6 +54,7 @@ export class LibraryLimitsComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   total: number | null = null;
   file: number | null = null;
+  history: number | null = null;
   loaded = false;
   busy = false;
   status = '';
@@ -58,6 +62,7 @@ export class LibraryLimitsComponent implements OnInit {
 
   get invalid() {
     return this.total === null || this.file === null || !Number.isFinite(this.total) || !Number.isFinite(this.file)
+      || this.history === null || !Number.isFinite(this.history) || this.history < 0 || this.history > 1024
       || this.total < this.file || this.total > 1024 || this.file < 1 / MiB || this.file > 10;
   }
 
@@ -67,10 +72,14 @@ export class LibraryLimitsComponent implements OnInit {
   }
 
   save() {
-    if (this.busy || this.invalid || this.total === null || this.file === null) return;
+    if (this.busy || this.invalid || this.total === null || this.file === null || this.history === null) return;
     this.busy = true;
     this.status = '';
-    this.api.saveLimits({maxBytes: Math.round(this.total * MiB), maxFileBytes: Math.round(this.file * MiB)})
+    this.api.saveLimits({
+      maxBytes: Math.round(this.total * MiB),
+      maxFileBytes: Math.round(this.file * MiB),
+      maxHistoryBytes: Math.round(this.history * MiB),
+    })
       .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.busy = false))
       .subscribe({next: limits => { this.apply(limits); this.status = 'library.limitsSaved'; }, error: e => this.status = libraryError(e.status)});
   }
@@ -78,5 +87,6 @@ export class LibraryLimitsComponent implements OnInit {
   private apply(limits: LibraryLimits) {
     this.total = limits.maxBytes / MiB;
     this.file = limits.maxFileBytes / MiB;
+    this.history = (limits.maxHistoryBytes ?? limits.maxBytes) / MiB;
   }
 }
