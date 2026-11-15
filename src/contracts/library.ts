@@ -13,12 +13,19 @@ export interface LibrarySnapshot {
   maxBytes: number;
   maxFileBytes: number;
   maxFiles: number;
+  historyUsedBytes?: number;
+  maxHistoryBytes?: number;
 }
 
 export const libraryDocumentType = 'text/vnd.relaxkon.document+markdown';
 export interface LibraryLimits {
   maxBytes: number;
   maxFileBytes: number;
+}
+
+export interface LibraryAdminLimits extends LibraryLimits {
+  usedBytes?: number;
+  historyUsedBytes?: number;
 }
 
 export interface LibraryRevision {

@@ -54,7 +54,10 @@ test('one frontend still hosts user and administrator routes', () => {
   for (const route of ['chat', 'accounts', 'admin', 'image-studio', 'media-studio']) {
     assert.match(routes, new RegExp(`path: '${route}'`));
   }
-  for (const template of ['src/pages/chat-page/chat-page.html', 'src/admin/pages/admin.component.html', 'src/pages/accounts/account/account.html']) {
+  const chat = read('src/pages/chat-page/chat-page.html');
+  assert.match(chat, /<app-workspace-sidebar\b/);
+  assert.doesNotMatch(chat, /Turbo AI/);
+  for (const template of ['src/admin/pages/admin.component.html', 'src/pages/accounts/account/account.html']) {
     assert.match(read(template), /RelaxKon/);
     assert.doesNotMatch(read(template), /Turbo AI/);
   }

@@ -1,19 +1,28 @@
 import {Component, DestroyRef, OnInit, inject} from '@angular/core';
+import {DecimalPipe} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {TranslatePipe} from '@ngx-translate/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {finalize} from 'rxjs';
-import {LibraryLimits} from '../../contracts/library';
+import {LibraryAdminLimits, LibraryLimits} from '../../contracts/library';
 import {LibraryService} from '../../services/library.service';
 import {libraryError} from '../../pages/library/library-error';
 
 const MiB = 1024 * 1024;
 
 @Component({
-  imports: [FormsModule, TranslatePipe],
+  imports: [DecimalPipe, FormsModule, TranslatePipe],
   template: `
     <h2>{{ 'library.manageLimits' | translate }}</h2>
     <p>{{ 'library.limitsHint' | translate }}</p>
+    @if (usage?.usedBytes !== undefined && usage?.historyUsedBytes !== undefined) {
+      <dl>
+        <dt>{{ 'library.currentFilesUsage' | translate }}</dt>
+        <dd>{{ usage?.usedBytes | number }} B</dd>
+        <dt>{{ 'library.historyUsage' | translate }}</dt>
+        <dd>{{ usage?.historyUsedBytes | number }} B</dd>
+      </dl>
+    }
     @if (loaded) {
       <form (ngSubmit)="save()">
         <label>{{ 'library.storagePerAccount' | translate }}
@@ -45,6 +54,7 @@ export class LibraryLimitsComponent implements OnInit {
   loaded = false;
   busy = false;
   status = '';
+  usage?: LibraryAdminLimits;
 
   get invalid() {
     return this.total === null || this.file === null || !Number.isFinite(this.total) || !Number.isFinite(this.file)
@@ -53,7 +63,7 @@ export class LibraryLimitsComponent implements OnInit {
 
   ngOnInit() {
     this.api.limits().pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({next: limits => { this.apply(limits); this.loaded = true; }, error: e => this.status = libraryError(e.status)});
+      .subscribe({next: limits => { this.usage = limits; this.apply(limits); this.loaded = true; }, error: e => this.status = libraryError(e.status)});
   }
 
   save() {

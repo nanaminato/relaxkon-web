@@ -36,6 +36,9 @@
     </section>
     @if (status) { <p class="status" role="status">{{ status | translate }}</p> }
     @if (snapshot) {
+      @if (snapshot.historyUsedBytes !== undefined && snapshot.maxHistoryBytes !== undefined) {
+        <div class="quota">{{ 'library.historyStorage' | translate }} {{ size(snapshot.historyUsedBytes) }} / {{ size(snapshot.maxHistoryBytes) }}</div>
+      }
       <div class="quota"><span>{{ 'library.storage' | translate }} {{ size(snapshot.usedBytes) }} / {{ size(snapshot.maxBytes) }} · {{ 'library.fileLimit' | translate }} {{ size(snapshot.maxFileBytes) }}</span><progress [value]="usedPercent" max="100" [attr.aria-label]="'library.storage' | translate"></progress></div>
       @for (group of groups; track group.key) {
         <section class="file-group" [attr.aria-labelledby]="'library-group-' + group.key">

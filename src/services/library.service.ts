@@ -2,7 +2,7 @@ import {inject, Injectable} from '@angular/core';
 import {Observable, Subject, catchError, EMPTY, mergeMap} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {ServiceProvider} from '../roots';
-import {LibraryItem, LibraryLimits, LibraryRevision, LibrarySnapshot} from '../contracts/library';
+import {LibraryItem, LibraryAdminLimits, LibraryLimits, LibraryRevision, LibrarySnapshot} from '../contracts/library';
 
 /** Private, authenticated server storage; never expose bearer tokens in download URLs. */
 @Injectable({providedIn: 'root'})
@@ -51,7 +51,7 @@ export class LibraryService {
   textPreview(id: string) {
     return this.http.get<{content: string}>(`${this.url}/${encodeURIComponent(id)}/text-preview`);
   }
-  limits() { return this.http.get<LibraryLimits>(`${this.url}/limits`); }
+  limits() { return this.http.get<LibraryAdminLimits>(`${this.url}/limits`); }
   saveLimits(limits: LibraryLimits) { return this.http.put<LibraryLimits>(`${this.url}/limits`, limits); }
   content(id: string) {
     return this.http.get(`${this.url}/${encodeURIComponent(id)}/content`, {responseType: 'blob'});
