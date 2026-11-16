@@ -1,11 +1,14 @@
 import {DEFAULT_TOAST_DURATION} from '../shared/toast-duration';
-import {NZ_CONFIG} from 'ng-zorro-antd/core/config';
+import {NZ_CONFIG, NzConfigService} from 'ng-zorro-antd/core/config';
 import {SyncEffects} from '../services/sync/sync.effects';
 import {provideAppTranslations} from './app-translations';
 import {localizationInterceptor} from '../systems/interceptors/localization.interceptor';
 import {
   ApplicationConfig,
+  DestroyRef,
+  inject,
   isDevMode,
+  provideAppInitializer,
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
 } from '@angular/core';
@@ -29,7 +32,25 @@ import {chatHistoryReducer} from "../systems/store/chat-history/chat-history.red
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    {provide: NZ_CONFIG, useValue: {message: {nzDuration: DEFAULT_TOAST_DURATION, nzMaxStack: 1, nzPauseOnHover: false, nzTop: 24}, notification: {nzDuration: DEFAULT_TOAST_DURATION, nzMaxStack: 1, nzPauseOnHover: true, nzPlacement: 'topRight'}}},
+    {
+      provide: NZ_CONFIG,
+      useValue: {
+        message: {nzDuration: DEFAULT_TOAST_DURATION, nzMaxStack: 1, nzPauseOnHover: false, nzTop: 24},
+        notification: {nzDuration: DEFAULT_TOAST_DURATION, nzMaxStack: 1, nzPauseOnHover: false, nzPlacement: 'topRight'}
+      }
+    },
+    provideAppInitializer(() => {
+      const config = inject(NzConfigService);
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const updateAnimations = () => {
+        // NG-ZORRO waits for animationend before removing animated notices.
+        config.set('message', {nzAnimate: !reducedMotion.matches});
+        config.set('notification', {nzAnimate: !reducedMotion.matches});
+      };
+      updateAnimations();
+      reducedMotion.addEventListener('change', updateAnimations);
+      inject(DestroyRef).onDestroy(() => reducedMotion.removeEventListener('change', updateAnimations));
+    }),
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes, withPreloading(PreloadAllModules)),

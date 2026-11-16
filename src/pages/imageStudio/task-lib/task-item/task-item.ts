@@ -51,7 +51,7 @@ export class TaskItem {
           this.universalService.addOrUpdateGenerateTask(this.task!).then(
             c=>{
               this.sendService.updateTask(this.task!);
-              this.notification.info(this.localization.text('notifications.taskResultRetrieved'), '')
+              this.notification.success(this.localization.text('notifications.taskResultRetrieved'), '', {nzDuration: SUCCESS_TOAST_DURATION})
             }
           );
         }else{

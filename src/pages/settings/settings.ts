@@ -93,7 +93,8 @@ export class Settings {
       .create(
         "success",
         this.localization.text('notifications.resetSuccess'),
-        this.localization.text('notifications.settingsResetSuccess')
+        this.localization.text('notifications.settingsResetSuccess'),
+        {nzDuration: SUCCESS_TOAST_DURATION}
       );
   }
 
@@ -105,7 +106,8 @@ export class Settings {
       .create(
         "success",
         this.localization.text('notifications.applySuccess'),
-        this.localization.text('notifications.settingsSaved')
+        this.localization.text('notifications.settingsSaved'),
+        {nzDuration: SUCCESS_TOAST_DURATION}
       );
   }
 

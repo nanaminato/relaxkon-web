@@ -141,9 +141,6 @@ button, [role="button"] {
 }
 .ant-message-custom-content { display: flex; align-items: baseline; gap: 10px; }
 .ant-message-custom-content > .anticon { margin-right: 0; flex-shrink: 0; }
-@media (prefers-reduced-motion: reduce) {
-  .ant-message-notice { animation: none !important; transition: none !important; }
-}
 
 /* Overlay content lives outside page components, so share the app theme here. */
 .ant-modal-mask { background: rgba(15, 23, 42, .38); backdrop-filter: blur(3px); }

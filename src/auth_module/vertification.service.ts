@@ -19,7 +19,7 @@ export class VerificationService {
         if (err instanceof HttpErrorResponse) {
           this.message.error(this.localization.text('notifications.verificationCodeNetworkFailed'))
         }else{
-          this.message.error(this.localization.text('notifications.verificationCodeFailed'), err)
+          this.message.error(this.localization.text('notifications.verificationCodeFailed'))
         }
         throw err;
       })
