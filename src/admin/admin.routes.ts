@@ -23,6 +23,7 @@ export const ADMIN_ROUTES: Routes = [
         ]
       },
       {path: 'auth-security', canActivate: [authSecurityGuard], loadComponent: () => import('./pages/auth-security/auth-security.component').then(m => m.AuthSecurityComponent)},
+      {path: 'child-keys', loadComponent: () => import('./pages/child-keys.component').then(m => m.ChildKeysComponent)},
       {path: 'library', loadComponent: () => import('./pages/library-limits.component').then(m => m.LibraryLimitsComponent)},
       {path: 'feature-access', loadComponent: () => import('./pages/feature-access/feature-access.component').then(m => m.FeatureAccessComponent)},
       {path: '', pathMatch: 'full', redirectTo: 'operations/models'},
