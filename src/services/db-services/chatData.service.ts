@@ -22,7 +22,7 @@ export class ChatDataService{
           chatInterface.content,
           chatInterface.fileList,
           chatInterface.dataId,
-          true,
+          chatInterface.finish ?? true,
           chatInterface.model
         )
       }));

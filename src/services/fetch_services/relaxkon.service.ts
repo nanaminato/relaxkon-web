@@ -1,4 +1,4 @@
-import {chatRole, type ChatChunk, type ChatCompletionRequest} from '../../contracts/chat';
+import {chatRole, type ChatChunk, type ChatCompletionRequest, type ChatJobReceipt} from '../../contracts/chat';
 import {throwError} from 'rxjs';
 import {ChatStreamInterrupted, readChatStream} from '../chat/chat-stream';
 import {LocalizationService} from '../normal-services/localization.service';
@@ -30,7 +30,7 @@ export class RelaxKonService {
       this.config = config;
     });
   }
-  fetchChat(mp: ChatPacket, model?: string, generationId?: string): Observable<ChatChunk> {
+  fetchChat(mp: ChatPacket, model?: string, generationId?: string, assistantMessageId?: number): Observable<ChatChunk> {
     const messages: (Message | VisionMessage)[] = mp.messages;
     let config = this.config!;
     let url = this.baseUrl + "/chat";
@@ -40,6 +40,7 @@ export class RelaxKonService {
       messages: messages.map(message => ({role: chatRole(message.role), content: message.content})),
       model: modelValue,
       ...(mp.conversationId ? {conversationId: mp.conversationId} : {}),
+      ...(assistantMessageId ? {assistantMessageId} : {}),
       vision: config?.model.vision,
       stream: true
     };
@@ -101,6 +102,14 @@ export class RelaxKonService {
       void run().catch(error => { if (!abort.signal.aborted) observer.error(error); });
       return () => abort.abort();
     });
+  }
+
+  async generationsForHistory(historyId: number): Promise<ChatJobReceipt[]> {
+    const url = this.baseUrl + '/chat/jobs?historyId=' + historyId;
+    const response = await this.generationRequest(url, 'GET', this.authService.user?.id, AbortSignal.timeout(10_000));
+    if (!response.ok) throw await this.generationError(response);
+    const result: unknown = await response.json();
+    return Array.isArray(result) ? result : [];
   }
 
   async stopGeneration(id: string): Promise<void> {

@@ -534,6 +534,7 @@
       "featureLimitExceeded": "已达到聊天请求次数或并发上限，请稍后重试。",
       "featureAccessUnavailable": "暂时无法检查聊天权限，请稍后重试。",
       "accessDenied": "当前账号无权使用聊天功能，请联系管理员检查权限。",
+      "generationInterrupted": "生成已中断，已保留此前生成的内容。",
       "responseInterrupted": "发生其他错误（请求中断或服务不可用）",
       "responseStopped": "响应已终止",
       "supportsVision": "支持视觉",

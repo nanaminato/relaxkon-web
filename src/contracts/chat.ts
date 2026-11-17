@@ -9,7 +9,8 @@ export type ChatRole = 'system' | 'developer' | 'user' | 'assistant';
 export type ChatContentPart = {type: 'text'; text: string} | {type: 'image_url'; image_url: {url: string}}
   | {type: 'attachment'; attachment: ChatAttachment};
 export interface ChatMessageRequest { role: ChatRole; content: string | ChatContentPart[]; }
-export interface ChatCompletionRequest { model: string; messages: ChatMessageRequest[]; stream?: boolean; vision?: boolean; conversationId?: string; }
+export interface ChatCompletionRequest { model: string; messages: ChatMessageRequest[]; stream?: boolean; vision?: boolean; conversationId?: string; assistantMessageId?: number; }
+export interface ChatJobReceipt { id: string; messageId: number; model: string | null; }
 export interface ChatModelResponse { modelName: string | null; modelValue: string | null; vision: boolean; }
 export type ChatStreamEventResponse = {type: 'delta'; text: string; code?: null}
   | {type: 'attachment'; attachment: ChatAttachment; text?: null; code?: null}

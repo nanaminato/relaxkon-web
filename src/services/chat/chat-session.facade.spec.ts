@@ -7,8 +7,41 @@ import {AuthService, SendManagerService} from '../../auth_module';
 import {LocalizationService} from '../normal-services/localization.service';
 import {ChatSessionFacade} from './chat-session.facade';
 import {ErrorType} from '../../errors';
+import {RelaxKonService} from '../fetch_services/relaxkon.service';
 
 describe('Chat session ownership', () => {
+  it('restores a missing assistant reply from the conversation receipt and retains interrupted text', async () => {
+    const id = crypto.randomUUID();
+    const response = new Subject<string>();
+    const save = jasmine.createSpy('save').and.resolveTo();
+    const transport = {
+      generationsForHistory: jasmine.createSpy().and.resolveTo([{id, messageId: 42, model: 'test'}]),
+      followGeneration: jasmine.createSpy().and.returnValue(response)
+    };
+    TestBed.configureTestingModule({providers: [ChatSessionFacade,
+      {provide: AuthService, useValue: {user: {id: 3}, accountId$: of(3)}},
+      {provide: ChatDataService, useValue: {putHistory: () => Promise.resolve()}},
+      {provide: SendManagerService, useValue: {updateMessage: save}},
+      {provide: LocalizationService, useValue: {text: (key: string) => key}},
+      {provide: NzMessageService, useValue: {error: () => undefined}},
+      {provide: RelaxKonService, useValue: transport}
+    ]});
+    const facade = TestBed.inject(ChatSessionFacade);
+    const history = new ChatHistoryModel('existing', undefined, 41, 3);
+    const updates = await facade.recover(history, () => true);
+    expect(updates).toBeDefined();
+    const completed = lastValueFrom(updates!);
+    response.next('saved text');
+    response.error({type: ErrorType.Other, code: 'chat_generation_interrupted'});
+    await completed;
+    const [message] = history.chatList!.chatModel!;
+    expect(message.dataId).toBe(42);
+    expect(message.content).toBe('saved text\n\nchat.composer.generationInterrupted');
+    expect(save).toHaveBeenCalledOnceWith(41, jasmine.objectContaining({dataId: 42}));
+    expect(await facade.recover(history, () => true)).toBeUndefined();
+    expect(transport.followGeneration).toHaveBeenCalledOnceWith(id);
+  });
+
   it('continues saving the original reply when its page view detaches', async () => {
     const local = jasmine.createSpy('save').and.resolveTo();
     const remote = jasmine.createSpy('update').and.resolveTo();

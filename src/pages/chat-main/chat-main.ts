@@ -203,15 +203,26 @@ export class ChatMainComponent implements OnDestroy{
     const history = this.chatHistoryModel!;
     history.userId ??= this.auth.user?.id;
     const generationId = crypto.randomUUID();
-    const source = this.modelFetchService.getFetchResponse(packet, selectedModel, generationId);
+    const source = this.modelFetchService.getFetchResponse(packet, selectedModel, generationId, message.dataId);
     this.observeResponse(this.session.start(source, history, message, generationId));
   }
 
-  private observeResponse(updates: Observable<void>): void {
+  private observeResponse(updates: Observable<void>, onFinished?: () => void): void {
     this.answering = true;
     this.responseSubscription = updates.subscribe({
       next: () => this.nextSubscribe(true),
-      complete: () => { this.answering = false; this.finalizeResponse(); }
+      complete: () => { this.answering = false; this.finalizeResponse(); onFinished?.(); }
+    });
+  }
+
+  private recoverResponse(history: ChatHistoryModel): void {
+    if (!history.title) return;
+    const isCurrent = () => this.chatHistoryModel === history && !this.answering;
+    void this.session.recover(history, isCurrent).then(updates => {
+      if (!updates || !isCurrent()) return;
+      this.scrollSubject = new Subject<boolean>();
+      this.scrollSubscribe();
+      this.observeResponse(updates, () => this.recoverResponse(history));
     });
   }
 
@@ -451,6 +462,8 @@ export class ChatMainComponent implements OnDestroy{
         this.scrollSubject = new Subject<boolean>();
         this.scrollSubscribe();
         this.observeResponse(updates);
+      } else {
+        this.recoverResponse(this.chatHistoryModel);
       }
       this.jumpToLatest();
       this.chatContext = chatHistory

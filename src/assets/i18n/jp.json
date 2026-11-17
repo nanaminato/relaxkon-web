@@ -534,6 +534,7 @@
       "featureLimitExceeded": "チャットのリクエスト数または同時実行数の上限に達しました。しばらくしてから再試行してください。",
       "featureAccessUnavailable": "チャットの権限を確認できません。しばらくしてから再試行してください。",
       "accessDenied": "このアカウントにはチャットの利用権限がありません。管理者に確認してください。",
+      "generationInterrupted": "生成が中断されました。それまでの出力は保存されています。",
       "responseInterrupted": "別のエラーが発生しました（リクエストの中断またはサービス停止）",
       "responseStopped": "応答を停止しました",
       "supportsVision": "画像認識対応",

@@ -534,6 +534,7 @@
       "featureLimitExceeded": "The chat request or concurrency limit has been reached. Please try again later.",
       "featureAccessUnavailable": "Chat permissions cannot be checked right now. Please try again later.",
       "accessDenied": "Your account does not have access to chat. Ask an administrator to check your permissions.",
+      "generationInterrupted": "Generation was interrupted. Any earlier output has been saved.",
       "responseInterrupted": "Another error occurred (request interrupted or service unavailable)",
       "responseStopped": "Response stopped",
       "supportsVision": "supports vision",

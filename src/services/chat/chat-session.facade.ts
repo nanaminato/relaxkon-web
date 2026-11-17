@@ -63,6 +63,25 @@ export class ChatSessionFacade {
     return draft;
   }
 
+  async recover(history: ChatHistoryModel, isCurrent: () => boolean): Promise<Observable<void> | undefined> {
+    const account = this.auth.user?.id;
+    if (account == null || history.userId !== account || history.dataId == null || this.watch(history)) return;
+    const transport = this.injector.get(RelaxKonService);
+    const receipts = await transport.generationsForHistory(history.dataId).catch(() => []);
+    if (!isCurrent() || this.auth.user?.id !== account || this.watch(history)) return;
+    const messages = history.chatList!.chatModel!;
+    const receipt = receipts.find(job => !messages.some(message => message.dataId === job.messageId &&
+      (message.role !== 'assistant' || message.finish)));
+    if (!receipt) return;
+    const existing = messages.find(message => message.dataId === receipt.messageId);
+    const answer = existing ?? new ChatModel('assistant', '', undefined, receipt.messageId, false, receipt.model ?? undefined);
+    if (!existing) {
+      const index = messages.findIndex(message => message.dataId! > receipt.messageId);
+      messages.splice(index < 0 ? messages.length : index, 0, answer);
+    }
+    return this.launch(transport.followGeneration(receipt.id), history, answer, receipt.id, false);
+  }
+
   watch(history: ChatHistoryModel): Observable<void> | undefined {
     return this.running.get(this.storageKey(history.dataId, history.userId))?.updates;
   }
@@ -98,9 +117,10 @@ export class ChatSessionFacade {
     if (existing) return existing.updates;
     const job: RunningResponse = {history, updates: new ReplaySubject<void>(1), id};
     this.running.set(key, job);
+    let removed = false;
     const finish = async () => {
       if (this.running.get(key) !== job) return;
-      const saved = await this.save(history, message);
+      const saved = removed || await this.save(history, message);
       if (this.running.get(key) !== job) return;
       if (saved && this.readPending(key)?.id === id) this.clearPending(key);
       this.running.delete(key);
@@ -117,7 +137,7 @@ export class ChatSessionFacade {
       if (this.running.get(key) !== job) return;
       job.subscription = this.response(source, history, message, false).pipe(finalize(() => { void finish(); })).subscribe({
         next: () => job.updates.next(),
-        error: () => undefined
+        error: (error: ResponseError) => { removed = error.code === 'chat_job_missing'; }
       });
     };
     job.ready = begin();
@@ -177,6 +197,7 @@ export class ChatSessionFacade {
             chat_attachment_size: 'attachmentSize',
             chat_attachment_rejected: 'attachmentRejected',
             chat_output_size: 'outputAttachmentSize',
+            chat_generation_interrupted: 'generationInterrupted',
           };
           const key = (error?.code && attachmentErrors[error.code]) || (error?.code === 'account_changed'  ? 'accountChanged'
             : limited && error?.retryAfterSeconds != null ? 'rateLimitedRetryAfter'
@@ -186,6 +207,7 @@ export class ChatSessionFacade {
             : error?.status === 403 ? 'accessDenied'
             : error?.type === ErrorType.NotAuthorize ? 'authorizationRequired'
             : limited ? 'rateLimited' : 'responseInterrupted');
+          if (message.content) message.content += '\n\n';
           message.content += this.locale.text(`chat.composer.${key}`, {seconds: error?.retryAfterSeconds});
         }
       }),
