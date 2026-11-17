@@ -2,7 +2,6 @@ import {SUCCESS_TOAST_DURATION} from '../../shared/toast-duration';
 import {LibraryPicker} from './library-picker/library-picker';
 import {ShareDialog} from './share-dialog/share-dialog';
 import {createShareSnapshot, ShareMessage} from './share-dialog/share-snapshot';
-import {ChatChunk} from '../../contracts/chat';
 import {ChatSessionFacade} from '../../services/chat/chat-session.facade';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {LanguageSwitcher} from '../../shared/language-switcher';
@@ -78,8 +77,7 @@ import {historyTitleActions} from "../../systems/store/history-title/history-tit
     NzImageModule,
     NzSkeletonModule,
     TranslateModule,
-  ],
-  providers: [ChatSessionFacade]
+  ]
 })
 export class ChatMainComponent implements OnDestroy{
   libraryPickerVisible = false;
@@ -182,9 +180,7 @@ export class ChatMainComponent implements OnDestroy{
       if (this.inputText === prompt) this.inputText = '';
       this.removeAttachments(uploads);
       this.chatFileList = [];
-      this.animalModel = assistant;
-      this.responseSubscription = this.subscriptionResponse(
-        this.modelFetchService.getFetchResponse(packet, selectedModel), assistant);
+      this.startResponse(packet, selectedModel, assistant);
     } catch {
       if (version !== this.draftVersion) return;
       this.answering = false;
@@ -203,28 +199,28 @@ export class ChatMainComponent implements OnDestroy{
     }
     void this.session.saveUser(history, model);
   }
-  subscriptionResponse(subject: Observable<ChatChunk>, model: ChatModel): Subscription{
+  private startResponse(packet: ChatPacket, selectedModel: string | undefined, message: ChatModel): void {
     const history = this.chatHistoryModel!;
-    return this.session.response(subject, history, model).subscribe({
+    history.userId ??= this.auth.user?.id;
+    const generationId = crypto.randomUUID();
+    const source = this.modelFetchService.getFetchResponse(packet, selectedModel, generationId);
+    this.observeResponse(this.session.start(source, history, message, generationId));
+  }
+
+  private observeResponse(updates: Observable<void>): void {
+    this.answering = true;
+    this.responseSubscription = updates.subscribe({
       next: () => this.nextSubscribe(true),
-      error: () => { this.answering = false; this.finalizeResponse(); },
       complete: () => { this.answering = false; this.finalizeResponse(); }
     });
   }
 
-  // 一个相应的生命周期的结束，清空 文件列表，结束滚动订阅
-  //
-  finalizeResponse() {
+  finalizeResponse(): void {
     this.scrollSubject?.complete();
-    for (const subscription of this.responseHolder) subscription.unsubscribe();
-    this.responseHolder = [];
-    if (this.responseSubscription&&!this.responseSubscription.closed) {
-      if(this.animalModel){
-        this.animalModel.finish = true;
-      }
-      this.responseSubscription.unsubscribe();
-    }
+    this.responseSubscription?.unsubscribe();
+    this.responseSubscription = undefined;
   }
+
   syncHistorySession(){
     void this.chatDataService.putHistory(this.chatHistoryModel!).catch(() =>
       this.notification.error(this.localization.text('admin.management.saveFailed'), ''));
@@ -249,14 +245,6 @@ export class ChatMainComponent implements OnDestroy{
     if (this.scrollTimer) clearTimeout(this.scrollTimer);
     this.draftVersion++;
     this.finalizeResponse();
-    if (this.responseSubscription) {
-      this.responseSubscription.unsubscribe();
-    }
-    for(let subscription of this.responseHolder){
-      if(subscription&&!subscription.closed){
-        subscription.unsubscribe();
-      }
-    }
   }
 
   async typeControlGPT() {
@@ -279,8 +267,14 @@ export class ChatMainComponent implements OnDestroy{
   async buttonControlGPT() {
     if (this.answering) {
       this.draftVersion++;
-      this.answering = false;
-      this.finalizeResponse();
+      const history = this.chatHistoryModel;
+      if (history && this.responseSubscription) {
+        try { await this.session.stop(history); }
+        catch { this.notification.error(this.localization.text('chat.composer.responseInterrupted'), ''); }
+      } else {
+        this.answering = false;
+        this.finalizeResponse();
+      }
     } else {
       this.askGPT();
     }
@@ -293,7 +287,6 @@ export class ChatMainComponent implements OnDestroy{
   }
 
   inputText: string = '';
-  animalModel: ChatModel | undefined;
   scrollSubject: Subject<boolean> | undefined;
   chatFileList: FileAdds[] = [];
   private _chatHistoryModel: ChatHistoryModel | undefined;
@@ -314,7 +307,6 @@ export class ChatMainComponent implements OnDestroy{
   answering: boolean = false;
   notifyChatHistoryIdentifier: boolean = false;
   responseSubscription: Subscription | undefined;
-  responseHolder: Subscription[] = [];
   chatContext: ChatContext;
 
   findLatestTrueRequest(lastId: number): ChatModel | undefined{
@@ -383,12 +375,10 @@ export class ChatMainComponent implements OnDestroy{
     generateModel!.markAsChanged = true;
 
     try {
-      const response = this.modelFetchService.getFetchResponse(fetchParam, generateModel!.model);
-      this.animalModel = generateModel;
       this.followOutput = true;
       this.scrollSubject = new Subject<boolean>();
       this.scrollSubscribe();
-      this.responseSubscription = this.subscriptionResponse(response, generateModel!);
+      this.startResponse(fetchParam, generateModel!.model, generateModel!);
     } catch {
       generateModel!.finish = true;
       this.answering = false;
@@ -438,7 +428,6 @@ export class ChatMainComponent implements OnDestroy{
       this.inputText = '';
       this.draggingFiles = false;
       this.dragDepth = 0;
-      this.animalModel = undefined;
       if (this.isVisible) this.handleCancel();
       this.chatHistoryModel = undefined;
       this.chatContext = {pointer: undefined};
@@ -456,9 +445,13 @@ export class ChatMainComponent implements OnDestroy{
       this.answering = false;
       this.finalizeResponse();
       if (this.isVisible) this.handleCancel();
-      for (const subscription of this.responseHolder) subscription.unsubscribe();
-      this.responseHolder = [];
       this.chatHistoryModel = this.session.draft(chatHistory);
+      const updates = this.session.watch(this.chatHistoryModel);
+      if (updates) {
+        this.scrollSubject = new Subject<boolean>();
+        this.scrollSubscribe();
+        this.observeResponse(updates);
+      }
       this.jumpToLatest();
       this.chatContext = chatHistory
         ? this.contextMemoryService.getValue(chatHistory.dataId!, chatHistory.userId) || defaultContext

@@ -1,5 +1,6 @@
 {
   "childKeys": {
+    "issuedKeys": "已签发的子 Key",
     "title": "子 API Key",
     "description": "每把子 Key 绑定一个上游，使用签发人账户的聊天配额。",
     "error": "操作失败，请重试。",

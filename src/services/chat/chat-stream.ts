@@ -2,10 +2,13 @@ import {ErrorType, ResponseError} from '../../errors';
 import {ChatChunk, isChatStreamEvent} from '../../contracts/chat';
 const MAX_EVENT_LENGTH = 14 * 1024 * 1024;
 
-export async function* readChatStream(body: ReadableStream<Uint8Array>): AsyncGenerator<ChatChunk> {
+export class ChatStreamInterrupted extends Error {}
+
+export async function readChatStream(body: ReadableStream<Uint8Array>, onChunk: (chunk: ChatChunk) => void): Promise<void> {
   const reader = body.getReader();
   const decoder = new TextDecoder();
   let pending = '';
+  let completed = false;
   try {
     while (true) {
       const {value, done} = await reader.read();
@@ -20,15 +23,19 @@ export async function* readChatStream(body: ReadableStream<Uint8Array>): AsyncGe
         if (data.length > MAX_EVENT_LENGTH) throw new Error('Chat event exceeds size limit');
         const event: unknown = JSON.parse(data);
         if (!isChatStreamEvent(event)) throw new Error('Invalid chat event');
-        if (event.type === 'completed') return;
+        if (event.type === 'completed') {
+          completed = true;
+          break;
+        }
         if (event.type === 'error') throw {type: ErrorType.Other, code: event.code} satisfies ResponseError;
-        yield event.type === 'attachment' ? {attachment: event.attachment} : event.text;
+        onChunk(event.type === 'attachment' ? {attachment: event.attachment} : event.text);
       }
+      if (completed) break;
       if (pending.length > MAX_EVENT_LENGTH) throw new Error('Chat event exceeds size limit');
-      if (done) throw new Error('Chat stream ended before completion');
+      if (done) throw new ChatStreamInterrupted('Chat stream ended before completion');
     }
   } finally {
-    await reader.cancel().catch(() => undefined);
+    void reader.cancel().catch(() => undefined);
     reader.releaseLock();
   }
 }

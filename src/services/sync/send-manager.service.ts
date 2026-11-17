@@ -26,7 +26,7 @@ export class SendManagerService {
     await this.sync.enqueueBatch([
       {kind: 'history', action: 'upsert', entityId: String(historyId), payload: {dataId: historyId, title: history.title}},
       {kind: 'message', action: 'upsert', entityId: String(message.dataId), historyId, payload: message}
-    ]);
+    ], owner);
     return this.i18n.instant('admin.management.syncQueued');
   }
   updateMessage(historyId: number, message: ChatInterface) { return this.sendMessage(historyId, message); }

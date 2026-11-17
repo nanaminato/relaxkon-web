@@ -11,9 +11,9 @@ export class ModelFetchService{
   relaxKonService: RelaxKonService = inject(RelaxKonService);
   public getFetchResponse(
                           param:  ChatPacket,
-                          model?: string){
+                          model?: string, generationId?: string){
     let subject: Observable<ChatChunk>;
-    subject = this.relaxKonService.fetchChat(param as ChatPacket,model);
+    subject = this.relaxKonService.fetchChat(param as ChatPacket, model, generationId);
     return subject!;
   }
 }

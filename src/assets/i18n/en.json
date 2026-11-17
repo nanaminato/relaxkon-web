@@ -1,5 +1,6 @@
 {
   "childKeys": {
+    "issuedKeys": "Issued child keys",
     "title": "Child API keys",
     "description": "Each key routes to one upstream and shares the issuing account’s chat quota.",
     "error": "The request failed. Try again.",

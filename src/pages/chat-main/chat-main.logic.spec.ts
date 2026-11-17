@@ -67,7 +67,7 @@ describe('Chat interaction lifecycle', () => {
       {provide: Store, useValue: {select: () => selections++ === 0 ? of({model: {modelValue: 'one'}, chatConfiguration: {models: []}}) : history, dispatch: () => undefined}},
       {provide: Renderer2, useValue: {setProperty: () => undefined}},
       {provide: LocalizationService, useValue: {text: (key: string) => key}},
-      {provide: ChatSessionFacade, useValue: {saveUser: async () => undefined, response: (source: any) => source}},
+      {provide: ChatSessionFacade, useValue: {saveUser: async () => undefined, start: (source: any) => source, stop: async () => stream.complete()}},
       {provide: ChatDataService, useValue: {putHistory: async () => undefined}},
       {provide: SendManagerService, useValue: {updateMessage: async () => undefined}},
       {provide: AuthService, useValue: {user: {id: 3}, accountId$: accountIds}},

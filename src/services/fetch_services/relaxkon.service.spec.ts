@@ -9,6 +9,30 @@ import {ChatHistoryModel, ChatPacket} from '../../models';
 import {ErrorType} from '../../errors';
 
 describe('Multilingual chat streaming', () => {
+  it('reconnects at the next frame after a truncated stream without repeating the generation POST', async () => {
+    TestBed.configureTestingModule({providers: [
+      {provide: Store, useValue: {select: () => of(null)}},
+      {provide: ServiceProvider, useValue: {apiUrl: '/'}},
+      {provide: AuthService, useValue: {token: 'test', user: {id: 7}}},
+      {provide: LocalizationService, useValue: {requestLanguage: 'zh'}}
+    ]});
+    const headers = {'Content-Type': 'text/event-stream'};
+    const fetch = spyOn(window, 'fetch').and.returnValues(
+      Promise.resolve(new Response(null, {status: 202})),
+      Promise.resolve(new Response('data: {"type":"delta","text":"first"}\n\n', {headers})),
+      Promise.resolve(new Response('data: {"type":"delta","text":"second"}\n\ndata: {"type":"completed"}\n\n', {headers}))
+    );
+    const job = crypto.randomUUID();
+    const result = await firstValueFrom(TestBed.inject(RelaxKonService).followGeneration(job,
+      {model: 'test', messages: [{role: 'user', content: 'hello'}]}).pipe(toArray()));
+    expect(result).toEqual(['first', 'second']);
+    expect(fetch.calls.allArgs().map(([url, request]) => [url, request?.method])).toEqual([
+      ['/api/ai/chat/jobs/' + job, 'POST'],
+      ['/api/ai/chat/jobs/' + job + '?offset=0', 'GET'],
+      ['/api/ai/chat/jobs/' + job + '?offset=1', 'GET']
+    ]);
+  });
+
   it('keeps the persisted conversation identifier across turns and model changes', () => {
     TestBed.configureTestingModule({providers: [
       {provide: Store, useValue: {select: () => of(null)}},

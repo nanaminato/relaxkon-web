@@ -9,7 +9,7 @@ describe('Chat event protocol', () => {
       controller.close();
     }});
     const result: ChatChunk[] = [];
-    for await (const text of readChatStream(body)) result.push(text);
+    await readChatStream(body, chunk => result.push(chunk));
     return result;
   }
   it('preserves split UTF-8 and multiline text until an explicit completion', async () => {

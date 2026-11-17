@@ -1,3 +1,4 @@
+import {ChatSessionFacade} from '../../../services/chat/chat-session.facade';
 import {inject, Injectable} from "@angular/core";
 import {AuthService, RequestManagerService} from "../../../auth_module";
 import {Store} from "@ngrx/store";
@@ -15,6 +16,7 @@ export class ChatHistoryEffects {
   private chatDataService = inject(ChatDataService);
   private requestManagerService = inject(RequestManagerService);
   private auth = inject(AuthService);
+  private readonly sessions = inject(ChatSessionFacade);
   private actions$ = inject(Actions);
   private store = inject(Store);
 
@@ -99,7 +101,7 @@ export class ChatHistoryEffects {
         return this.store.select(selectChatHistory).pipe(
           take(1),
           concatMap(history => {
-            if (history.dataId !== mergedChatList.dateId) return of({type: '[Chat] Stale Save Ignored'});
+            if (history.dataId !== mergedChatList.dateId || this.sessions.watch(history)) return of({type: '[Chat] Stale Save Ignored'});
             const newHistory: ChatHistoryModel = {
               ...history,
               chatList: mergedChatList

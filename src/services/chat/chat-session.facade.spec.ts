@@ -1,18 +1,51 @@
 import {TestBed} from '@angular/core/testing';
-import {Subject, throwError} from 'rxjs';
+import {lastValueFrom, of, Subject, throwError} from 'rxjs';
 import {NzMessageService} from 'ng-zorro-antd/message';
 import {ChatHistoryModel, ChatModel} from '../../models';
 import {ChatDataService} from '../db-services';
-import {SendManagerService} from '../../auth_module';
+import {AuthService, SendManagerService} from '../../auth_module';
 import {LocalizationService} from '../normal-services/localization.service';
 import {ChatSessionFacade} from './chat-session.facade';
 import {ErrorType} from '../../errors';
 
 describe('Chat session ownership', () => {
+  it('continues saving the original reply when its page view detaches', async () => {
+    const local = jasmine.createSpy('save').and.resolveTo();
+    const remote = jasmine.createSpy('update').and.resolveTo();
+    TestBed.configureTestingModule({providers: [ChatSessionFacade,
+      {provide: AuthService, useValue: {user: {id: 3}, accountId$: of(3)}},
+      {provide: ChatDataService, useValue: {putHistory: local}},
+      {provide: SendManagerService, useValue: {updateMessage: remote}},
+      {provide: LocalizationService, useValue: {text: (key: string) => key}},
+      {provide: NzMessageService, useValue: {error: () => undefined}}
+    ]});
+    const facade = TestBed.inject(ChatSessionFacade);
+    const a = new ChatHistoryModel('first', undefined, 21, 3);
+    const b = new ChatHistoryModel('second', undefined, 22, 3);
+    const message = new ChatModel('assistant', '', undefined, 4, false);
+    a.chatList!.chatModel!.push(message);
+    const transport = new Subject<string>();
+    const updates = facade.start(transport, a, message, crypto.randomUUID());
+    const page = updates.subscribe();
+    await Promise.resolve();
+    transport.next('first');
+    page.unsubscribe();
+    expect(facade.draft(b).chatList!.chatModel).toEqual([]);
+    transport.next(' second');
+    expect(facade.draft(a).chatList!.chatModel![0].content).toBe('first second');
+    const saved = lastValueFrom(updates);
+    transport.complete();
+    await saved;
+    expect(message.finish).toBeTrue();
+    expect(remote).toHaveBeenCalledOnceWith(21, jasmine.objectContaining({content: 'first second'}));
+    expect(localStorage.getItem('relaxkon.chat-job.3.21')).toBeNull();
+  });
+
   it('keeps frozen Store snapshots separate and persists the original session on cancellation', async () => {
     const local = jasmine.createSpy('save').and.resolveTo();
     const remote = jasmine.createSpy('update').and.resolveTo();
     TestBed.configureTestingModule({providers: [ChatSessionFacade,
+      {provide: AuthService, useValue: {user: {id: 3}, accountId$: of(3)}},
       {provide: ChatDataService, useValue: {putHistory: local}},
       {provide: SendManagerService, useValue: {updateMessage: remote}},
       {provide: LocalizationService, useValue: {text: (key: string) => key}},
@@ -45,6 +78,7 @@ describe('Chat throttle messages', () => {
   beforeEach(() => {
     text = jasmine.createSpy().and.callFake((key: string) => key);
     TestBed.configureTestingModule({providers: [ChatSessionFacade,
+      {provide: AuthService, useValue: {user: {id: 3}, accountId$: of(3)}},
       {provide: ChatDataService, useValue: {putHistory: () => Promise.resolve()}},
       {provide: SendManagerService, useValue: {updateMessage: () => Promise.resolve()}},
       {provide: LocalizationService, useValue: {text}},

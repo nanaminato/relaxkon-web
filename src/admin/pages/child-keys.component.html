@@ -1,0 +1,109 @@
+<div class="key-page" [attr.aria-busy]="busy">
+  <header class="page-heading">
+    <h2>{{ 'childKeys.title' | translate }}</h2>
+    <p>{{ 'childKeys.description' | translate }}</p>
+  </header>
+
+  @if (failed) {
+    <div class="notice error" role="alert">
+      <span>{{ 'childKeys.error' | translate }}</span>
+      <button type="button" (click)="load()" [disabled]="busy">{{ 'childKeys.refresh' | translate }}</button>
+    </div>
+  }
+
+  @if (loaded) {
+    <section class="panel panel-form" [attr.aria-label]="'childKeys.create' | translate">
+      @if (suppliers.length) {
+        <form #form="ngForm" (ngSubmit)="create()">
+          <label>
+            <span>{{ 'childKeys.supplier' | translate }}</span>
+            <select name="supplier" [(ngModel)]="supplierId" required>
+              <option [ngValue]="null">{{ 'childKeys.select' | translate }}</option>
+              @for (supplier of suppliers; track supplier.id) {
+                <option [ngValue]="supplier.id">{{ supplier.provider }} #{{ supplier.id }} · {{ supplier.baseUrl }}</option>
+              }
+            </select>
+          </label>
+          <label>
+            <span>{{ 'childKeys.name' | translate }}</span>
+            <input name="name" [(ngModel)]="name" required maxlength="100" autocomplete="off">
+          </label>
+          <label>
+            <span>{{ 'childKeys.validDays' | translate }}</span>
+            <input type="number" name="days" [(ngModel)]="validDays" required min="1" max="365" step="1">
+          </label>
+          <button class="primary" type="submit" [disabled]="busy || form.invalid || !name.trim() || !validDays || validDays % 1 !== 0">
+            {{ 'childKeys.create' | translate }}
+          </button>
+        </form>
+      } @else {
+        <p class="muted">{{ 'childKeys.noSuppliers' | translate }}</p>
+      }
+    </section>
+
+    @if (issued) {
+      <section class="panel issued" aria-live="polite">
+        <p>{{ 'childKeys.oneTime' | translate }}</p>
+        <div class="issued-fields">
+          <label>
+            <span>{{ 'childKeys.secret' | translate }}</span>
+            <input readonly dir="ltr" autocomplete="off" spellcheck="false" [value]="issued.secret">
+          </label>
+          <label>
+            <span>{{ 'childKeys.baseUrl' | translate }}</span>
+            <input readonly dir="ltr" spellcheck="false" [value]="issued.baseUrl">
+          </label>
+          <button type="button" (click)="issued = null">{{ 'childKeys.done' | translate }}</button>
+        </div>
+      </section>
+    }
+
+    <section class="panel panel-list" aria-labelledby="issued-keys-heading">
+      <h3 id="issued-keys-heading">{{ 'childKeys.issuedKeys' | translate }}</h3>
+      @if (keys.length) {
+        <div class="table-scroll">
+          <table role="table" aria-labelledby="issued-keys-heading">
+            <thead role="rowgroup">
+              <tr role="row">
+                <th role="columnheader" scope="col">{{ 'childKeys.name' | translate }}</th>
+                <th role="columnheader" scope="col">{{ 'childKeys.supplier' | translate }}</th>
+                <th role="columnheader" scope="col">{{ 'childKeys.expires' | translate }}</th>
+                <th role="columnheader" scope="col">{{ 'childKeys.status' | translate }}</th>
+                <th role="columnheader" scope="col">{{ 'childKeys.actions' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody role="rowgroup">
+              @for (key of keys; track key.id) {
+                @let keyStatus = status(key);
+                <tr role="row">
+                  <td role="cell" class="key-name">
+                    <strong>{{ key.name }}</strong>
+                    <code>{{ key.prefix }}…</code>
+                  </td>
+                  <td role="cell">
+                    <span class="mobile-label" aria-hidden="true">{{ 'childKeys.supplier' | translate }}</span>
+                    #{{ key.supplierKeyId }}
+                  </td>
+                  <td role="cell" class="expiry">
+                    <span class="mobile-label" aria-hidden="true">{{ 'childKeys.expires' | translate }}</span>
+                    {{ expiry(key.expiresAt, translate.getCurrentLang()) }}
+                  </td>
+                  <td role="cell" class="key-status">
+                    <span class="status" [attr.data-status]="keyStatus">{{ ('childKeys.' + keyStatus) | translate }}</span>
+                  </td>
+                  <td role="cell" class="actions">
+                    @if (!key.revokedAt) {
+                      <button type="button" class="revoke" [disabled]="busy" (click)="revoke(key)">{{ 'childKeys.revoke' | translate }}</button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <p class="empty muted">{{ 'childKeys.empty' | translate }}</p>
+      }
+    </section>
+  }
+</div>

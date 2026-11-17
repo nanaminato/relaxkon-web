@@ -1,3 +1,4 @@
+import {ChatSessionFacade} from '../../../services/chat/chat-session.facade';
 import {TranslateService} from '@ngx-translate/core';
 import {Actions, createEffect, ofType} from "@ngrx/effects";
 import {inject, Injectable} from "@angular/core";
@@ -18,6 +19,7 @@ export class HistoryTitleEffect {
   store = inject(Store)
   historyTitleService = inject(HistoryTitleService)
   private sendService = inject(SendManagerService);
+  private readonly sessions = inject(ChatSessionFacade);
   private chatDataService: ChatDataService = inject(ChatDataService);
   authService = inject(AuthService)
   private readonly sync = inject(SyncService);
@@ -77,6 +79,7 @@ export class HistoryTitleEffect {
   private async deleteSession(dataId: number, owner?: number) {
     if (owner != null) {
       if (this.authService.user?.id !== owner) throw new Error('Account changed before deletion');
+      this.sessions.discard(dataId, owner);
       await this.sendService.deleteHistory(dataId);
     } else {
       if (this.authService.user) await this.sendService.deleteHistory(dataId);
