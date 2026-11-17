@@ -1,0 +1,85 @@
+:host {
+  display: block;
+  color: var(--app-text);
+}
+
+.accounts-page {
+  min-height: 100%;
+}
+
+.accounts-panel {
+  overflow: hidden;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.accounts-table {
+  min-width: 720px;
+}
+
+.accounts-table a {
+  color: var(--app-accent);
+  text-decoration: none;
+}
+
+.accounts-table a:hover {
+  text-decoration: underline;
+}
+
+.accounts-table .cell-title strong {
+  color: var(--app-text);
+  font-weight: 600;
+}
+
+.accounts-table .cell-title .cell-note {
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.role-chips {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.role-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--app-selection);
+  color: var(--app-accent);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.accounts-loading {
+  display: grid;
+  gap: 18px;
+  padding: 24px 20px;
+}
+
+.accounts-empty {
+  border-top: 1px solid var(--app-border);
+}
+
+.accounts-table .cell-actions .btn {
+  min-height: 32px;
+  margin: 0;
+  padding: 4px 11px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+@media (max-width: 760px) {
+  .accounts-table {
+    min-width: 0;
+  }
+
+  .accounts-loading {
+    padding: 16px;
+  }
+}

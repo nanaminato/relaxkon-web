@@ -1,5 +1,10 @@
-<section class="security-page" [attr.aria-busy]="busy">
-  <header class="page-heading"><div><h1>{{'admin.authSecurity.title' | translate}}</h1><p>{{'admin.authSecurity.description' | translate}}</p></div></header>
+<section class="admin-page security-page" [attr.aria-busy]="busy">
+  <header class="admin-page-header">
+    <div class="admin-page-heading">
+      <h1>{{'admin.authSecurity.title' | translate}}</h1>
+      <p>{{'admin.authSecurity.description' | translate}}</p>
+    </div>
+  </header>
   <div class="toolbar">
     <span role="status">{{(dirty ? 'admin.featureAccess.unsaved' : 'admin.featureAccess.upToDate') | translate}}</span>
     <div class="actions">
@@ -38,10 +43,34 @@
     @if (snapshot; as state) {
       <p class="hint">{{'admin.authSecurity.capacity' | translate: {used: state.entryCount, capacity: state.capacity} }}</p>
       <h3>{{'admin.authSecurity.restrictions' | translate}}</h3>
-      <div class="table-scroll"><table><thead><tr><th>{{'admin.authSecurity.dimension' | translate}}</th><th>{{'admin.authSecurity.key' | translate}}</th><th>{{'admin.authSecurity.count' | translate}}</th><th>{{'admin.authSecurity.retryAt' | translate}}</th><th>{{'admin.authSecurity.expiresAt' | translate}}</th><th>{{'admin.authSecurity.action' | translate}}</th></tr></thead>
-        <tbody>@for (item of state.restrictions; track item.id) {
-          <tr><td>{{item.dimension}}</td><td><code>{{item.id}}</code></td><td>{{item.count}}</td><td>{{item.retryAt ? (item.retryAt | date:'yyyy-MM-dd HH:mm:ss') : '—'}}</td><td>{{item.expiresAt | date:'yyyy-MM-dd HH:mm:ss'}}</td><td><button class="btn btn-outline-danger" [disabled]="busy || refreshing" (click)="requestClear(item)">{{'admin.authSecurity.clear' | translate}}</button></td></tr>
-        } @empty { <tr><td colspan="6">{{'admin.authSecurity.noRestrictions' | translate}}</td></tr> }</tbody></table></div>
+      <div class="table-scroll">
+        <table class="admin-data-table admin-responsive-table">
+          <thead><tr>
+            <th>{{'admin.authSecurity.dimension' | translate}}</th>
+            <th>{{'admin.authSecurity.key' | translate}}</th>
+            <th>{{'admin.authSecurity.count' | translate}}</th>
+            <th>{{'admin.authSecurity.retryAt' | translate}}</th>
+            <th>{{'admin.authSecurity.expiresAt' | translate}}</th>
+            <th class="cell-end">{{'admin.authSecurity.action' | translate}}</th>
+          </tr></thead>
+          <tbody>
+            @for (item of state.restrictions; track item.id) {
+              <tr>
+                <td class="cell-title">{{item.dimension}}</td>
+                <td [attr.data-label]="'admin.authSecurity.key' | translate"><code>{{item.id}}</code></td>
+                <td [attr.data-label]="'admin.authSecurity.count' | translate">{{item.count}}</td>
+                <td [attr.data-label]="'admin.authSecurity.retryAt' | translate">{{item.retryAt ? (item.retryAt | date:'yyyy-MM-dd HH:mm:ss') : '—'}}</td>
+                <td [attr.data-label]="'admin.authSecurity.expiresAt' | translate">{{item.expiresAt | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                <td class="cell-actions">
+                  <button class="btn btn-outline-danger" [disabled]="busy || refreshing" (click)="requestClear(item)">{{'admin.authSecurity.clear' | translate}}</button>
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="6" class="empty-row">{{'admin.authSecurity.noRestrictions' | translate}}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
       @if (confirmClear; as target) {
         <div class="confirmation" role="group" [attr.aria-label]="'admin.authSecurity.confirmClearTitle' | translate">
           <h3>{{'admin.authSecurity.confirmClearTitle' | translate}}</h3><p>{{'admin.authSecurity.confirmClear' | translate}}</p><code>{{target.id}}</code>
@@ -49,10 +78,32 @@
         </div>
       }
       <h3>{{'admin.authSecurity.events' | translate}}</h3>
-      <div class="table-scroll"><table><thead><tr><th>{{'admin.authSecurity.at' | translate}}</th><th>{{'admin.authSecurity.kind' | translate}}</th><th>{{'admin.authSecurity.ip' | translate}}</th><th>{{'admin.authSecurity.accountKey' | translate}}</th><th>{{'admin.authSecurity.retrySeconds' | translate}}</th><th>{{'admin.authSecurity.actor' | translate}}</th></tr></thead>
-        <tbody>@for (event of state.events; track $index) {
-          <tr><td>{{event.at | date:'yyyy-MM-dd HH:mm:ss'}}</td><td>{{event.kind}}</td><td>{{event.ip || '—'}}</td><td><code>{{event.accountKey || '—'}}</code></td><td>{{event.retryAfterSeconds}}</td><td>{{event.actorId ?? '—'}}</td></tr>
-        } @empty { <tr><td colspan="6">{{'admin.authSecurity.noEvents' | translate}}</td></tr> }</tbody></table></div>
+      <div class="table-scroll">
+        <table class="admin-data-table admin-responsive-table">
+          <thead><tr>
+            <th>{{'admin.authSecurity.at' | translate}}</th>
+            <th>{{'admin.authSecurity.kind' | translate}}</th>
+            <th>{{'admin.authSecurity.ip' | translate}}</th>
+            <th>{{'admin.authSecurity.accountKey' | translate}}</th>
+            <th>{{'admin.authSecurity.retrySeconds' | translate}}</th>
+            <th>{{'admin.authSecurity.actor' | translate}}</th>
+          </tr></thead>
+          <tbody>
+            @for (event of state.events; track $index) {
+              <tr>
+                <td class="cell-title">{{event.at | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                <td [attr.data-label]="'admin.authSecurity.kind' | translate">{{event.kind}}</td>
+                <td [attr.data-label]="'admin.authSecurity.ip' | translate">{{event.ip || '—'}}</td>
+                <td [attr.data-label]="'admin.authSecurity.accountKey' | translate"><code>{{event.accountKey || '—'}}</code></td>
+                <td [attr.data-label]="'admin.authSecurity.retrySeconds' | translate">{{event.retryAfterSeconds}}</td>
+                <td [attr.data-label]="'admin.authSecurity.actor' | translate">{{event.actorId ?? '—'}}</td>
+              </tr>
+            } @empty {
+              <tr><td colspan="6" class="empty-row">{{'admin.authSecurity.noEvents' | translate}}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
     }
   </section>
 </section>

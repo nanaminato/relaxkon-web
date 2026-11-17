@@ -2,7 +2,7 @@ import {SUCCESS_TOAST_DURATION} from '../../../../../shared/toast-duration';
 import {TranslateService} from '@ngx-translate/core';
 import {TranslateModule} from '@ngx-translate/core';
 import {inject, Component, EventEmitter, Input, Output} from '@angular/core';
-import {NzCardComponent} from "ng-zorro-antd/card";
+
 import {NzPopconfirmDirective, NzPopconfirmModule} from "ng-zorro-antd/popconfirm";
 import {RouterLink} from "@angular/router";
 import {NzMessageService} from "ng-zorro-antd/message";
@@ -16,7 +16,6 @@ import {ReactiveFormsModule} from "@angular/forms";
   standalone: true,
     imports: [
     TranslateModule,
-        NzCardComponent,
         NzPopconfirmModule,
         RouterLink,
         ReactiveFormsModule

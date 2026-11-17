@@ -4,6 +4,7 @@ import {finalize} from 'rxjs';
 import {TranslateService} from '@ngx-translate/core';
 import {TranslateModule} from '@ngx-translate/core';
 import {inject, Component, OnInit} from '@angular/core';
+import {FormsModule} from '@angular/forms';
 import {NzMessageService} from "ng-zorro-antd/message";
 import {NzSkeletonComponent} from "ng-zorro-antd/skeleton";
 import {ActivatedRoute, RouterLink} from "@angular/router";
@@ -18,6 +19,7 @@ import { admin_routes } from '../../../routes';
   styleUrl: './account-management.component.css',
   imports: [
     TranslateModule,
+    FormsModule,
     NzSkeletonComponent,
     RouterLink,
     NzPopconfirmDirective
@@ -27,11 +29,20 @@ import { admin_routes } from '../../../routes';
 export class AccountManagementComponent implements OnInit{
   readonly i18n = inject(TranslateService);
     accounts: Account[] | undefined;
+    search = '';
     constructor(private call: AccountCallService, private message: NzMessageService,
                 private route: ActivatedRoute) {
 
     }
     roleId:number | undefined;
+
+    get filteredAccounts(): Account[] {
+      const term = this.search.trim().toLowerCase();
+      return (this.accounts ?? []).filter(account =>
+        !term || [account.username, account.email, ...(account.userRoles ?? []).map(role => role.name)]
+          .some(value => String(value ?? '').toLowerCase().includes(term)));
+    }
+
     ngOnInit(): void {
       this.route.queryParams.subscribe(params => {
         const roleId = params['roleId'];
@@ -70,6 +81,7 @@ export class AccountManagementComponent implements OnInit{
           }
         },
         error: err => {
+          this.accounts = [];
           this.message.error(this.i18n.instant('admin.management.accountsFailed'))
         }
       });

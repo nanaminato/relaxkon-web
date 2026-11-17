@@ -1,0 +1,575 @@
+/*
+ * Shared visual language for the administration workspace.
+ *
+ * Admin pages use the semantic app theme tokens (see theme/theme.scss) so the
+ * same components work in both light and dark mode. Keep page-specific layout
+ * in the component stylesheet and reuse these primitives for headers, panels,
+ * toolbars and responsive data tables.
+ */
+
+.admin-workspace {
+  --admin-radius: 16px;
+  --admin-radius-small: 10px;
+  --admin-shadow: 0 1px 2px rgb(15 23 42 / 4%), 0 18px 48px rgb(15 23 42 / 5%);
+}
+
+/* ---------------------------------------------------------------- page shell */
+
+.admin-page {
+  display: grid;
+  gap: 20px;
+  width: 100%;
+  max-width: 1440px;
+  min-width: 0;
+  margin-inline: auto;
+}
+
+.admin-page > * {
+  min-width: 0;
+}
+
+.admin-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px 24px;
+  flex-wrap: wrap;
+}
+
+.admin-page-heading {
+  min-width: 0;
+}
+
+.admin-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  color: var(--app-accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.admin-page-heading h1,
+.admin-page-heading h2 {
+  margin: 0;
+  color: var(--app-text);
+  font-size: clamp(24px, 2.4vw, 30px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.admin-page-heading p {
+  max-width: 68ch;
+  margin: 8px 0 0;
+  color: var(--app-text-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.admin-page-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-page-actions .ant-btn,
+.admin-page-actions .btn {
+  min-height: 38px;
+  height: auto;
+  padding: 7px 14px;
+  border-radius: var(--admin-radius-small);
+  font-size: 13px;
+  font-weight: 550;
+  box-shadow: none;
+}
+
+.admin-page-actions .ant-btn-default:not(.ant-btn-dangerous) {
+  border-color: var(--app-border);
+  background: var(--app-surface);
+  color: var(--app-text);
+}
+
+.admin-page-actions .ant-btn-default:not(.ant-btn-dangerous):hover {
+  border-color: var(--app-accent);
+  color: var(--app-accent);
+  background: var(--app-hover);
+}
+
+.admin-page-actions .admin-icon-button {
+  width: 38px;
+  min-width: 38px;
+  padding-inline: 0;
+}
+
+.admin-page-actions [nz-icon],
+.admin-toolbar [nz-icon] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ------------------------------------------------------------------- panels */
+
+.admin-panel {
+  min-width: 0;
+  border: 1px solid var(--app-border);
+  border-radius: var(--admin-radius);
+  background: var(--app-surface);
+  box-shadow: var(--admin-shadow);
+  overflow: hidden;
+}
+
+.admin-panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.admin-panel-heading h2,
+.admin-panel-heading h3 {
+  margin: 0;
+  color: var(--app-text);
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.admin-panel-heading p {
+  margin: 4px 0 0;
+  color: var(--app-text-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.admin-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 18px;
+  flex-wrap: wrap;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--app-border);
+  background: var(--app-surface);
+}
+
+.admin-toolbar .admin-search {
+  width: min(360px, 100%);
+}
+
+.admin-toolbar-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--app-text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.admin-result-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.admin-result-count strong {
+  color: var(--app-text);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-panel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--app-border);
+  background: var(--app-surface);
+}
+
+.admin-empty {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  padding: 56px 24px;
+  text-align: center;
+}
+
+.admin-empty p {
+  max-width: 46ch;
+  margin: 0;
+  color: var(--app-text-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* ------------------------------------------------------------------- tables */
+
+.admin-data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  color: var(--app-text);
+  font-size: 13px;
+}
+
+.admin-data-table thead th {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--app-border);
+  background: var(--app-surface-muted);
+  color: var(--app-text-muted);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.045em;
+  text-align: start;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.admin-data-table tbody td,
+.admin-data-table tbody th {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--app-border);
+  color: var(--app-text);
+  font-weight: 400;
+  text-align: start;
+  vertical-align: middle;
+}
+
+.admin-data-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.admin-data-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.admin-data-table tbody tr:hover {
+  background: var(--app-hover);
+}
+
+.admin-data-table .cell-center {
+  text-align: center;
+}
+
+.admin-data-table .cell-end {
+  text-align: end;
+}
+
+.admin-data-table .cell-actions {
+  text-align: end;
+}
+
+.admin-data-table .cell-actions > * {
+  margin: 0;
+}
+
+.admin-data-table .table-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.admin-data-table code {
+  display: inline-block;
+  max-width: 100%;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: var(--app-surface-muted);
+  color: var(--app-text-muted);
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.admin-data-table .cell-note {
+  display: block;
+  margin-top: 4px;
+  color: var(--app-text-muted);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.admin-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--app-surface-muted);
+  color: var(--app-text-muted);
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.65;
+  white-space: nowrap;
+}
+
+.admin-pill::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.admin-pill.is-success {
+  color: #1c7c54;
+  background: color-mix(in srgb, #1fa571 14%, var(--app-surface));
+}
+
+.admin-pill.is-warning {
+  color: #8a5a18;
+  background: color-mix(in srgb, #dd9d33 16%, var(--app-surface));
+}
+
+.admin-pill.is-accent {
+  color: var(--app-accent);
+  background: var(--app-selection);
+}
+
+.admin-workspace .btn-danger-ghost {
+  border: 1px solid color-mix(in srgb, var(--app-danger-text) 42%, var(--app-border));
+  background: var(--app-surface);
+  color: var(--app-danger-text);
+}
+
+.admin-workspace .btn-danger-ghost:hover:not(:disabled) {
+  border-color: var(--app-danger-text);
+  background: var(--app-danger-surface);
+  color: var(--app-danger-text);
+}
+
+.admin-workspace .admin-link-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px 10px;
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  background: var(--app-surface);
+  color: var(--app-text);
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 1.4;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.admin-workspace .admin-link-button:hover {
+  border-color: var(--app-accent);
+  background: var(--app-hover);
+  color: var(--app-accent);
+  text-decoration: none;
+}
+
+/* ----------------------------------------------------- responsive tables */
+
+@media (max-width: 760px) {
+  .admin-page {
+    gap: 14px;
+  }
+
+  .admin-page-header {
+    align-items: flex-start;
+  }
+
+  .admin-page-heading h1,
+  .admin-page-heading h2 {
+    font-size: 23px;
+  }
+
+  .admin-page-heading p {
+    margin-top: 6px;
+    font-size: 12px;
+  }
+
+  .admin-page-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .admin-page-actions .ant-btn,
+  .admin-page-actions .btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .admin-page-actions .admin-icon-button {
+    flex: 0 0 auto;
+  }
+
+  .admin-toolbar {
+    align-items: stretch;
+    padding: 14px;
+  }
+
+  .admin-toolbar .admin-search {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+
+  .admin-toolbar-meta {
+    justify-content: space-between;
+  }
+
+  .admin-panel-footer {
+    justify-content: center;
+    padding: 12px 14px;
+  }
+
+  .admin-responsive-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .admin-responsive-table,
+  .admin-responsive-table tbody,
+  .admin-responsive-table tr,
+  .admin-responsive-table th,
+  .admin-responsive-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .admin-responsive-table tbody tr {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--app-border);
+  }
+
+  .admin-responsive-table tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  .admin-responsive-table tbody tr:hover {
+    background: transparent;
+  }
+
+  .admin-responsive-table tbody td,
+  .admin-responsive-table tbody th {
+    display: grid;
+    grid-template-columns: minmax(92px, 34%) minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    padding: 7px 0;
+    border: 0;
+    text-align: start;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-responsive-table tbody td::before,
+  .admin-responsive-table tbody th::before {
+    content: attr(data-label);
+    color: var(--app-text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1.5;
+  }
+
+  .admin-responsive-table tbody :is(th, td).cell-title {
+    display: block;
+    padding: 0 0 10px;
+    font-size: 15px;
+    font-weight: 650;
+    line-height: 1.45;
+  }
+
+  .admin-responsive-table tbody :is(th, td).cell-title::before {
+    display: none;
+  }
+
+  .admin-responsive-table tbody :is(th, td)[data-label=""] {
+    display: block;
+    padding: 7px 0;
+  }
+
+  .admin-responsive-table tbody :is(th, td)[data-label=""]::before {
+    display: none;
+  }
+
+  .admin-responsive-table tbody td.cell-actions {
+    display: flex;
+    justify-content: flex-start;
+    gap: 8px;
+    padding-top: 12px;
+  }
+
+  .admin-responsive-table tbody td.cell-actions::before {
+    display: none;
+  }
+
+  .admin-responsive-table tbody td.cell-actions .btn,
+  .admin-responsive-table tbody td.cell-actions .ant-btn {
+    margin: 0 !important;
+  }
+
+  .admin-responsive-table .cell-center,
+  .admin-responsive-table .cell-end,
+  .admin-responsive-table .cell-actions {
+    text-align: start;
+  }
+
+  .admin-responsive-table .cell-actions {
+    justify-content: flex-start;
+  }
+
+  .admin-responsive-table .cell-actions > * {
+    flex: 0 1 auto;
+  }
+
+  .admin-data-table .table-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-page-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .admin-page-actions .ant-btn,
+  .admin-page-actions .btn {
+    width: 100%;
+  }
+
+  .admin-page-actions .ant-btn .action-label {
+    display: inline;
+  }
+
+  .admin-page-actions .roles-link {
+    justify-self: end;
+  }
+
+  .admin-data-table,
+  .admin-responsive-table {
+    font-size: 12.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-data-table tbody tr {
+    transition: none;
+  }
+}

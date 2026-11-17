@@ -54,7 +54,8 @@
               "node_modules/prismjs/themes/prism-okaidia.css",
               "node_modules/katex/dist/katex.min.css",
               "src/theme/theme.scss",
-              "src/theme/workspace.scss"
+              "src/theme/workspace.scss",
+              "src/admin/admin-ui.css"
             ],
             "scripts": [
               "node_modules/prismjs/prism.js",

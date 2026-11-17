@@ -5,7 +5,6 @@ import {NzMessageService} from "ng-zorro-antd/message";
 import {Router} from "@angular/router";
 import {catchError} from "rxjs";
 import {HttpErrorResponse} from "@angular/common/http";
-import {NzCardComponent} from "ng-zorro-antd/card";
 import {AuthService, VerificationService} from "../../../../auth_module";
 import {AccountCallService} from "../../../services";
 import {admin_routes} from "../../../routes";
@@ -15,7 +14,6 @@ import {admin_routes} from "../../../routes";
   standalone: true,
   imports: [
     TranslateModule,
-    NzCardComponent,
   ],
   templateUrl: './account-info.component.html',
   styleUrl: './account-info.component.css'

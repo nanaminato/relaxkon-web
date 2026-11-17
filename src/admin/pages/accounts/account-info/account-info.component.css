@@ -1,6 +1,79 @@
-.super-b{
-  /*background: linear-gradient(to right, #b4b4b4, #eeeeee);*/
+:host {
+  display: block;
+  color: var(--app-text);
 }
-.fs-u{
-  font-size: 1.3em;
+
+.account-page {
+  min-height: 100%;
+}
+
+.account-panel {
+  padding: 22px;
+}
+
+.account-profile {
+  display: grid;
+  gap: 18px;
+  margin: 0;
+}
+
+.account-field {
+  display: grid;
+  grid-template-columns: minmax(100px, 160px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: baseline;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.account-field:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.account-field dt {
+  color: var(--app-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.account-field dd {
+  margin: 0;
+  color: var(--app-text);
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.role-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.role-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--app-selection);
+  color: var(--app-accent);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.account-empty {
+  color: var(--app-text-muted);
+}
+
+@media (max-width: 600px) {
+  .account-panel {
+    padding: 16px;
+  }
+
+  .account-field {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
 }

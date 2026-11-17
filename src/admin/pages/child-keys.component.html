@@ -20,7 +20,7 @@
             <select name="supplier" [(ngModel)]="supplierId" required>
               <option [ngValue]="null">{{ 'childKeys.select' | translate }}</option>
               @for (supplier of suppliers; track supplier.id) {
-                <option [ngValue]="supplier.id">{{ supplier.provider }} #{{ supplier.id }} · {{ supplier.baseUrl }}</option>
+                <option [ngValue]="supplier.id">{{ supplier.name }} · #{{ supplier.id }}</option>
               }
             </select>
           </label>
@@ -58,16 +58,45 @@
       </section>
     }
 
+  }
     <section class="panel panel-list" aria-labelledby="issued-keys-heading">
       <h3 id="issued-keys-heading">{{ 'childKeys.issuedKeys' | translate }}</h3>
-      @if (keys.length) {
+      <div class="list-tools">
+        <div class="key-tabs" [attr.aria-label]="'childKeys.status' | translate" role="group">
+          @for (item of tabs; track item) {
+            <button type="button" [attr.aria-pressed]="tab === item" (click)="selectTab(item)">
+              {{ ('childKeys.tab.' + item) | translate }}
+            </button>
+          }
+        </div>
+        <div class="key-filters">
+          <input type="search" maxlength="100" [ngModel]="search" (ngModelChange)="updateSearch($event)"
+                 [placeholder]="'childKeys.search' | translate" [attr.aria-label]="'childKeys.search' | translate">
+          <select [(ngModel)]="filterSupplierId" (ngModelChange)="loadPage(1)"
+                  [attr.aria-label]="'childKeys.supplier' | translate">
+            <option [ngValue]="null">{{ 'childKeys.allSuppliers' | translate }}</option>
+            @for (supplier of filterSuppliers; track supplier.id) {
+              <option [ngValue]="supplier.id">{{ supplier.name }} · #{{ supplier.id }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      @if (listLoading) {
+        <p class="empty muted" role="status">{{ 'childKeys.loading' | translate }}</p>
+      } @else if (listFailed) {
+        <div class="notice error" role="alert">
+          <span>{{ 'childKeys.error' | translate }}</span>
+          <button type="button" (click)="loadPage()">{{ 'childKeys.refresh' | translate }}</button>
+        </div>
+      } @else if (keys.length) {
         <div class="table-scroll">
           <table role="table" aria-labelledby="issued-keys-heading">
             <thead role="rowgroup">
               <tr role="row">
                 <th role="columnheader" scope="col">{{ 'childKeys.name' | translate }}</th>
                 <th role="columnheader" scope="col">{{ 'childKeys.supplier' | translate }}</th>
-                <th role="columnheader" scope="col">{{ 'childKeys.expires' | translate }}</th>
+                <th role="columnheader" scope="col">{{ (tab === 'history' ? 'childKeys.historyTime' : 'childKeys.expires') | translate }}</th>
                 <th role="columnheader" scope="col">{{ 'childKeys.status' | translate }}</th>
                 <th role="columnheader" scope="col">{{ 'childKeys.actions' | translate }}</th>
               </tr>
@@ -82,11 +111,16 @@
                   </td>
                   <td role="cell">
                     <span class="mobile-label" aria-hidden="true">{{ 'childKeys.supplier' | translate }}</span>
+                    @if (supplierName(key.supplierKeyId); as label) { {{ label }} · }
                     #{{ key.supplierKeyId }}
                   </td>
                   <td role="cell" class="expiry">
-                    <span class="mobile-label" aria-hidden="true">{{ 'childKeys.expires' | translate }}</span>
-                    {{ expiry(key.expiresAt, translate.getCurrentLang()) }}
+                    @if (tab === 'history') {
+                      <span class="date-label">{{ (key.revokedAt != null ? 'childKeys.revokedAt' : 'childKeys.expires') | translate }}</span>
+                    } @else {
+                      <span class="mobile-label" aria-hidden="true">{{ 'childKeys.expires' | translate }}</span>
+                    }
+                    {{ expiry(key.revokedAt ?? key.expiresAt, translate.getCurrentLang()) }}
                   </td>
                   <td role="cell" class="key-status">
                     <span class="status" [attr.data-status]="keyStatus">{{ ('childKeys.' + keyStatus) | translate }}</span>
@@ -101,9 +135,15 @@
             </tbody>
           </table>
         </div>
+        @if (lastPage > 1) {
+          <nav class="key-pagination" [attr.aria-label]="'childKeys.pagination' | translate">
+            <button type="button" (click)="loadPage(page - 1)" [disabled]="page <= 1">{{ 'childKeys.previous' | translate }}</button>
+            <span aria-live="polite">{{ 'childKeys.page' | translate:{page: page, last: lastPage, total: total} }}</span>
+            <button type="button" (click)="loadPage(page + 1)" [disabled]="page >= lastPage">{{ 'childKeys.next' | translate }}</button>
+          </nav>
+        }
       } @else {
-        <p class="empty muted">{{ 'childKeys.empty' | translate }}</p>
+        <p class="empty muted">{{ 'childKeys.noResults' | translate }}</p>
       }
     </section>
-  }
 </div>

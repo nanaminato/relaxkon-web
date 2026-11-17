@@ -1,8 +1,13 @@
-<section class="access-page" [attr.aria-busy]="loading || saving">
-  <header class="page-heading">
-    <div><span class="eyebrow">{{'admin.featureAccess.policyCenter' | translate}}</span>
-      <h1>{{'admin.featureAccess.title' | translate}}</h1><p>{{'admin.featureAccess.description' | translate}}</p></div>
-    <a class="roles-link" routerLink="/admin/accounts/roles">{{'admin.management.roles' | translate}} <span aria-hidden="true">↗</span></a>
+<section class="admin-page access-page" [attr.aria-busy]="loading || saving">
+  <header class="admin-page-header">
+    <div class="admin-page-heading">
+      <span class="admin-eyebrow">{{'admin.featureAccess.policyCenter' | translate}}</span>
+      <h1>{{'admin.featureAccess.title' | translate}}</h1>
+      <p>{{'admin.featureAccess.description' | translate}}</p>
+    </div>
+    <div class="admin-page-actions">
+      <a class="roles-link" routerLink="/admin/accounts/roles">{{'admin.management.roles' | translate}} <span aria-hidden="true">↗</span></a>
+    </div>
   </header>
   <div class="save-toolbar">
     <div class="save-state" role="status">@if (document) { <span class="state-dot" [class.pending]="dirty"></span>{{(dirty ? 'admin.featureAccess.unsaved' : 'admin.featureAccess.upToDate') | translate}} } @else { {{(loading ? 'admin.featureAccess.loading' : 'admin.featureAccess.loadError') | translate}} }</div>
@@ -30,18 +35,22 @@
           @if (!enabledCount(feature)) { <div class="disabled-hint">{{'admin.featureAccess.noneEnabled' | translate}}</div> }
           <fieldset [disabled]="loading || saving">
             <legend class="visually-hidden">{{('admin.featureAccess.names.' + feature.key) | translate}}</legend>
-            <div class="policy-table"><table>
-              <thead><tr><th>{{'account.roles' | translate}}</th><th>{{'admin.featureAccess.enabled' | translate}}</th><th>{{'admin.featureAccess.perMinute' | translate}}</th><th>{{'admin.featureAccess.perDay' | translate}}</th><th>{{'admin.featureAccess.concurrent' | translate}}</th></tr></thead>
-              <tbody>@for (role of roleNames; track role) {
-                <tr [class.role-disabled]="!feature.roles[role].enabled">
-                  <th scope="row"><span class="role-name">{{roleLabel(role)}}</span><code>{{role}}</code><small>{{'admin.roles.editImpact' | translate: {count: memberCount(role)} }}</small></th>
-                  <td><label class="access-switch"><input type="checkbox" [(ngModel)]="feature.roles[role].enabled" (ngModelChange)="changed()" [attr.aria-label]="role + ' ' + feature.key + ' ' + ('admin.featureAccess.enabled' | translate)"><span aria-hidden="true"></span></label></td>
-                  @for (limit of limits; track limit.key) {
-                    <td><input type="number" min="1" max="2147483647" step="1" [placeholder]="'admin.featureAccess.unlimited' | translate" [(ngModel)]="feature.roles[role][limit.key]" (ngModelChange)="changed()" [attr.aria-invalid]="!validLimit(feature.roles[role][limit.key])" [attr.aria-label]="role + ' ' + feature.key + ' ' + (limit.label | translate)"></td>
-                  }
-                </tr>
-              } @empty { <tr><td colspan="5">{{'admin.featureAccess.noRoles' | translate}}</td></tr> }</tbody>
-            </table></div>
+            <div class="policy-table">
+              <table class="admin-data-table admin-responsive-table">
+                <thead><tr><th>{{'account.roles' | translate}}</th><th>{{'admin.featureAccess.enabled' | translate}}</th><th>{{'admin.featureAccess.perMinute' | translate}}</th><th>{{'admin.featureAccess.perDay' | translate}}</th><th>{{'admin.featureAccess.concurrent' | translate}}</th></tr></thead>
+                <tbody>
+                  @for (role of roleNames; track role) {
+                    <tr [class.role-disabled]="!feature.roles[role].enabled">
+                      <th scope="row" class="cell-title"><span class="role-name">{{roleLabel(role)}}</span><code>{{role}}</code><small>{{'admin.roles.editImpact' | translate: {count: memberCount(role)} }}</small></th>
+                      <td [attr.data-label]="'admin.featureAccess.enabled' | translate"><label class="access-switch"><input type="checkbox" [(ngModel)]="feature.roles[role].enabled" (ngModelChange)="changed()" [attr.aria-label]="role + ' ' + feature.key + ' ' + ('admin.featureAccess.enabled' | translate)"><span aria-hidden="true"></span></label></td>
+                      @for (limit of limits; track limit.key) {
+                        <td [attr.data-label]="limit.label | translate"><input type="number" min="1" max="2147483647" step="1" [placeholder]="'admin.featureAccess.unlimited' | translate" [(ngModel)]="feature.roles[role][limit.key]" (ngModelChange)="changed()" [attr.aria-invalid]="!validLimit(feature.roles[role][limit.key])" [attr.aria-label]="role + ' ' + feature.key + ' ' + (limit.label | translate)"></td>
+                      }
+                    </tr>
+                  } @empty { <tr><td colspan="5" class="empty-row">{{'admin.featureAccess.noRoles' | translate}}</td></tr> }
+                </tbody>
+              </table>
+            </div>
           </fieldset>
           @if (!valid) { <p class="validation-error" role="alert">{{'admin.featureAccess.invalid' | translate}}</p> }
           <div class="editor-hint">{{'admin.featureAccess.mergeHint' | translate}}</div>
@@ -59,10 +68,22 @@
           }
         </div>
         @if (selectedCodes.length) {
-          <div class="policy-table"><table><thead><tr><th>{{'admin.roles.feature' | translate}}</th><th>{{'admin.featureAccess.enabled' | translate}}</th><th>{{'admin.featureAccess.perMinute' | translate}}</th><th>{{'admin.featureAccess.perDay' | translate}}</th><th>{{'admin.featureAccess.concurrent' | translate}}</th></tr></thead>
-            <tbody>@for (feature of document.features; track feature.key) { @let grant = effective(feature);
-              <tr><th>{{('admin.featureAccess.names.' + feature.key) | translate}}</th><td><span class="grant-badge" [class.allowed]="grant.enabled">{{(grant.enabled ? 'admin.roles.allowed' : 'admin.roles.denied') | translate}}</span></td><td>{{grant.enabled ? (grant.requestsPerMinute ?? ('admin.roles.unlimited' | translate)) : unavailable}}</td><td>{{grant.enabled ? (grant.requestsPerDay ?? ('admin.roles.unlimited' | translate)) : unavailable}}</td><td>{{grant.enabled ? (grant.maxConcurrent ?? ('admin.roles.unlimited' | translate)) : unavailable}}</td></tr>
-            }</tbody></table></div>
+          <div class="policy-table">
+            <table class="admin-data-table admin-responsive-table">
+              <thead><tr><th>{{'admin.roles.feature' | translate}}</th><th>{{'admin.featureAccess.enabled' | translate}}</th><th>{{'admin.featureAccess.perMinute' | translate}}</th><th>{{'admin.featureAccess.perDay' | translate}}</th><th>{{'admin.featureAccess.concurrent' | translate}}</th></tr></thead>
+              <tbody>
+                @for (feature of document.features; track feature.key) { @let grant = effective(feature);
+                  <tr>
+                    <th class="cell-title">{{('admin.featureAccess.names.' + feature.key) | translate}}</th>
+                    <td [attr.data-label]="'admin.featureAccess.enabled' | translate"><span class="grant-badge" [class.allowed]="grant.enabled">{{(grant.enabled ? 'admin.roles.allowed' : 'admin.roles.denied') | translate}}</span></td>
+                    <td [attr.data-label]="'admin.featureAccess.perMinute' | translate">{{grant.enabled ? (grant.requestsPerMinute ?? ('admin.roles.unlimited' | translate)) : unavailable}}</td>
+                    <td [attr.data-label]="'admin.featureAccess.perDay' | translate">{{grant.enabled ? (grant.requestsPerDay ?? ('admin.roles.unlimited' | translate)) : unavailable}}</td>
+                    <td [attr.data-label]="'admin.featureAccess.concurrent' | translate">{{grant.enabled ? (grant.maxConcurrent ?? ('admin.roles.unlimited' | translate)) : unavailable}}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         } @else { <p class="preview-empty">{{'admin.roles.previewSelect' | translate}}</p> }
         <p class="preview-note">{{'admin.roles.previewHint' | translate}}</p>
       </div>

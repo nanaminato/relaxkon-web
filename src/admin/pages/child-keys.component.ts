@@ -4,7 +4,7 @@ import {Component, DestroyRef, OnInit, inject} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {FormsModule} from '@angular/forms';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
-import {finalize, forkJoin} from 'rxjs';
+import {debounceTime, finalize, Subject, Subscription} from 'rxjs';
 import {ServiceProvider} from '../../roots';
 
 const expiryFormats = {
@@ -17,6 +17,7 @@ interface Supplier {
   id: number;
   provider: string;
   baseUrl: string;
+  name: string;
 }
 
 interface ChildKey {
@@ -27,6 +28,15 @@ interface ChildKey {
   createdAt: number;
   expiresAt: number;
   revokedAt: number | null;
+}
+
+type KeyTab = 'active' | 'attention' | 'history';
+
+interface ChildKeyPage {
+  items: ChildKey[];
+  page: number;
+  total: number;
+  suppliers: {id: number; name: string}[];
 }
 
 @Component({
@@ -44,6 +54,19 @@ export class ChildKeysComponent implements OnInit {
 
   suppliers: Supplier[] = [];
   keys: ChildKey[] = [];
+  readonly tabs: KeyTab[] = ['active', 'attention', 'history'];
+  tab: KeyTab = 'active';
+  search = '';
+  filterSupplierId: number | null = null;
+  filterSuppliers: ChildKeyPage['suppliers'] = [];
+  page = 1;
+  total = 0;
+  listLoading = true;
+  listFailed = false;
+  private pageRequest?: Subscription;
+  private readonly searchChanged = new Subject<void>();
+
+  get lastPage(): number { return Math.max(1, Math.ceil(this.total / 20)); }
   supplierId: number | null = null;
   name = '';
   validDays: number | null = 30;
@@ -52,22 +75,60 @@ export class ChildKeysComponent implements OnInit {
   failed = false;
   issued: {secret: string; baseUrl: string} | null = null;
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {
+    this.searchChanged.pipe(debounceTime(250), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.loadPage(1));
+    this.load();
+  }
 
   load(): void {
-    this.busy = true;
     this.failed = false;
-    forkJoin({
-      keys: this.http.get<ChildKey[]>(this.endpoint),
-      suppliers: this.http.get<Supplier[]>(this.endpoint + '/suppliers')
-    }).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.busy = false)).subscribe({
-      next: ({keys, suppliers}) => {
-        this.keys = keys;
+    this.http.get<Supplier[]>(this.endpoint + '/suppliers').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: suppliers => {
         this.suppliers = suppliers;
         this.loaded = true;
       },
       error: () => this.failed = true
     });
+    this.loadPage();
+  }
+
+  selectTab(tab: KeyTab): void {
+    if (this.tab === tab) return;
+    this.tab = tab;
+    this.loadPage(1);
+  }
+
+  updateSearch(search: string): void {
+    this.search = search;
+    this.searchChanged.next();
+  }
+
+  loadPage(page = this.page): void {
+    this.pageRequest?.unsubscribe();
+    this.listLoading = true;
+    this.listFailed = false;
+    const params = {
+      tab: this.tab,
+      page,
+      ...(this.search.trim() ? {search: this.search.trim()} : {}),
+      ...(this.filterSupplierId != null ? {supplierId: this.filterSupplierId} : {})
+    };
+    this.pageRequest = this.http.get<ChildKeyPage>(this.endpoint + '/page', {params})
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.listLoading = false))
+      .subscribe({
+        next: result => {
+          this.keys = result.items;
+          this.page = result.page;
+          this.total = result.total;
+          this.filterSuppliers = result.suppliers;
+        },
+        error: () => this.listFailed = true
+      });
+  }
+
+  supplierName(id: number): string | undefined {
+    return this.filterSuppliers.find(supplier => supplier.id === id)?.name;
   }
 
   create(): void {
@@ -84,7 +145,7 @@ export class ChildKeysComponent implements OnInit {
     }).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.busy = false)).subscribe({
       next: result => {
         this.issued = {secret: result.secret, baseUrl};
-        this.keys = [result.key, ...this.keys];
+        this.loadPage();
         this.name = '';
       },
       error: () => this.failed = true
@@ -98,7 +159,7 @@ export class ChildKeysComponent implements OnInit {
     this.issued = null;
     this.http.delete<void>(this.endpoint + '/' + key.id)
       .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.busy = false)).subscribe({
-        next: () => key.revokedAt = Math.floor(Date.now() / 1000),
+        next: () => this.loadPage(),
         error: () => this.failed = true
       });
   }
@@ -109,9 +170,7 @@ export class ChildKeysComponent implements OnInit {
   }
 
   status(key: ChildKey): 'revoked' | 'expired' | 'unavailable' | 'active' {
-    if (key.revokedAt) return 'revoked';
-    if (key.expiresAt * 1000 <= Date.now()) return 'expired';
-    if (!this.suppliers.some(item => item.id === key.supplierKeyId)) return 'unavailable';
-    return 'active';
+    if (this.tab === 'history') return key.revokedAt == null ? 'expired' : 'revoked';
+    return this.tab === 'attention' ? 'unavailable' : 'active';
   }
 }

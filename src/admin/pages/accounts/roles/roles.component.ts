@@ -7,6 +7,7 @@ import {RouterLink} from '@angular/router';
 import {NzMessageService} from 'ng-zorro-antd/message';
 import {NzModalModule} from 'ng-zorro-antd/modal';
 import {NzPopconfirmDirective} from 'ng-zorro-antd/popconfirm';
+import {NzSkeletonModule} from 'ng-zorro-antd/skeleton';
 import {finalize} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {NewRoleComponent} from './new-role/new-role.component';
@@ -15,7 +16,7 @@ import {Role} from '../../../models/accounts';
 import {AccountCallService} from '../../../services';
 @Component({
   selector: 'app-roles', standalone: true,
-  imports: [TranslateModule, FormsModule, RouterLink, NewRoleComponent, EditRoleComponent, NzModalModule, NzPopconfirmDirective],
+  imports: [TranslateModule, FormsModule, RouterLink, NewRoleComponent, EditRoleComponent, NzModalModule, NzPopconfirmDirective, NzSkeletonModule],
   templateUrl: './roles.component.html', styleUrl: './roles.component.css'
 })
 export class RolesComponent implements OnInit {

@@ -1,23 +1,36 @@
-<nz-card class="super-b overflow-y-scroll h-100 w-100">
+<section class="admin-page account-page">
+  <header class="admin-page-header">
+    <div class="admin-page-heading">
+      <h1>{{'admin.management.accountInfo' | translate}}</h1>
+      <p>{{'admin.management.admin' | translate}}</p>
+    </div>
+    <div class="admin-page-actions">
+      <button class="btn btn-secondary" type="button" (click)="logout()">{{'admin.management.logout' | translate}}</button>
+    </div>
+  </header>
 
-  <div class="d-flex flex-row-reverse">
-    <button class="btn btn-primary"
-            (click)="logout()">
-      {{'admin.management.logout' | translate}}
-    </button>
+  <div class="admin-panel account-panel">
+    <dl class="account-profile">
+      <div class="account-field">
+        <dt>{{'admin.management.username' | translate}}</dt>
+        <dd>{{user?.name || '—'}}</dd>
+      </div>
+      <div class="account-field">
+        <dt>{{'admin.management.nickname' | translate}}</dt>
+        <dd>{{user?.nickname ?? ('admin.management.none' | translate)}}</dd>
+      </div>
+      <div class="account-field account-roles">
+        <dt>{{'admin.management.roles' | translate}}</dt>
+        <dd>
+          <div class="role-chips">
+            @for (role of user?.roles ?? []; track role.roleId) {
+              <span class="role-chip">{{role.name}}</span>
+            } @empty {
+              <span class="account-empty">—</span>
+            }
+          </div>
+        </dd>
+      </div>
+    </dl>
   </div>
-  <div class="m-1 fs-u">
-    {{'admin.management.username' | translate}}:  {{user?.name}}
-  </div>
-  <div class="m-1 fs-u">
-    {{'admin.management.nickname' | translate}}:  {{user?.nickname ?? ('admin.management.none' | translate)}}
-  </div>
-  <div class="m-1 fs-u">
-    {{'admin.management.roles' | translate}}:
-    @if(user!==undefined){
-      @for(role of user!.roles;track role.roleId){
-        {{role.name}}
-      }
-    }
-  </div>
-</nz-card>
+</section>
